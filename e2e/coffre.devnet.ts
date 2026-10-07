@@ -1,11 +1,10 @@
 import fs from "node:fs";
 import { expect, it } from "vitest";
-import { hmac } from "@noble/hashes/hmac.js";
-import { sha512 } from "@noble/hashes/sha2.js";
-import { generateMnemonic, mnemonicToSeedSync } from "@scure/bip39";
+import { generateMnemonic } from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
 import * as multisig from "@sqds/multisig";
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
+import { phantomKeypair } from "./hd";
 
 /**
  * Coffre multi-signature de la trésorerie (Squads v4) + nouvelle config DBC dont les frais vont au coffre.
@@ -14,17 +13,7 @@ import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from "@sola
  */
 const run = process.env.RUN_COFFRE === "1";
 
-/** Dérivation SLIP-0010 ed25519, chemin Phantom m/44'/501'/0'/0' (la phrase s'importe telle quelle dans Phantom). */
-function phantomKeypair(mnemonic: string): Keypair {
-  let I = hmac(sha512, new TextEncoder().encode("ed25519 seed"), mnemonicToSeedSync(mnemonic));
-  for (const index of [44, 501, 0, 0]) {
-    const data = new Uint8Array(37);
-    data.set(I.slice(0, 32), 1);
-    new DataView(data.buffer).setUint32(33, (index | 0x80000000) >>> 0);
-    I = hmac(sha512, I.slice(32), data);
-  }
-  return Keypair.fromSeed(I.slice(0, 32));
-}
+
 
 it.skipIf(!run)("crée le coffre 2 sur 3 et la config dont les frais vont au coffre", { timeout: 5 * 60_000 }, async () => {
   const { buildCreateConfigTx } = await import("@/lib/solana/dbc");

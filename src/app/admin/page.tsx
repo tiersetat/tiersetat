@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { DbcConfigPanel } from "@/components/admin/DbcConfigPanel";
 import { ModerationPanel, type HiddenToken, type ReportGroup } from "@/components/admin/ModerationPanel";
 import { RevenuePanel, type RevenueToken } from "@/components/admin/RevenuePanel";
+import { VaultPanel, type VaultToken } from "@/components/admin/VaultPanel";
+import { DBC_CONFIG } from "@/lib/solana/config";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { MissingEnvError } from "@/lib/env";
 import { requireAdmin, type Profile } from "@/lib/auth/session";
@@ -50,7 +52,7 @@ export default async function AdminPage() {
       .limit(500),
     db.from("tokens").select("mint, name, ticker, hidden_reason, hidden_at").eq("hidden", true).order("hidden_at", { ascending: false }).limit(200),
     db.from("blocked_words").select("word").order("word"),
-    db.from("tokens").select("mint, name, ticker, pool").order("created_at", { ascending: false }).limit(200),
+    db.from("tokens").select("mint, name, ticker, pool, config").order("created_at", { ascending: false }).limit(200),
   ]);
 
   // Regroupe les signalements par token
@@ -86,7 +88,8 @@ export default async function AdminPage() {
               Télécharger la liste (CSV)
             </a>
           </section>
-          <RevenuePanel tokens={(allTokens ?? []) as RevenueToken[]} />
+          <VaultPanel tokens={((allTokens ?? []) as (VaultToken & { config: string })[]).filter((t) => t.config === DBC_CONFIG?.toBase58())} />
+          <RevenuePanel tokens={((allTokens ?? []) as (RevenueToken & { config: string })[]).filter((t) => t.config !== DBC_CONFIG?.toBase58())} />
           <DbcConfigPanel />
         </div>
       </div>
