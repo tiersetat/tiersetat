@@ -14,7 +14,7 @@ const DAMM_V2_PROGRAM = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG";
 /** Mème de test qui a pris la Bastille sur le devnet (marché DAMM v2 créé). */
 const BASTILLE_TEST_POOL = "2hHbSBo4ggP595qnjNnu2teVhb9FLxYcXD1bttujwjpP";
 
-const CODE_SOURCE = "https://github.com/axel9lg/tiersetat";
+const CODE_SOURCE = "https://github.com/tiersetat/tiersetat";
 
 const ADRESSES = [
   { label: "Programme de la courbe (Meteora)", detail: "Le code qui crée les tokens et exécute chaque échange", address: DBC_PROGRAM_ID.toBase58() },
