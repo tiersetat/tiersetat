@@ -32,7 +32,7 @@ const BRIQUES: Brique[] = [
     nom: "L'Assemblée",
     role: "La gouvernance",
     texte: "Les détenteurs votent : mèmes mis en avant, nouvelles fonctions, utilisation du Trésor. Le peuple décide, comme en 1789.",
-    statut: "À venir",
+    statut: "En construction",
   },
   {
     nom: "Le Trésor du peuple",

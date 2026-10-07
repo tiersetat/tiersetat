@@ -35,7 +35,7 @@ const CENTRALISE = [
   ["Le site", "Hébergé chez un prestataire, avec une interface de secours indépendante", "Adresse décentralisée et hébergement IPFS permanent"],
   ["Le code du site", "Public sur GitHub", "Vérification que le site en ligne correspond au code publié"],
   ["Profils, points, commentaires", "Base de données de Tiers-État", "Ancrage progressif sur la blockchain"],
-  ["Les décisions", "L'équipe", "L'Assemblée : vote des détenteurs de $TIERS"],
+  ["Les décisions", "L'équipe ; l'Assemblée est en répétition sur le réseau de test", "L'Assemblée : vote des détenteurs de $TIERS"],
 ];
 
 export default async function VerifierPage() {

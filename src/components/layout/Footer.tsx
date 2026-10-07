@@ -17,6 +17,9 @@ export function Footer() {
           </p>
         </div>
         <div className="flex gap-5 text-sm text-muted-foreground sm:items-end">
+          <Link href="/assemblee" className="hover:text-foreground">
+            Assemblée
+          </Link>
           <Link href="/vision" className="hover:text-foreground">
             Vision
           </Link>
