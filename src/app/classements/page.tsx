@@ -116,6 +116,9 @@ export default async function ClassementsPage({ searchParams }: PageProps<"/clas
       <header className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">Classements de la semaine</h1>
         <p className="text-sm text-muted-foreground">Remise à zéro chaque lundi à minuit (heure de Paris). Classement au volume échangé, pas aux gains.</p>
+        <Link href="/semaine" className="inline-flex text-sm text-amber-300 underline-offset-4 hover:underline">
+          🏆 Voir le concours du Mème de la semaine →
+        </Link>
       </header>
       <nav className="flex gap-2" aria-label="Type de classement">
         {(Object.keys(TABS) as Tab[]).map((k) => (

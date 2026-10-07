@@ -2,6 +2,7 @@ import "server-only";
 import { rankCahiers, scoreCahier, type Cahier, type CahierStats } from "@/lib/cahiers";
 import type { Clan } from "@/lib/clans";
 import { getFounders } from "@/lib/founders-data";
+import { winsByCreator } from "@/lib/weekly-data";
 import { memo } from "@/lib/memo";
 import { supabasePublic } from "@/lib/supabase/public";
 
@@ -17,8 +18,8 @@ export async function getCahiers(me: string | null, limit = 50) {
     return data ?? [];
   }).catch(() => null);
   if (!stats) return null;
-  const founders = await getFounders().catch(() => null);
-  const data = stats.map((st) => ({ ...st, founder: founders?.byWallet.has(st.wallet) ?? false }));
+  const [founders, wins] = await Promise.all([getFounders().catch(() => null), winsByCreator().catch(() => new Map<string, number>())]);
+  const data = stats.map((st) => ({ ...st, founder: founders?.byWallet.has(st.wallet) ?? false, weekly_wins: wins.get(st.wallet) ?? 0 }));
   const ranked = rankCahiers(data ?? []);
   const top = ranked.slice(0, limit);
 

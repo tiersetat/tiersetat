@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { HomeBuzz } from "@/components/buzz/HomeBuzz";
+import { HomeWeekly } from "@/components/weekly/HomeWeekly";
 import { DebtLive } from "@/components/dette/DebtLive";
 import { DETTE } from "@/lib/dette";
 import { getOfficialDette, type DetteToken } from "@/lib/dette-token";
@@ -105,6 +106,11 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       {/* Ça brûle en France : actus chaudes (streamées, n'attendent pas les flux RSS) */}
       <Suspense fallback={<div className="-mt-12 h-[26rem] animate-pulse rounded-2xl border border-ligne bg-white/[0.02]" />}>
         <HomeBuzz />
+      </Suspense>
+
+      {/* Le Mème de la semaine */}
+      <Suspense fallback={<div className="h-56 animate-pulse rounded-2xl border border-ligne bg-white/[0.02]" />}>
+        <HomeWeekly />
       </Suspense>
 
       {/* La dette en direct */}

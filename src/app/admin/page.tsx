@@ -6,6 +6,8 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { MissingEnvError } from "@/lib/env";
 import { requireAdmin, type Profile } from "@/lib/auth/session";
 import { getWaitlistCount } from "@/lib/waitlist";
+import { WeeklyPost } from "@/components/admin/WeeklyPost";
+import { getWeek } from "@/lib/weekly-data";
 
 export const metadata: Metadata = { title: "Administration — Tiers-État" };
 
@@ -34,6 +36,11 @@ export default async function AdminPage() {
 
   const db = supabaseAdmin();
   const waitlist = await getWaitlistCount().catch(() => null);
+  const lastWeek = await getWeek(1).catch(() => null);
+  // Annonce sans emoji, factuelle, < 280 caractères (le lien compte pour 23)
+  const weeklyPost = lastWeek?.winner
+    ? `Le Mème de la semaine sur Tiers-État : ${lastWeek.winner.name} ($${lastWeek.winner.ticker}).\n\n${lastWeek.winner.traders} traders, ${lastWeek.winner.volumeSol.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} SOL échangés par la communauté.\n\nUne nouvelle semaine commence.\ntiersetat.vercel.app/semaine`
+    : null;
   const [{ data: reports }, { data: hidden }, { data: words }, { data: allTokens }] = await Promise.all([
     db
       .from("reports")
@@ -68,6 +75,7 @@ export default async function AdminPage() {
           words={(words ?? []).map((w) => w.word as string)}
         />
         <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <WeeklyPost text={weeklyPost} />
           <section className="surface space-y-3 p-5">
             <h2 className="font-semibold">Liste d&apos;attente du lancement</h2>
             <p className="text-sm text-muted-foreground">

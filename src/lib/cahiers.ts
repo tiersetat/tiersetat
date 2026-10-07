@@ -13,6 +13,8 @@ export type CahierStats = {
   active_referrals?: number;
   /** Parmi les 100 Fondateurs */
   founder?: boolean;
+  /** Victoires au concours du Mème de la semaine */
+  weekly_wins?: number;
 };
 
 type Regle = { key: string; label: string; detail: string; per: number; cap: number; value: (s: CahierStats) => number };
@@ -29,6 +31,7 @@ export const REGLES: Regle[] = [
   { key: "invitations", label: "Invités actifs", detail: "50 points par personne invitée qui crée ou échange un mème", per: 50, cap: 2_500, value: (s) => s.active_referrals ?? 0 },
   { key: "abonnes", label: "Abonnés", detail: "10 points par abonné", per: 10, cap: 2_000, value: (s) => s.followers },
   { key: "parole", label: "Prises de parole", detail: "5 points par commentaire", per: 5, cap: 200, value: (s) => s.comments },
+  { key: "semaine", label: "Mème de la semaine", detail: "500 points par victoire au concours hebdomadaire", per: 500, cap: 5_000, value: (s) => s.weekly_wins ?? 0 },
   { key: "fondateur", label: "Fondateur", detail: "250 points pour les 100 premiers à créer ou échanger un mème", per: 250, cap: 250, value: (s) => (s.founder ? 1 : 0) },
   { key: "clan", label: "Membre d'un clan", detail: "50 points en rejoignant ta région", per: 50, cap: 50, value: (s) => (s.has_clan ? 1 : 0) },
 ];
