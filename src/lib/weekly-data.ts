@@ -7,6 +7,11 @@ import { rankWeek, weekStart, winnerOf, type WeekEntry } from "@/lib/weekly";
 export type WeekMeme = WeekEntry & { name: string; ticker: string; image_url: string; creator_wallet: string };
 export type Week = { start: number; end: number; ranking: WeekMeme[]; winner: WeekMeme | null };
 
+/** Semaine en cours sans aucun échange (repli si la base est indisponible). */
+export function emptyWeek(): Week {
+  return { start: weekStart(Date.now()), end: weekStart(Date.now(), -1), ranking: [], winner: null };
+}
+
 /** Une semaine du concours (0 = en cours, 1 = la précédente…), cache 60 s. */
 export function getWeek(weeksAgo = 0): Promise<Week> {
   return memo(`week:${weeksAgo}:${weekStart(Date.now(), weeksAgo)}`, 60_000, async () => {

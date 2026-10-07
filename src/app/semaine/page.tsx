@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Countdown } from "@/components/weekly/Countdown";
 import { WeekRow } from "@/components/weekly/WeekRow";
 import { DUMP_LIMIT_PCT, TRADER_BONUS_SOL, WINNER_POINTS } from "@/lib/weekly";
-import { getPastWinners, getWeek } from "@/lib/weekly-data";
+import { emptyWeek, getPastWinners, getWeek } from "@/lib/weekly-data";
 
 export const metadata: Metadata = {
   title: "Le Mème de la semaine — Tiers-État",
@@ -14,7 +14,8 @@ export const revalidate = 60;
 const jour = (ms: number) => new Date(ms).toLocaleDateString("fr-FR", { day: "numeric", month: "long", timeZone: "Europe/Paris" });
 
 export default async function SemainePage() {
-  const [week, past] = await Promise.all([getWeek(0), getPastWinners(12).catch(() => [])]);
+  // Base indisponible (ex. copie du code sans configuration) : semaine vide plutôt qu'une erreur
+  const [week, past] = await Promise.all([getWeek(0).catch(emptyWeek), getPastWinners(12).catch(() => [])]);
   const leader = week.winner;
 
   return (
