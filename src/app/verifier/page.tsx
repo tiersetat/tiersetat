@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { VerifyOnChain } from "@/components/verify/VerifyOnChain";
+import secours from "@/lib/secours.json";
 import { DBC_CONFIG, DBC_PROGRAM_ID, explorerUrl, TREASURY_WALLET } from "@/lib/solana/config";
 
 export const metadata: Metadata = {
@@ -26,7 +27,7 @@ const ADRESSES = [
 
 const CENTRALISE = [
   ["La trésorerie", "Coffre multi-signature 2 sur 3 (réseau de test)", "Signataires indépendants (clé matérielle, personne de confiance) au lancement"],
-  ["Le site", "Hébergé chez un prestataire", "Interface de secours hébergée de façon décentralisée"],
+  ["Le site", "Hébergé chez un prestataire, avec une interface de secours indépendante", "Adresse décentralisée et hébergement IPFS permanent"],
   ["Le code du site", "Public sur GitHub", "Vérification que le site en ligne correspond au code publié"],
   ["Profils, points, commentaires", "Base de données de Tiers-État", "Ancrage progressif sur la blockchain"],
   ["Les décisions", "L'équipe", "L'Assemblée : vote des détenteurs de $TIERS"],
@@ -65,6 +66,23 @@ export default function VerifierPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="surface space-y-3 p-6">
+        <h2 className="text-2xl font-semibold">Si ce site tombe</h2>
+        <p className="text-sm text-muted-foreground">
+          Une interface de secours, hébergée hors de notre infrastructure, lit les mèmes directement sur la blockchain et permet de les échanger
+          avec ton propre wallet. Elle ne dépend ni de nos serveurs ni de notre base de données.
+        </p>
+        <div className="flex flex-wrap gap-2 text-sm">
+          <a href={secours.pages} target="_blank" rel="noreferrer" className="btn-primary">
+            Ouvrir l&apos;interface de secours
+          </a>
+          <a href={`https://${secours.cid}.ipfs.dweb.link/`} target="_blank" rel="noreferrer" className="btn-ghost">
+            Version IPFS
+          </a>
+        </div>
+        <p className="break-all font-mono text-xs text-muted-foreground">IPFS : {secours.cid}</p>
       </section>
 
       <section className="space-y-4">

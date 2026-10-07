@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tiers-État · interface de secours</title>
+<meta name="description" content="Interface de secours décentralisée de Tiers-État : les mèmes lus directement sur la blockchain Solana." />
+<link rel="icon" href="icon.png" />
+<style>
+  :root { --nuit:#030206; --surface:#0b0a12; --ligne:#24223a; --texte:#f4f1fa; --muted:#9b98ad; --pervenche:#8c93c9; --lueur:#c8c6ee; --achat:#4ade80; --vente:#f87171; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--nuit); color:var(--texte); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif; }
+  main { max-width:960px; margin:0 auto; padding:24px 16px 64px; }
+  header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  h1 { font-size:22px; margin:0; } .tag { font-family:ui-monospace,monospace; font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:var(--pervenche); }
+  p { line-height:1.5; } .muted { color:var(--muted); } .small { font-size:12px; }
+  a { color:var(--lueur); }
+  button { cursor:pointer; border:0; border-radius:12px; padding:9px 14px; font-weight:600; background:var(--lueur); color:#0b0a12; }
+  button.ghost { background:transparent; color:var(--texte); border:1px solid var(--ligne); }
+  input { background:rgba(255,255,255,.04); border:1px solid var(--ligne); color:var(--texte); border-radius:12px; padding:9px 12px; min-width:0; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:14px; margin-top:20px; }
+  .card { background:var(--surface); border:1px solid var(--ligne); border-radius:18px; padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .row { display:flex; justify-content:space-between; align-items:center; gap:8px; } .tick { font-family:ui-monospace,monospace; color:var(--pervenche); }
+  .bar { height:6px; background:rgba(255,255,255,.06); border-radius:99px; overflow:hidden; } .bar div { height:100%; background:linear-gradient(90deg,#545a92,#8c93c9,#f1ecfa); }
+  .trade { display:flex; gap:6px; flex-wrap:wrap; } .trade input { flex:1 1 90px; }
+  .status:empty { display:none; }
+  .status { margin-top:14px; padding:10px 14px; border-radius:12px; font-size:14px; background:rgba(255,255,255,.04); min-height:20px; }
+  .status.ok { color:var(--achat); } .status.err { color:var(--vente); }
+  .box { margin-top:28px; padding:16px; border:1px solid var(--ligne); border-radius:16px; }
+  .box .row input { flex:1; font-family:ui-monospace,monospace; font-size:12px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <p class="tag">Interface de secours · <span id="cluster"></span></p>
+      <h1>Tiers-État</h1>
+    </div>
+    <button id="connect">Connecter un wallet <span id="wallet"></span></button>
+  </header>
+  <p class="muted">
+    Cette page ne dépend d'aucun serveur de Tiers-État. Hébergée hors de notre infrastructure (IPFS, GitHub Pages), elle lit les mèmes directement sur la blockchain Solana et te
+    laisse les échanger avec ton propre wallet. Elle reste disponible même si le site principal est hors ligne.
+  </p>
+  <div id="status" class="status"></div>
+  <section id="list" class="grid"></section>
+  <section class="box">
+    <p class="small muted" style="margin-top:0">Point d'accès à la blockchain (RPC). Si la lecture échoue, colle l'adresse d'un autre fournisseur.</p>
+    <div class="row"><input id="rpc" spellcheck="false" aria-label="Adresse RPC" /><button id="rpc-save" class="ghost">Utiliser</button></div>
+  </section>
+  <p class="small muted" style="margin-top:28px">
+    Les memecoins sont spéculatifs : tu peux tout perdre. Réservé aux 18 ans et plus. Aucun conseil financier.
+    Code source : <a href="https://github.com/axel9lg/tiersetat" target="_blank" rel="noreferrer">github.com/axel9lg/tiersetat</a>.
+  </p>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

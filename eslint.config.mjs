@@ -9,6 +9,8 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    // Interface de secours assemblée (code généré)
+    "ipfs/dist/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
