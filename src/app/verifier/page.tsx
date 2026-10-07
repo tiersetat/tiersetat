@@ -13,6 +13,8 @@ const DAMM_V2_PROGRAM = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG";
 /** Mème de test qui a pris la Bastille sur le devnet (marché DAMM v2 créé). */
 const BASTILLE_TEST_POOL = "2hHbSBo4ggP595qnjNnu2teVhb9FLxYcXD1bttujwjpP";
 
+const CODE_SOURCE = "https://github.com/axel9lg/tiersetat";
+
 const ADRESSES = [
   { label: "Programme de la courbe (Meteora)", detail: "Le code qui crée les tokens et exécute chaque échange", address: DBC_PROGRAM_ID.toBase58() },
   { label: "Configuration Tiers-État", detail: "Les règles communes à tous les mèmes, inscrites une fois pour toutes", address: DBC_CONFIG?.toBase58() },
@@ -25,7 +27,7 @@ const ADRESSES = [
 const CENTRALISE = [
   ["La trésorerie", "Coffre multi-signature 2 sur 3 (réseau de test)", "Signataires indépendants (clé matérielle, personne de confiance) au lancement"],
   ["Le site", "Hébergé chez un prestataire", "Interface de secours hébergée de façon décentralisée"],
-  ["Le code du site", "Privé", "Publication en open source"],
+  ["Le code du site", "Public sur GitHub", "Vérification que le site en ligne correspond au code publié"],
   ["Profils, points, commentaires", "Base de données de Tiers-État", "Ancrage progressif sur la blockchain"],
   ["Les décisions", "L'équipe", "L'Assemblée : vote des détenteurs de $TIERS"],
 ];
@@ -92,6 +94,9 @@ export default function VerifierPage() {
           </table>
         </div>
         <p className="text-sm">
+          <a href={CODE_SOURCE} target="_blank" rel="noreferrer" className="mr-6 underline underline-offset-4 hover:text-foreground">
+            Lire le code source sur GitHub
+          </a>
           <Link href="/vision" className="underline underline-offset-4 hover:text-foreground">
             Voir la feuille de route complète
           </Link>

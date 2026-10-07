@@ -133,7 +133,6 @@ Alternative : importer le dépôt GitHub sur [vercel.com/new](https://vercel.com
 
 ## Avant le lancement réel
 
-Une liste de vérification interne couvre le passage sur le réseau principal : validation juridique, renouvellement des clés, trésorerie en multi-signature, configuration mainnet, RPC dédié, hébergement et limitation de débit.
 
 ## Feuille de route
 
