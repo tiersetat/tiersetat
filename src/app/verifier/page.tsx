@@ -1,0 +1,107 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { VerifyOnChain } from "@/components/verify/VerifyOnChain";
+import { DBC_CONFIG, DBC_PROGRAM_ID, explorerUrl, TREASURY_WALLET } from "@/lib/solana/config";
+
+export const metadata: Metadata = {
+  title: "Vérifie par toi-même — Tiers-État",
+  description: "Les règles de Tiers-État relues en direct sur la blockchain Solana : frais, offre fixe, liquidité bloquée, trésorerie.",
+};
+
+/** Programme DAMM v2 de Meteora (marché d'échange après la migration). */
+const DAMM_V2_PROGRAM = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG";
+/** Mème de test qui a pris la Bastille sur le devnet (marché DAMM v2 créé). */
+const BASTILLE_TEST_POOL = "2hHbSBo4ggP595qnjNnu2teVhb9FLxYcXD1bttujwjpP";
+
+const ADRESSES = [
+  { label: "Programme de la courbe (Meteora)", detail: "Le code qui crée les tokens et exécute chaque échange", address: DBC_PROGRAM_ID.toBase58() },
+  { label: "Configuration Tiers-État", detail: "Les règles communes à tous les mèmes, inscrites une fois pour toutes", address: DBC_CONFIG?.toBase58() },
+  { label: "Trésorerie : coffre multi-signature", detail: "Reçoit la part des frais de la plateforme ; toute dépense exige 2 signatures sur 3", address: TREASURY_WALLET?.toBase58() },
+  { label: "Règles du coffre (Squads)", detail: "Les 3 signataires et le seuil de 2 signatures, inscrits sur la blockchain", address: process.env.NEXT_PUBLIC_TREASURY_MULTISIG },
+  { label: "Programme du marché après migration (Meteora)", detail: "Là où un mème part quand il prend la Bastille", address: DAMM_V2_PROGRAM },
+  { label: "Exemple : migration testée", detail: "Marché créé par notre test de bout en bout, liquidité bloquée", address: BASTILLE_TEST_POOL },
+];
+
+const CENTRALISE = [
+  ["La trésorerie", "Coffre multi-signature 2 sur 3 (réseau de test)", "Signataires indépendants (clé matérielle, personne de confiance) au lancement"],
+  ["Le site", "Hébergé chez un prestataire", "Interface de secours hébergée de façon décentralisée"],
+  ["Le code du site", "Privé", "Publication en open source"],
+  ["Profils, points, commentaires", "Base de données de Tiers-État", "Ancrage progressif sur la blockchain"],
+  ["Les décisions", "L'équipe", "L'Assemblée : vote des détenteurs de $TIERS"],
+];
+
+export default function VerifierPage() {
+  return (
+    <div className="mx-auto max-w-4xl space-y-12">
+      <header className="space-y-3">
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Transparence</p>
+        <h1 className="text-4xl font-semibold tracking-tight">Vérifie par toi-même</h1>
+        <p className="max-w-2xl text-lg text-muted-foreground">
+          Ne nous crois pas sur parole. Les règles de Tiers-État sont inscrites sur la blockchain Solana : cette page les relit en direct, depuis
+          ton navigateur, sans passer par nos serveurs.
+        </p>
+      </header>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Les règles, relues en direct</h2>
+        <VerifyOnChain />
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Toutes les adresses</h2>
+        <p className="text-sm text-muted-foreground">Ouvre-les dans l&apos;explorateur Solana pour voir chaque transaction, sans intermédiaire.</p>
+        <ul className="surface divide-y divide-ligne">
+          {ADRESSES.filter((a) => a.address).map((a) => (
+            <li key={a.label} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+              <div className="min-w-0">
+                <p className="font-medium">{a.label}</p>
+                <p className="text-xs text-muted-foreground">{a.detail}</p>
+              </div>
+              <a href={explorerUrl("address", a.address!)} target="_blank" rel="noreferrer" className="chip font-mono">
+                {a.address!.slice(0, 6)}…{a.address!.slice(-6)} ↗
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Ce qui est encore centralisé</h2>
+        <p className="text-sm text-muted-foreground">
+          Tes fonds et tes tokens ne dépendent déjà que de la blockchain. Voici, en toute honnêteté, ce qui dépend encore de nous, et comment ça
+          va changer.
+        </p>
+        <div className="surface overflow-x-auto">
+          <table className="w-full min-w-[560px] text-sm">
+            <thead className="text-left text-xs text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 font-medium">Élément</th>
+                <th className="px-2 py-3 font-medium">Aujourd&apos;hui</th>
+                <th className="px-4 py-3 font-medium">Prochaine étape</th>
+              </tr>
+            </thead>
+            <tbody>
+              {CENTRALISE.map(([el, now, next]) => (
+                <tr key={el} className="border-t border-ligne">
+                  <td className="px-4 py-3 font-medium">{el}</td>
+                  <td className="px-2 py-3 text-muted-foreground">{now}</td>
+                  <td className="px-4 py-3">{next}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-sm">
+          <Link href="/vision" className="underline underline-offset-4 hover:text-foreground">
+            Voir la feuille de route complète
+          </Link>
+        </p>
+      </section>
+
+      <p className="text-xs text-muted-foreground">
+        Bêta sur le réseau de test de Solana (devnet) : les adresses et les montants concernent ce réseau. Les programmes de la courbe et du
+        marché sont développés et opérés par Meteora.
+      </p>
+    </div>
+  );
+}

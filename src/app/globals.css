@@ -1,0 +1,227 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Identité « pro » : nuit profonde + lueur lavande du logo. */
+@theme inline {
+  --color-nuit: var(--nuit);
+  --color-surface: var(--surface);
+  --color-ligne: var(--ligne);
+  --color-lueur: var(--lueur);
+  --color-pervenche: var(--pervenche);
+  --color-indigo: var(--indigo);
+  --color-achat: var(--achat);
+  --color-vente: var(--vente);
+
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+:root {
+  --nuit: #030206;
+  --surface: rgb(255 255 255 / 0.035);
+  --ligne: rgb(255 255 255 / 0.09);
+  --lueur: #ece6f6;
+  --pervenche: #8c93c9;
+  --indigo: #545a92;
+  --achat: #7fe3b8;
+  --vente: #ff7a93;
+
+  --background: var(--nuit);
+  --foreground: #f4f1fa;
+  --card: #0b0a12;
+  --card-foreground: var(--foreground);
+  --popover: #0e0d17;
+  --popover-foreground: var(--foreground);
+  --primary: var(--lueur);
+  --primary-foreground: #0b0a12;
+  --secondary: #16152200;
+  --secondary-foreground: var(--foreground);
+  --muted: #14131d;
+  --muted-foreground: #9b98ad;
+  --accent: #191826;
+  --accent-foreground: var(--foreground);
+  --destructive: var(--vente);
+  --border: var(--ligne);
+  --input: rgb(255 255 255 / 0.12);
+  --ring: var(--pervenche);
+  --radius: 0.75rem;
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image:
+      radial-gradient(60rem 40rem at 50% -10%, rgb(140 147 201 / 0.16), transparent 70%),
+      radial-gradient(40rem 30rem at 100% 0%, rgb(84 90 146 / 0.12), transparent 70%);
+    background-repeat: no-repeat;
+  }
+  ::selection {
+    background: var(--pervenche);
+    color: var(--nuit);
+  }
+}
+
+@layer components {
+  /* Carte en verre dépoli */
+  .surface {
+    @apply rounded-2xl border border-ligne bg-surface backdrop-blur-sm;
+  }
+  .surface-hover {
+    @apply transition-colors hover:border-white/20 hover:bg-white/[0.05];
+  }
+  /* Bouton principal : dégradé de la lueur du logo */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-nuit transition disabled:opacity-50;
+    background: linear-gradient(180deg, #fbf8ff 0%, #c9c7ef 55%, #9aa0d6 100%);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25) inset, 0 8px 30px -8px rgb(140 147 201 / 0.6);
+  }
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35) inset, 0 10px 40px -6px rgb(140 147 201 / 0.8);
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-ligne bg-white/[0.02] px-5 py-2.5 text-sm font-medium text-foreground transition hover:border-white/20 hover:bg-white/[0.06] disabled:opacity-50;
+  }
+  .chip {
+    @apply rounded-full border border-ligne px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-white/20 hover:text-foreground;
+  }
+  .chip-active {
+    @apply border-pervenche/60 bg-pervenche/15 text-lueur;
+  }
+  .field {
+    @apply w-full rounded-xl border border-input bg-black/30 px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-pervenche/70 focus:ring-2 focus:ring-pervenche/25;
+  }
+  .label {
+    @apply text-xs font-medium text-muted-foreground;
+  }
+  .text-lueur-gradient {
+    background: linear-gradient(180deg, #ffffff 10%, #c8c6ee 60%, #8c93c9 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* Barre de progression de la bonding curve */
+  .progress-track {
+    @apply h-1.5 overflow-hidden rounded-full bg-white/[0.07];
+  }
+  .progress-fill {
+    @apply h-full rounded-full transition-[width] duration-700;
+    background: linear-gradient(90deg, #545a92, #8c93c9 55%, #f1ecfa);
+    box-shadow: 0 0 12px rgb(140 147 201 / 0.7);
+  }
+}
+
+/* Bouton et fenêtre du wallet-adapter aux couleurs du site */
+.wallet-adapter-button-trigger,
+.wallet-adapter-button.wallet-adapter-button-trigger {
+  background: rgb(255 255 255 / 0.04) !important;
+  border: 1px solid var(--ligne) !important;
+  color: var(--foreground) !important;
+  font-family: var(--font-geist), sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  border-radius: 0.75rem !important;
+  height: 2.5rem !important;
+  padding: 0 1rem !important;
+  transition: background 0.15s, border-color 0.15s;
+}
+.wallet-adapter-button-trigger:hover {
+  background: rgb(255 255 255 / 0.08) !important;
+  border-color: rgb(255 255 255 / 0.2) !important;
+}
+.wallet-adapter-button-start-icon img {
+  border-radius: 6px;
+}
+.wallet-adapter-modal-wrapper {
+  background: #0e0d17 !important;
+  border: 1px solid var(--ligne);
+  border-radius: 1.25rem !important;
+  box-shadow: 0 30px 80px -20px rgb(140 147 201 / 0.35) !important;
+}
+.wallet-adapter-modal-title {
+  color: var(--foreground) !important;
+  font-family: var(--font-geist), sans-serif;
+  font-weight: 600;
+}
+.wallet-adapter-modal-list .wallet-adapter-button {
+  font-family: var(--font-geist), sans-serif;
+  border-radius: 0.75rem;
+}
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  background: rgb(255 255 255 / 0.06) !important;
+}
+.wallet-adapter-dropdown-list {
+  background: #0e0d17 !important;
+  border: 1px solid var(--ligne);
+  border-radius: 0.9rem !important;
+}
+.wallet-adapter-dropdown-list-item {
+  font-family: var(--font-geist), sans-serif;
+  font-weight: 500;
+}
+.wallet-adapter-dropdown-list-item:hover {
+  background: rgb(255 255 255 / 0.06) !important;
+}
+
+/* Arcs lumineux de l'accueil : respiration lente */
+@keyframes arc-breathe {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.015); }
+}
+.hero-arc {
+  animation: arc-breathe 9s ease-in-out infinite;
+  transform-origin: center;
+}
+.hero-arc-delay {
+  animation-delay: -4.5s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-arc { animation: none; }
+}
+
+
+/* En-tête compact sur téléphone */
+@media (max-width: 639px) {
+  .wallet-adapter-button.wallet-adapter-button-trigger {
+    height: 2.5rem !important;
+    padding: 0 0.85rem !important;
+  }
+  .wallet-adapter-button-trigger .wallet-adapter-button-start-icon {
+    margin-right: 6px !important;
+  }
+}
+
+/* Rangées défilantes sans barre de défilement visible */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

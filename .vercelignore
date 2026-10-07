@@ -1,0 +1,7 @@
+.env*
+!.env.example
+/e2e
+/scripts
+/supabase
+/.next
+/node_modules
