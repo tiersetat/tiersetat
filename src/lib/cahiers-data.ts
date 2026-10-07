@@ -8,10 +8,10 @@ import { supabasePublic } from "@/lib/supabase/public";
 
 export type CahierRow = Cahier & { pseudo: string | null; avatar_url: string | null; clan: Clan | null; founder: number | null };
 
-/** Classement des Cahiers (top `limit`) et cahier du compte connecté avec sa position. null si la vue n'existe pas encore. */
-export async function getCahiers(me: string | null, limit = 50) {
+/** Classement complet des Cahiers (tous les comptes ayant des points), null si la vue n'existe pas encore. */
+export async function rankedCahiers(): Promise<Cahier[] | null> {
   const db = supabasePublic();
-  // Statistiques partagées par tous les visiteurs (cache 30 s) ; seul « mon cahier » est personnalisé
+  // Statistiques partagées par tous les visiteurs (cache 30 s)
   const stats = await memo("cahiers", 30_000, async () => {
     const { data, error } = await db.from("cahiers_stats").select("*").limit(10_000).returns<CahierStats[]>();
     if (error) throw error;
@@ -19,8 +19,15 @@ export async function getCahiers(me: string | null, limit = 50) {
   }).catch(() => null);
   if (!stats) return null;
   const [founders, wins] = await Promise.all([getFounders().catch(() => null), winsByCreator().catch(() => new Map<string, number>())]);
-  const data = stats.map((st) => ({ ...st, founder: founders?.byWallet.has(st.wallet) ?? false, weekly_wins: wins.get(st.wallet) ?? 0 }));
-  const ranked = rankCahiers(data ?? []);
+  return rankCahiers(stats.map((st) => ({ ...st, founder: founders?.byWallet.has(st.wallet) ?? false, weekly_wins: wins.get(st.wallet) ?? 0 })));
+}
+
+/** Classement des Cahiers (top `limit`) et cahier du compte connecté avec sa position. null si la vue n'existe pas encore. */
+export async function getCahiers(me: string | null, limit = 50) {
+  const db = supabasePublic();
+  const ranked = await rankedCahiers();
+  if (!ranked) return null;
+  const founders = await getFounders().catch(() => null);
   const top = ranked.slice(0, limit);
 
   const wallets = [...new Set([...top.map((c) => c.wallet), ...(me ? [me] : [])])];
@@ -46,8 +53,8 @@ export async function getCahiers(me: string | null, limit = 50) {
   let mine: { cahier: CahierRow; position: number | null } | null = null;
   if (me) {
     const index = ranked.findIndex((c) => c.wallet === me);
-    const stats = (data ?? []).find((s) => s.wallet === me);
-    const cahier = index >= 0 ? ranked[index] : scoreCahier(stats ?? { wallet: me, tokens_created: 0, volume_sol: 0, tokens_traded: 0, comments: 0, followers: 0, has_clan: false, creator_volume_sol: 0 });
+    // Hors classement = aucun point : cahier vide
+    const cahier = index >= 0 ? ranked[index] : scoreCahier({ wallet: me, tokens_created: 0, volume_sol: 0, tokens_traded: 0, comments: 0, followers: 0, has_clan: false, creator_volume_sol: 0 });
     mine = { cahier: withProfile(cahier), position: index >= 0 ? index + 1 : null };
   }
   return { top: top.map(withProfile), total: ranked.length, mine, founders };

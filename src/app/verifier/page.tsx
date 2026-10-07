@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { VerifyOnChain } from "@/components/verify/VerifyOnChain";
 import secours from "@/lib/secours.json";
+import { VerifySnapshots } from "@/components/verify/VerifySnapshots";
+import { gatewayPrefix } from "@/lib/ipfs";
+import { getSealedSnapshots } from "@/lib/snapshot-data";
 import { DBC_CONFIG, DBC_PROGRAM_ID, explorerUrl, TREASURY_WALLET } from "@/lib/solana/config";
 
 export const metadata: Metadata = {
@@ -10,6 +13,8 @@ export const metadata: Metadata = {
 };
 
 /** Programme DAMM v2 de Meteora (marché d'échange après la migration). */
+export const revalidate = 120;
+
 const DAMM_V2_PROGRAM = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG";
 /** Mème de test qui a pris la Bastille sur le devnet (marché DAMM v2 créé). */
 const BASTILLE_TEST_POOL = "2hHbSBo4ggP595qnjNnu2teVhb9FLxYcXD1bttujwjpP";
@@ -33,7 +38,14 @@ const CENTRALISE = [
   ["Les décisions", "L'équipe", "L'Assemblée : vote des détenteurs de $TIERS"],
 ];
 
-export default function VerifierPage() {
+export default async function VerifierPage() {
+  const snapshots = await getSealedSnapshots().catch(() => []);
+  let prefix = "";
+  try {
+    prefix = gatewayPrefix();
+  } catch {
+    /* passerelle Pinata non configurée : passerelles publiques seulement */
+  }
   return (
     <div className="mx-auto max-w-4xl space-y-12">
       <header className="space-y-3">
@@ -66,6 +78,15 @@ export default function VerifierPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Les preuves des points</h2>
+        <p className="text-sm text-muted-foreground">
+          Chaque instantané des Cahiers de doléances est publié sur IPFS et son empreinte est scellée sur la blockchain. Personne, pas même
+          nous, ne peut réécrire l&apos;historique des points. Connecte ton wallet pour vérifier les tiens.
+        </p>
+        <VerifySnapshots snapshots={snapshots} gatewayPrefix={prefix} />
       </section>
 
       <section className="surface space-y-3 p-6">

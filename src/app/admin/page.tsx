@@ -9,6 +9,7 @@ import { MissingEnvError } from "@/lib/env";
 import { requireAdmin, type Profile } from "@/lib/auth/session";
 import { getWaitlistCount } from "@/lib/waitlist";
 import { WeeklyPost } from "@/components/admin/WeeklyPost";
+import { SnapshotPanel } from "@/components/admin/SnapshotPanel";
 import { getWeek } from "@/lib/weekly-data";
 
 export const metadata: Metadata = { title: "Administration — Tiers-État" };
@@ -78,6 +79,7 @@ export default async function AdminPage() {
         />
         <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           <WeeklyPost text={weeklyPost} />
+          <SnapshotPanel />
           <section className="surface space-y-3 p-5">
             <h2 className="font-semibold">Liste d&apos;attente du lancement</h2>
             <p className="text-sm text-muted-foreground">
