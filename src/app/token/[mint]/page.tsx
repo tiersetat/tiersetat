@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ReportButton } from "@/components/moderation/ReportButton";
 import { RiskPanel } from "@/components/token/RiskPanel";
+import { HoldersPanel } from "@/components/token/HoldersPanel";
+import { getHolders } from "@/lib/holders";
 import { Comments } from "@/components/token/Comments";
 import { ShareButton } from "@/components/token/ShareButton";
 import { TrustBadge } from "@/components/trust/TrustBadge";
@@ -68,7 +70,7 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
     );
   }
 
-  const [{ data: trades }, risk] = await Promise.all([
+  const [{ data: trades }, risk, holders] = await Promise.all([
     supabaseAdmin()
       .from("trades")
       .select("signature, trader_wallet, side, sol_amount, token_amount, price_sol, block_time")
@@ -76,6 +78,7 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
       .order("block_time", { ascending: true })
       .limit(2000),
     getRiskReport(token),
+    getHolders(token),
   ]);
   const flags = riskFlags(risk);
 
@@ -138,6 +141,7 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
           <>
             <CreatorEarnings compact creator={token.creator_wallet} tokens={[{ mint: token.mint, name: token.name, ticker: token.ticker, pool: token.pool }]} />
             <RiskPanel flags={flags} />
+            <HoldersPanel holders={holders} />
           </>
         }
       />
