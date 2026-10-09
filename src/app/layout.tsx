@@ -8,6 +8,7 @@ import "./globals.css";
 import { InviteCapture } from "@/components/invite/InviteCapture";
 import { BottomTabBar } from "@/components/layout/BottomTabBar";
 import { LiveTrades } from "@/components/social/LiveTrades";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { RegisterSW } from "@/components/app/RegisterSW";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
@@ -32,8 +33,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <InviteCapture />
           <RegisterSW />
           <Header />
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
-          <Footer />
+          <div className="flex flex-1 flex-col lg:pl-64">
+            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
+            <Footer />
+          </div>
+          <Sidebar />
           <BottomTabBar />
           <LiveTrades />
         </WalletProviders>
