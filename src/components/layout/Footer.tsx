@@ -6,7 +6,7 @@ import { InstallApp } from "@/components/app/InstallApp";
 export function Footer() {
   return (
     <footer className="mt-24 border-t border-ligne pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-[1fr_auto]">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_auto]">
         <div className="space-y-3">
           <Wordmark />
           <p className="max-w-md text-sm text-muted-foreground">Le peuple frappe sa monnaie. Le launchpad des mèmes français, sur Solana.</p>
@@ -16,7 +16,7 @@ export function Footer() {
             {CLUSTER === "devnet" && " Réseau de test Solana (devnet) : les tokens n'ont aucune valeur réelle."}
           </p>
         </div>
-        <div className="flex gap-5 text-sm text-muted-foreground sm:items-end">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted-foreground sm:grid-cols-4 sm:self-end">
           <Link href="/assemblee" className="hover:text-foreground">
             Assemblée
           </Link>

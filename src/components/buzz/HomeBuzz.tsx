@@ -46,7 +46,7 @@ export async function HomeBuzz() {
   })}`;
 
   return (
-    <section className="-mt-12 space-y-5">
+    <section className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className={`flex items-center gap-2 text-xs font-medium uppercase tracking-widest ${style.text}`}>
