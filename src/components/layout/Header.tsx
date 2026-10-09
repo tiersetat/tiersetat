@@ -15,8 +15,7 @@ const NAV = [
   { href: "/dette", label: "La dette" },
   { href: "/vision", label: "Vision" },
 ];
-// Sur petit écran, la recherche passe dans le menu
-const MOBILE_NAV = [...NAV, { href: "/abonnements", label: "Abonnements" }, { href: "/recherche", label: "Rechercher" }];
+// Sur téléphone, la navigation passe dans la barre d'onglets en bas (BottomTabBar)
 
 export function Header() {
   return (
@@ -42,13 +41,6 @@ export function Header() {
           <EmailLoginButton />
           <WalletButton />
         </div>
-        <nav className="-mx-1 flex w-full gap-1 overflow-x-auto text-sm md:hidden">
-          {MOBILE_NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="shrink-0 rounded-lg px-3 py-1.5 text-muted-foreground hover:bg-white/5 hover:text-foreground">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
       </div>
     </header>
   );

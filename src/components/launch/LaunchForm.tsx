@@ -10,6 +10,7 @@ import { moderate } from "@/lib/moderation";
 import { explorerUrl } from "@/lib/solana/config";
 import { applyPriority } from "@/lib/solana/priority";
 import { hasAcceptedRisk, RiskGate } from "@/components/token/RiskGate";
+import { celebrate } from "@/lib/celebrate";
 import { IMAGE_MAX_BYTES, IMAGE_TYPES, launchFieldsSchema } from "@/lib/validators";
 
 type Step = "idle" | "upload" | "sign" | "confirm" | "index" | "done";
@@ -108,6 +109,7 @@ export function LaunchForm() {
       tx.recentBlockhash = latest.blockhash;
       const sig = await sendTransaction(tx, connection, { signers: [mintKeypair] });
       setSignature(sig);
+      void celebrate("launch");
 
       setStep("confirm");
       const conf = await connection.confirmTransaction({ signature: sig, ...latest }, "confirmed");

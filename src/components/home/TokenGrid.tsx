@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { LogoMark } from "@/components/brand/Logo";
 import { TokenCard as Card } from "@/components/brand/TokenCard";
@@ -44,6 +44,12 @@ function CreatorSoldBadge({ pct }: { pct?: number | null }) {
 export function TokenGrid({ tab, initial }: { tab: Tab; initial: TokenCard[] }) {
   const [tokens, setTokens] = useState(initial);
   const [fresh, setFresh] = useState<Set<string>>(new Set());
+  /** Clignotement vert/rouge d'une carte quand sa capitalisation bouge (temps réel) */
+  const [flash, setFlash] = useState<Record<string, "up" | "down">>({});
+  const tokensRef = useRef(tokens);
+  useEffect(() => {
+    tokensRef.current = tokens;
+  }, [tokens]);
 
   useEffect(() => {
     const supabase = supabaseBrowser();
@@ -58,6 +64,16 @@ export function TokenGrid({ tab, initial }: { tab: Tab; initial: TokenCard[] }) 
       })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tokens" }, ({ new: row }) => {
         const token = row as TokenCard & { hidden: boolean };
+        const prev = tokensRef.current.find((t) => t.mint === token.mint);
+        if (prev && !token.hidden && Number(token.market_cap_sol) !== Number(prev.market_cap_sol)) {
+          const dir = Number(token.market_cap_sol) > Number(prev.market_cap_sol) ? "up" : "down";
+          setFlash((f) => ({ ...f, [token.mint]: dir }));
+          setTimeout(() => setFlash((f) => {
+            const next = { ...f };
+            delete next[token.mint];
+            return next;
+          }), 1400);
+        }
         setTokens((list) =>
           token.hidden
             ? list.filter((t) => t.mint !== token.mint)
@@ -85,7 +101,12 @@ export function TokenGrid({ tab, initial }: { tab: Tab; initial: TokenCard[] }) 
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {tokens.map((t) => (
-        <li key={t.mint} className={fresh.has(t.mint) ? "animate-in fade-in slide-in-from-top-4 duration-700" : ""}>
+        <li
+          key={t.mint}
+          className={`rounded-2xl transition-[box-shadow,transform] duration-500 hover:-translate-y-0.5 ${fresh.has(t.mint) ? "animate-in fade-in slide-in-from-top-4 duration-700" : ""} ${
+            flash[t.mint] === "up" ? "shadow-[0_0_0_2px_rgba(74,222,128,0.7),0_0_40px_-10px_rgba(74,222,128,0.8)]" : flash[t.mint] === "down" ? "shadow-[0_0_0_2px_rgba(248,113,113,0.7),0_0_40px_-10px_rgba(248,113,113,0.8)]" : ""
+          }`}
+        >
           <Link href={`/token/${t.mint}`} className="block" aria-label={`${t.name} ($${t.ticker})`}>
             <Card
               name={t.name}

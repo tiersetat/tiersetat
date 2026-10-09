@@ -12,6 +12,7 @@ import type { PoolSnapshot, Side } from "@/lib/solana/swap";
 import { Eur } from "@/components/Eur";
 import { applyPriority } from "@/lib/solana/priority";
 import { hasAcceptedRisk, RiskGate } from "./RiskGate";
+import { celebrate } from "@/lib/celebrate";
 import { TradeSettings, useTradeSettings } from "./TradeSettings";
 
 const TOKEN_UNIT = 10 ** PLATFORM_CURVE.tokenDecimals;
@@ -129,6 +130,7 @@ export function TradePanel({ mint, pool, ticker, migrated, warnings, onTraded }:
       const conf = await connection.confirmTransaction({ signature, ...latest }, "confirmed");
       if (conf.value.err) throw new Error("La transaction a échoué on-chain.");
       setDone(signature);
+      void celebrate(side);
       setAmount("");
       setEstimate(null);
       await fetch("/api/trades", {

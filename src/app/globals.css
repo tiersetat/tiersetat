@@ -225,3 +225,16 @@
 /* Rangées défilantes sans barre de défilement visible */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Retour tactile : les boutons s'enfoncent légèrement à l'appui */
+.btn-primary,
+.btn-ghost,
+.chip {
+  transition-property: transform, background-color, border-color, color, box-shadow, opacity;
+  transition-duration: 120ms;
+}
+.btn-primary:active:not(:disabled),
+.btn-ghost:active:not(:disabled),
+.chip:active {
+  transform: scale(0.97);
+}

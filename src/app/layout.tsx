@@ -6,6 +6,8 @@ import { WalletProviders } from "@/components/providers/WalletProviders";
 import { SITE_URL } from "@/lib/solana/config";
 import "./globals.css";
 import { InviteCapture } from "@/components/invite/InviteCapture";
+import { BottomTabBar } from "@/components/layout/BottomTabBar";
+import { LiveTrades } from "@/components/social/LiveTrades";
 import { RegisterSW } from "@/components/app/RegisterSW";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
@@ -32,6 +34,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Header />
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
           <Footer />
+          <BottomTabBar />
+          <LiveTrades />
         </WalletProviders>
       </body>
     </html>
