@@ -225,7 +225,7 @@ export default function CguPage() {
   return (
     <article className="mx-auto max-w-3xl space-y-8 text-sm leading-relaxed text-muted-foreground [&_li]:ml-5 [&_li]:list-disc [&_p]:my-2 [&_ul]:my-2 [&_ul]:space-y-1">
       <header className="space-y-3">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">Conditions d&apos;utilisation</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Conditions d&apos;utilisation</h1>
         <LegalNotice />
         <p className="text-xs">Version bêta du 7 octobre 2026. Les passages surlignés sont à compléter une fois la société constituée.</p>
       </header>

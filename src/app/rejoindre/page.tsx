@@ -16,7 +16,7 @@ export default async function RejoindrePage() {
     <div className="mx-auto flex max-w-xl flex-col items-center space-y-6 py-10 text-center">
       <LogoMark size={96} className="drop-shadow-[0_0_40px_rgba(140,147,201,0.55)]" />
       <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Lancement officiel</p>
-      <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Le peuple frappe sa monnaie. Bientôt pour de vrai.</h1>
+      <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Le peuple frappe sa monnaie. Bientôt pour de vrai.</h1>
       <p className="text-muted-foreground">
         Laisse ton e-mail : le jour du lancement, on te prévient de l&apos;heure exacte. En attendant, la bêta est ouverte et gratuite.
       </p>

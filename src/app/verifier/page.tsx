@@ -50,7 +50,7 @@ export default async function VerifierPage() {
     <div className="mx-auto max-w-4xl space-y-12">
       <header className="space-y-3">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Transparence</p>
-        <h1 className="text-4xl font-semibold tracking-tight">Vérifie par toi-même</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Vérifie par toi-même</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
           Ne nous crois pas sur parole. Les règles de Tiers-État sont inscrites sur la blockchain Solana : cette page les relit en direct, depuis
           ton navigateur, sans passer par nos serveurs.

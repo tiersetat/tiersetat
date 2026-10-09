@@ -44,7 +44,7 @@ export default function ManifestePage() {
     <article className="mx-auto max-w-3xl space-y-12">
       <header className="space-y-4">
         <p className="font-mono text-sm text-pervenche">MANIFESTE</p>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Qu&apos;est-ce que le Tiers-État ? Tout.</h1>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Qu&apos;est-ce que le Tiers-État ? Tout.</h1>
         <p className="text-lg text-muted-foreground">
           En 1789, le Tiers-État représentait presque toute la nation, sans avoir son mot à dire. Aujourd&apos;hui, la monnaie est encore entre les
           mains de quelques institutions. La crypto rend au peuple le pouvoir de la créer, de la détenir et de l&apos;échanger librement.

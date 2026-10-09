@@ -59,7 +59,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         <p className="mt-8 hidden rounded-full border border-ligne bg-white/[0.03] px-4 py-1.5 text-xs text-muted-foreground sm:block">
           Le peuple frappe sa monnaie <span className="mx-1.5 text-ligne">|</span> Solana
         </p>
-        <h1 className="text-lueur-gradient mt-5 max-w-3xl text-[2.6rem] leading-[1.05] font-semibold tracking-tight sm:mt-6 sm:text-6xl lg:text-7xl">
+        <h1 className="text-lueur-gradient mt-5 max-w-3xl text-[2.6rem] leading-[1.05] font-bold tracking-tight sm:mt-6 sm:text-6xl lg:text-7xl">
           Le launchpad des mèmes français.
         </h1>
         <p className="mt-4 max-w-xl text-base text-muted-foreground sm:mt-6 sm:text-lg">
@@ -98,7 +98,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       <section id="explorer" className="scroll-mt-24 space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Explorer les tokens</h2>
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Explorer les tokens</h2>
             <p className="mt-1 text-sm text-muted-foreground">Mis à jour en temps réel depuis la blockchain.</p>
           </div>
           <nav className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Trier les tokens">
@@ -130,7 +130,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
       {/* Comment ça marche, compact */}
       <section className="space-y-5">
-        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Comment ça marche</h2>
+        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Comment ça marche</h2>
         <ol className="grid gap-3 md:grid-cols-3">
           {STEPS.map((s) => (
             <li key={s.n} className="surface flex gap-4 p-4 sm:p-5">
@@ -148,7 +148,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       <section className="surface grid gap-8 p-6 sm:p-8 md:grid-cols-2 md:items-center">
         <div className="space-y-3">
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Lancement officiel</p>
-          <h2 className="text-2xl font-semibold tracking-tight">Sois prévenu en premier.</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Sois prévenu en premier.</h2>
           <JoinWaitlist initialCount={waitlist} />
         </div>
         {founders && (

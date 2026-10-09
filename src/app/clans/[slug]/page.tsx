@@ -48,7 +48,7 @@ export default async function ClanPage({ params }: PageProps<"/clans/[slug]">) {
       <header className="relative overflow-hidden rounded-3xl border border-ligne p-8">
         <div aria-hidden className="absolute -top-20 -right-20 size-72 rounded-full blur-3xl" style={{ background: `hsl(${clan.hue} 70% 55% / 0.25)` }} />
         <p className="relative font-mono text-xs text-muted-foreground">Clan · #{index + 1} cette semaine</p>
-        <h1 className="relative mt-2 text-4xl font-semibold tracking-tight" style={{ color: `hsl(${clan.hue} 80% 86%)` }}>
+        <h1 className="relative mt-2 text-4xl font-bold tracking-tight" style={{ color: `hsl(${clan.hue} 80% 86%)` }}>
           {clan.name}
         </h1>
         <dl className="relative mt-6 flex flex-wrap gap-8 text-sm">
@@ -75,7 +75,7 @@ export default async function ClanPage({ params }: PageProps<"/clans/[slug]">) {
         {(tokens ?? []).length === 0 ? (
           <p className="surface p-6 text-sm text-muted-foreground">Aucun token pour l&apos;instant. À toi de lancer le premier !</p>
         ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
             {(tokens as MemberToken[]).map((t) => (
               <li key={t.mint}>
                 <Link href={`/token/${t.mint}`} className="block">

@@ -69,7 +69,7 @@ export default async function AdminPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-3xl font-semibold tracking-tight">Administration</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Administration</h1>
         <p className="mt-1 font-mono text-xs break-all text-muted-foreground">{admin.wallet}</p>
       </header>
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">

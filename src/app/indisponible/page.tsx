@@ -8,7 +8,7 @@ export default function IndisponiblePage() {
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center space-y-5 py-16 text-center">
       <LogoMark size={72} />
-      <h1 className="text-3xl font-semibold tracking-tight">Tiers-État n&apos;est pas disponible dans ton pays</h1>
+      <h1 className="text-3xl font-bold tracking-tight">Tiers-État n&apos;est pas disponible dans ton pays</h1>
       <p className="text-muted-foreground">
         Pour respecter les sanctions internationales et les lois applicables, l&apos;accès à Tiers-État est restreint depuis certains pays et
         régions. Contourner cette restriction (VPN, par exemple) est contraire à nos conditions d&apos;utilisation.

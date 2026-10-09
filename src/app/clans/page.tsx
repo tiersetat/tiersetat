@@ -19,7 +19,7 @@ export default async function ClansPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Les clans</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Les clans</h1>
         <p className="max-w-2xl text-muted-foreground">
           Rejoins le clan de ta région et fais-le grimper au classement de la semaine. Un changement de clan possible par semaine.
         </p>

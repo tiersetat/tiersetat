@@ -25,7 +25,7 @@ export default async function DettePage() {
     <div className="mx-auto max-w-4xl space-y-16">
       <header className="space-y-6">
         <p className="font-mono text-sm uppercase tracking-[0.3em] text-vente">La dette en direct</p>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
           La France coule.
           <br />
           <span className="text-lueur-gradient">Le peuple frappe sa monnaie.</span>

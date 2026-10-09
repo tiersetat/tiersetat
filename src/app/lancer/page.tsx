@@ -8,7 +8,7 @@ export default function LancerPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Créer un token</h1>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Créer un token</h1>
         <p className="text-muted-foreground">Un nom, un ticker, une image. Une seule signature, et ton token est en ligne.</p>
       </header>
       <Suspense>

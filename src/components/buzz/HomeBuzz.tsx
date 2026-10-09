@@ -53,7 +53,7 @@ export async function HomeBuzz() {
             <span className={`h-2 w-2 rounded-full ${style.dot}`} />
             Ça brûle en France
           </p>
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
             {title}
             <span className="ml-3 align-middle font-mono text-sm font-normal text-muted-foreground">
               {top.sources} médias · {top.articles} articles

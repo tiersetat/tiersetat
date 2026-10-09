@@ -37,7 +37,7 @@ export default async function AbonnementsPage() {
     <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
       <div className="space-y-4">
         <header>
-          <h1 className="text-3xl font-semibold tracking-tight">Mes abonnements</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Mes abonnements</h1>
           <p className="mt-1 text-sm text-muted-foreground">Les lancements et les trades des comptes que tu suis, en direct.</p>
         </header>
         <ActivityFeed initial={(activity ?? []) as ActivityItem[]} profiles={feedProfiles} />

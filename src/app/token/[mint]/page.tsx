@@ -92,7 +92,7 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
         </div>
         <div className="min-w-0 space-y-2">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{token.name}</h1>
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{token.name}</h1>
             <span className="font-mono text-lg text-pervenche">${token.ticker}</span>
           </div>
           {token.description && <p className="max-w-2xl text-muted-foreground">{token.description}</p>}

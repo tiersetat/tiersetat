@@ -27,7 +27,7 @@ export async function HomeWeekly() {
       <div className="relative flex flex-wrap items-start justify-between gap-6">
         <div className="space-y-1">
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber-300">Le Mème de la semaine</p>
-          <h2 className="text-2xl font-semibold tracking-tight">La Une de Tiers-État</h2>
+          <h2 className="text-2xl font-bold tracking-tight">La Une de Tiers-État</h2>
           <p className="text-sm text-muted-foreground">
             Fin du concours dans <Countdown end={current.end} />
           </p>

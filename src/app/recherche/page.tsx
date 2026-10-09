@@ -48,7 +48,7 @@ export default async function RecherchePage({ searchParams }: PageProps<"/recher
   return (
     <div className="space-y-8">
       <header className="space-y-4">
-        <h1 className="text-3xl font-semibold tracking-tight">Recherche</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Recherche</h1>
         <form action="/recherche" className="flex max-w-xl gap-2">
           <input name="q" defaultValue={query} className="field" placeholder="Nom, ticker, pseudo ou adresse" autoFocus aria-label="Rechercher" />
           <button type="submit" className="btn-primary shrink-0">
@@ -66,7 +66,7 @@ export default async function RecherchePage({ searchParams }: PageProps<"/recher
           {tokens.length > 0 && (
             <section className="space-y-4">
               <h2 className="text-lg font-semibold">Tokens</h2>
-              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
                 {tokens.map((t) => (
                   <li key={t.mint}>
                     <Link href={`/token/${t.mint}`} className="block">

@@ -13,6 +13,7 @@ import { Eur } from "@/components/Eur";
 import { applyPriority } from "@/lib/solana/priority";
 import { hasAcceptedRisk, RiskGate } from "./RiskGate";
 import { celebrate } from "@/lib/celebrate";
+import { SlideToConfirm } from "./SlideToConfirm";
 import { TradeSettings, useTradeSettings } from "./TradeSettings";
 
 const TOKEN_UNIT = 10 ** PLATFORM_CURVE.tokenDecimals;
@@ -181,7 +182,7 @@ export function TradePanel({ mint, pool, ticker, migrated, warnings, onTraded }:
 
   return (
     <div className="surface space-y-4 p-5">
-      <div className="grid grid-cols-2 gap-1 rounded-xl bg-white/[0.04] p-1">
+      <div className="grid grid-cols-2 gap-1 rounded-full bg-white/[0.05] p-1">
         {(["buy", "sell"] as const).map((s) => (
           <button
             key={s}
@@ -192,7 +193,7 @@ export function TradePanel({ mint, pool, ticker, migrated, warnings, onTraded }:
               setEstimate(null);
               setError(null);
             }}
-            className={`rounded-lg py-2 text-sm font-semibold transition ${
+            className={`rounded-full py-2.5 text-sm font-bold transition ${
               side === s ? (s === "buy" ? "bg-achat text-nuit" : "bg-vente text-nuit") : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -281,14 +282,19 @@ export function TradePanel({ mint, pool, ticker, migrated, warnings, onTraded }:
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={onSubmit}
-        disabled={busy}
-        className={`w-full rounded-xl py-3 text-sm font-semibold text-nuit transition disabled:opacity-60 ${side === "buy" ? "bg-achat hover:brightness-110" : "bg-vente hover:brightness-110"}`}
-      >
-        {!publicKey ? "Connecter un wallet" : busy ? "Signature…" : side === "buy" ? `Acheter $${ticker}` : `Vendre $${ticker}`}
-      </button>
+      {!publicKey ? (
+        <button type="button" onClick={onSubmit} className="btn-primary w-full">
+          Connecter un wallet
+        </button>
+      ) : (
+        <SlideToConfirm
+          tone={side}
+          busy={busy}
+          disabled={!amountIn}
+          label={side === "buy" ? `Glisser pour acheter $${ticker}` : `Glisser pour vendre $${ticker}`}
+          onConfirm={() => void onSubmit()}
+        />
+      )}
 
       {error && <p className="rounded-xl border border-vente/40 bg-vente/10 p-3 text-sm break-words text-vente">{error}</p>}
       {done && (

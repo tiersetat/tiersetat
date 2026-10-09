@@ -12,7 +12,7 @@ export default function AssembleePage() {
     <div className="mx-auto max-w-4xl space-y-10">
       <header className="space-y-3">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Gouvernance · répétition générale</p>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">L&apos;Assemblée</h1>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">L&apos;Assemblée</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
           En 1789, le Tiers-État s&apos;est proclamé Assemblée nationale. Ici, l&apos;Assemblée vit sur la blockchain : chaque voix compte, les
           règles sont publiques, et son Trésor n&apos;obéit qu&apos;aux votes. Personne ne la contrôle, pas même nous.

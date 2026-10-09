@@ -99,7 +99,7 @@ export function TokenGrid({ tab, initial }: { tab: Tab; initial: TokenCard[] }) 
   }
 
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
       {tokens.map((t) => (
         <li
           key={t.mint}
@@ -107,7 +107,7 @@ export function TokenGrid({ tab, initial }: { tab: Tab; initial: TokenCard[] }) 
             flash[t.mint] === "up" ? "shadow-[0_0_0_2px_rgba(74,222,128,0.7),0_0_40px_-10px_rgba(74,222,128,0.8)]" : flash[t.mint] === "down" ? "shadow-[0_0_0_2px_rgba(248,113,113,0.7),0_0_40px_-10px_rgba(248,113,113,0.8)]" : ""
           }`}
         >
-          <Link href={`/token/${t.mint}`} className="block" aria-label={`${t.name} ($${t.ticker})`}>
+          <Link href={`/token/${t.mint}`} className="group block h-full" aria-label={`${t.name} ($${t.ticker})`}>
             <Card
               name={t.name}
               ticker={t.ticker}
@@ -115,10 +115,10 @@ export function TokenGrid({ tab, initial }: { tab: Tab; initial: TokenCard[] }) 
               marketCapSol={Number(t.market_cap_sol)}
               progress={Number(t.curve_progress)}
               footer={
-                <p className="flex items-center justify-between gap-2 border-t border-ligne pt-3 text-[11px] text-muted-foreground" suppressHydrationWarning>
-                  <span className="flex min-w-0 items-center gap-1.5">
-                    <span className="truncate">
-                      par <span className="font-mono">{t.creator_wallet.slice(0, 4)}…{t.creator_wallet.slice(-4)}</span>
+                <p className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 border-t border-ligne pt-2.5 text-[11px] text-muted-foreground" suppressHydrationWarning>
+                  <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+                    <span className="truncate font-mono">
+                      {t.creator_wallet.slice(0, 4)}…{t.creator_wallet.slice(-4)}
                     </span>
                     <CreatorSoldBadge pct={t.creator_sold_pct} />
                   </span>

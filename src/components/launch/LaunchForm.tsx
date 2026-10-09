@@ -206,7 +206,9 @@ export function LaunchForm() {
 
       <aside className="space-y-3 lg:sticky lg:top-24 lg:self-start">
         <p className="label">Aperçu</p>
-        <TokenCard name={name || "Nom du token"} ticker={ticker || "TICKER"} imageUrl={preview} marketCapSol={2} progress={0} />
+        <div className="mx-auto max-w-[260px] lg:max-w-none">
+          <TokenCard name={name || "Nom du token"} ticker={ticker || "TICKER"} imageUrl={preview} marketCapSol={2} progress={0} />
+        </div>
         <p className="text-xs text-muted-foreground">
           Frais de création : 0,02 SOL (anti-spam), plus ~0,02 SOL de frais réseau. Tu touches 70 % des frais de trading de ton token. Migration automatique sur un DEX à la fin de la courbe.
         </p>

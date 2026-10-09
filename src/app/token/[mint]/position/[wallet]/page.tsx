@@ -68,7 +68,7 @@ export default async function PositionPage({ params }: PageProps<"/token/[mint]/
         </div>
 
         <div className="mt-8 flex flex-wrap items-end gap-x-6 gap-y-2">
-          <p className={`text-6xl font-semibold tracking-tight sm:text-7xl ${gain ? "text-achat" : "text-vente"}`}>
+          <p className={`text-6xl font-bold tracking-tight sm:text-7xl ${gain ? "text-achat" : "text-vente"}`}>
             {p.pnlPct === null ? "—" : pct(p.pnlPct)}
           </p>
           <div className="pb-2">

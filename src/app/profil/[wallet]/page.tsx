@@ -90,7 +90,7 @@ export default async function ProfilePage({ params }: PageProps<"/profil/[wallet
         <Avatar wallet={wallet} pseudo={profile.pseudo} url={profile.avatar_url} size={96} />
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-semibold tracking-tight">{displayName(profile)}</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{displayName(profile)}</h1>
             {clan ? (
               <ClanBadge clan={clan} size="lg" />
             ) : me === wallet ? (
@@ -140,7 +140,7 @@ export default async function ProfilePage({ params }: PageProps<"/profil/[wallet
         {tokens.length === 0 ? (
           <p className="surface p-6 text-sm text-muted-foreground">Aucun token créé pour l&apos;instant.</p>
         ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
             {tokens.map((t) => (
               <li key={t.mint}>
                 <Link href={`/token/${t.mint}`} className="block">

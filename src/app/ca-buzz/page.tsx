@@ -46,7 +46,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Ça buzz en France</h1>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Ça buzz en France</h1>
           <p className="max-w-2xl text-muted-foreground">Les sujets que tout le monde reprend en même temps. Plus c&apos;est rouge, plus ça chauffe. Un clic pour en faire un token.</p>
         </div>
         <div className="flex gap-4 text-xs text-muted-foreground">

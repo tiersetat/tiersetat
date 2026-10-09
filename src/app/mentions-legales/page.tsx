@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Mentions légales — Tiers-État" }
 export default function MentionsLegalesPage() {
   return (
     <article className="mx-auto max-w-3xl space-y-6 text-muted-foreground [&_h1]:text-foreground [&_h2]:text-foreground">
-      <h1 className="text-3xl font-semibold tracking-tight">Mentions légales</h1>
+      <h1 className="text-3xl font-bold tracking-tight">Mentions légales</h1>
       <LegalNotice />
 
       <section className="space-y-2">

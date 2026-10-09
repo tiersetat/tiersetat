@@ -79,7 +79,7 @@ export default function VisionPage() {
       <header className="flex flex-col items-center space-y-6 text-center">
         <LogoMark size={96} className="drop-shadow-[0_0_40px_rgba(140,147,201,0.55)]" />
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Vision</p>
-        <h1 className="text-lueur-gradient max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">L&apos;écosystème financier du peuple.</h1>
+        <h1 className="text-lueur-gradient max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">L&apos;écosystème financier du peuple.</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
           Frapper sa monnaie, l&apos;échanger, payer avec, et décider ensemble de la suite. Tiers-État commence par un launchpad. Il ne s&apos;arrête pas là.
         </p>

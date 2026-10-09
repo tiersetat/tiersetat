@@ -26,7 +26,7 @@ export default async function CahiersPage() {
     <div className="mx-auto max-w-5xl space-y-12">
       <header className="space-y-3">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Programme de points</p>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Les Cahiers de doléances</h1>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Les Cahiers de doléances</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
           En 1789, le peuple a écrit ses doléances. Ici, chaque action utile est inscrite dans ton cahier : créer, échanger, rassembler. Les
           premiers bâtisseurs seront reconnus.

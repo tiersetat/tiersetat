@@ -114,7 +114,7 @@ export default async function ClassementsPage({ searchParams }: PageProps<"/clas
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Classements de la semaine</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Classements de la semaine</h1>
         <p className="text-sm text-muted-foreground">Remise à zéro chaque lundi à minuit (heure de Paris). Classement au volume échangé, pas aux gains.</p>
         <Link href="/semaine" className="inline-flex text-sm text-amber-300 underline-offset-4 hover:underline">
           🏆 Voir le concours du Mème de la semaine →

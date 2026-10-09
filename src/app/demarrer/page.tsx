@@ -22,7 +22,7 @@ export default function DemarrerPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-10">
       <header className="space-y-3">
-        <h1 className="text-4xl font-semibold tracking-tight">Bien démarrer</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Bien démarrer</h1>
         <p className="text-lg text-muted-foreground">Trois minutes pour créer ton compte, obtenir des SOL et lancer ton premier token.</p>
         <InstallApp />
         {devnet && (
