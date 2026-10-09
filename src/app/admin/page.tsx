@@ -3,7 +3,8 @@ import { DbcConfigPanel } from "@/components/admin/DbcConfigPanel";
 import { ModerationPanel, type HiddenToken, type ReportGroup } from "@/components/admin/ModerationPanel";
 import { RevenuePanel, type RevenueToken } from "@/components/admin/RevenuePanel";
 import { VaultPanel, type VaultToken } from "@/components/admin/VaultPanel";
-import { DBC_CONFIG } from "@/lib/solana/config";
+/** Configurations d'avant le coffre : leurs frais vont au wallet du fondateur ; toutes les autres versent au coffre. */
+const FOUNDER_FEE_CONFIGS = (process.env.NEXT_PUBLIC_DBC_LEGACY_FOUNDER_CONFIGS ?? "").split(",").map((c) => c.trim()).filter(Boolean);
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { MissingEnvError } from "@/lib/env";
 import { requireAdmin, type Profile } from "@/lib/auth/session";
@@ -90,8 +91,8 @@ export default async function AdminPage() {
               Télécharger la liste (CSV)
             </a>
           </section>
-          <VaultPanel tokens={((allTokens ?? []) as (VaultToken & { config: string })[]).filter((t) => t.config === DBC_CONFIG?.toBase58())} />
-          <RevenuePanel tokens={((allTokens ?? []) as (RevenueToken & { config: string })[]).filter((t) => t.config !== DBC_CONFIG?.toBase58())} />
+          <VaultPanel tokens={((allTokens ?? []) as (VaultToken & { config: string })[]).filter((t) => !FOUNDER_FEE_CONFIGS.includes(t.config))} />
+          <RevenuePanel tokens={((allTokens ?? []) as (RevenueToken & { config: string })[]).filter((t) => FOUNDER_FEE_CONFIGS.includes(t.config))} />
           <DbcConfigPanel />
         </div>
       </div>

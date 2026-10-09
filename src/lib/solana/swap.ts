@@ -27,6 +27,8 @@ export type Quote = {
   amountUsed: BN;
   /** Part de l'entrée non utilisée et rendue : la courbe se termine avant (achat final) */
   amountLeft: BN;
+  /** Frais totaux de l'échange en % (1 % en temps normal, plus pendant la minute anti-robots) */
+  feePct: number;
 };
 
 /**
@@ -48,7 +50,12 @@ export function quote(connection: Connection, snap: PoolSnapshot, side: Side, am
     side === "buy" ? { ...base, swapMode: SwapMode.PartialFill, amountIn } : { ...base, swapMode: SwapMode.ExactIn, amountIn },
   );
   const outputAmount = new BN(q.outputAmount.toString());
+  // Frais prélevés en SOL : sur l'entrée à l'achat, sur la sortie à la vente
+  const fees = Number(q.tradingFee.toString()) + Number(q.protocolFee.toString()) + Number(q.referralFee.toString());
+  const feeBase = side === "buy" ? Number(q.includedFeeInputAmount.toString()) : Number(q.outputAmount.toString()) + fees;
+  const feePct = feeBase > 0 ? (fees / feeBase) * 100 : 0;
   return {
+    feePct,
     outputAmount,
     minimumAmountOut: q.minimumAmountOut ?? outputAmount.muln(10_000 - slippageBps).divn(10_000),
     amountUsed: new BN(q.includedFeeInputAmount.toString()),

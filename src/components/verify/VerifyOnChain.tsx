@@ -28,14 +28,32 @@ export function VerifyOnChain() {
           TREASURY_WALLET ? connection.getBalance(TREASURY_WALLET) : Promise.resolve(null),
         ]);
         if (!cfg) throw new Error("Configuration introuvable");
-        const feePct = Number(cfg.poolFees.baseFee.cliffFeeNumerator.toString()) / 1e7;
+        const bf = cfg.poolFees.baseFee;
+        const startPct = Number(bf.cliffFeeNumerator.toString()) / 1e7;
+        // Frais normaux = fin du planificateur de frais (identiques au départ si pas d'anti-robots)
+        const feePct =
+          bf.firstFactor > 0
+            ? sdk.calculateFeeSchedulerEndingBaseFeeBps(Number(bf.cliffFeeNumerator.toString()), bf.firstFactor, Number(bf.secondFactor.toString()), Number(bf.thirdFactor.toString()), bf.baseFeeMode) / 100
+            : startPct;
+        const antiBotSec = bf.firstFactor * Number(bf.secondFactor.toString());
         const creationFee = Number(cfg.poolCreationFee.toString());
         const supply = Number(cfg.preMigrationTokenSupply.toString()) / 10 ** PLATFORM_CURVE.tokenDecimals;
         const locked = Number(cfg.partnerPermanentLockedLiquidityPercentage) + Number(cfg.creatorPermanentLockedLiquidityPercentage);
         const unlocked = Number(cfg.partnerLiquidityPercentage) + Number(cfg.creatorLiquidityPercentage);
         const threshold = Number(cfg.migrationQuoteThreshold.toString());
         const checks: Check[] = [
-          { label: "Frais par échange", promesse: `${PLATFORM_CURVE.tradingFeeBps / 100} %`, lu: `${feePct.toLocaleString("fr-FR")} %`, ok: Math.abs(feePct - PLATFORM_CURVE.tradingFeeBps / 100) < 1e-9 },
+          {
+            label: "Frais par échange",
+            promesse: `${PLATFORM_CURVE.tradingFeeBps / 100} %`,
+            lu: `${feePct.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} %`,
+            ok: Math.abs(feePct - PLATFORM_CURVE.tradingFeeBps / 100) < 0.01,
+          },
+          {
+            label: "Protection anti-robots au lancement",
+            promesse: `${PLATFORM_CURVE.antiBot.startingFeeBps / 100} % puis 1 % en ${PLATFORM_CURVE.antiBot.durationSec} s`,
+            lu: bf.firstFactor > 0 ? `${startPct.toLocaleString("fr-FR")} % puis ${feePct.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} % en ${antiBotSec} s` : "Aucune",
+            ok: bf.firstFactor > 0 && startPct === PLATFORM_CURVE.antiBot.startingFeeBps / 100 && antiBotSec === PLATFORM_CURVE.antiBot.durationSec,
+          },
           {
             label: "Part du créateur sur les frais",
             promesse: `${PLATFORM_CURVE.creatorTradingFeePercentage} %`,

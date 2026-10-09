@@ -27,13 +27,14 @@ export function buildPlatformCurve(): ConfigParameters {
       leftover: 0,
     },
     fee: {
+      // Anti-robots : 50 % à la première seconde, puis décroissance exponentielle jusqu'à 1 % en 60 s
       baseFeeParams: {
-        baseFeeMode: BaseFeeMode.FeeSchedulerLinear,
+        baseFeeMode: BaseFeeMode.FeeSchedulerExponential,
         feeSchedulerParam: {
-          startingFeeBps: PLATFORM_CURVE.tradingFeeBps,
+          startingFeeBps: PLATFORM_CURVE.antiBot.startingFeeBps,
           endingFeeBps: PLATFORM_CURVE.tradingFeeBps,
-          numberOfPeriod: 0,
-          totalDuration: 0,
+          numberOfPeriod: PLATFORM_CURVE.antiBot.durationSec,
+          totalDuration: PLATFORM_CURVE.antiBot.durationSec,
         },
       },
       dynamicFeeEnabled: true,

@@ -18,6 +18,12 @@ export const PLATFORM_CURVE = {
   creatorTradingFeePercentage: 70,
   /** Frais de création d'un token (anti-spam), en SOL : 90 % plateforme, 10 % Meteora */
   poolCreationFeeSol: 0.02,
+  /**
+   * Anti-robots : frais de départ très élevés qui redescendent (décroissance exponentielle,
+   * seconde par seconde) jusqu'aux frais normaux. Le premier achat du créateur, dans la
+   * transaction de lancement, reste au tarif normal.
+   */
+  antiBot: { startingFeeBps: 5000, durationSec: 60 },
 } as const;
 
 /**

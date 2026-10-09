@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { BaseFeeMode, calculateFeeSchedulerEndingBaseFeeBps } from "@meteora-ag/dynamic-bonding-curve-sdk";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { validateConfigParameters } from "@meteora-ag/dynamic-bonding-curve-sdk";
 import { buildPlatformCurve, migrationThresholdSol, PLATFORM_CURVE } from "@/lib/solana/curve";
@@ -23,6 +24,21 @@ describe("courbe de la plateforme", () => {
   it("encaisse les frais en SOL et reverse une part au créateur", () => {
     expect(params.collectFeeMode).toBe(0);
     expect(params.creatorTradingFeePercentage).toBe(PLATFORM_CURVE.creatorTradingFeePercentage);
+  });
+
+  it("anti-robots : 50 % au départ, 1 % au bout de 60 s", () => {
+    const fee = params.poolFees.baseFee;
+    expect(fee.baseFeeMode).toBe(BaseFeeMode.FeeSchedulerExponential);
+    expect(Number(fee.cliffFeeNumerator.toString()) / 1e7).toBe(50);
+    expect(fee.firstFactor).toBe(PLATFORM_CURVE.antiBot.durationSec);
+    const endingBps = calculateFeeSchedulerEndingBaseFeeBps(
+      Number(fee.cliffFeeNumerator.toString()),
+      fee.firstFactor,
+      Number(fee.secondFactor.toString()),
+      Number(fee.thirdFactor.toString()),
+      fee.baseFeeMode,
+    );
+    expect(Math.round(endingBps)).toBe(PLATFORM_CURVE.tradingFeeBps);
   });
 });
 

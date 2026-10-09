@@ -32,6 +32,8 @@ export function TradePanel({ mint, pool, ticker, migrated, warnings, onTraded }:
   const [estimate, setEstimate] = useState<number | null>(null);
   /** Achat final d'une courbe : SOL réellement utilisés (le reste est rendu), sinon null */
   const [partialSol, setPartialSol] = useState<number | null>(null);
+  /** Frais réels du devis (en %), pour signaler la minute anti-robots */
+  const [feePct, setFeePct] = useState<number | null>(null);
   const [balances, setBalances] = useState<{ sol: number; token: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +92,7 @@ export function TradePanel({ mint, pool, ticker, migrated, warnings, onTraded }:
         if (!cancelled) {
           setEstimate(Number(q.outputAmount.toString()) / (side === "buy" ? TOKEN_UNIT : 1e9));
           setPartialSol(side === "buy" && !q.amountLeft.isZero() ? Number(q.amountUsed.toString()) / 1e9 : null);
+          setFeePct(q.feePct);
         }
       } catch {
         if (!cancelled) {
@@ -237,7 +240,13 @@ export function TradePanel({ mint, pool, ticker, migrated, warnings, onTraded }:
             </span>{" "}
             <Eur sol={side === "buy" ? parsed : estimate} className="text-xs text-muted-foreground" />
             <br />
-            Glissement max {settings.slippageBps / 100} % · frais 1 %
+            Glissement max {settings.slippageBps / 100} % · frais {feePct !== null ? `${feePct.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %` : "1 %"}
+            {feePct !== null && feePct > 1.5 && (
+              <span className="mt-1.5 block text-vente">
+                Protection anti-robots : ce mème vient d&apos;être lancé, les frais démarrent très haut et redescendent à 1 % en une minute.
+                Attends quelques secondes pour payer moins.
+              </span>
+            )}
             {partialSol !== null && (
               <span className="mt-1.5 block text-amber-300">
                 Ton achat complète la courbe : seuls ≈ {fmt(partialSol, 4)} SOL seront utilisés, le reste reste dans ton wallet. Le mème prend
