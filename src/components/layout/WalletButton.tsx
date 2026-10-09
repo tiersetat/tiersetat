@@ -15,7 +15,7 @@ const LABELS = {
 // Petit écran : libellé court pour garder l'en-tête sur une seule ligne
 const LABELS_MOBILE = { ...LABELS, "no-wallet": "Wallet" };
 
-const query = "(max-width: 639px)";
+const query = "(max-width: 1279px)";
 function subscribe(callback: () => void) {
   const mq = window.matchMedia(query);
   mq.addEventListener("change", callback);

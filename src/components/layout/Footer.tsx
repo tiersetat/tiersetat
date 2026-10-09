@@ -5,7 +5,7 @@ import { InstallApp } from "@/components/app/InstallApp";
 
 export function Footer() {
   return (
-    <footer className="mt-24 border-t border-ligne pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+    <footer className="mt-24 border-t border-ligne pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_auto]">
         <div className="space-y-3">
           <Wordmark />

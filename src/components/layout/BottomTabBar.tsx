@@ -54,7 +54,7 @@ export function BottomTabBar() {
   return (
     <>
       {open && (
-        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" onClick={() => setOpen(false)}>
           <nav
             aria-label="Plus de pages"
             onClick={(e) => e.stopPropagation()}
@@ -70,7 +70,7 @@ export function BottomTabBar() {
       )}
       <nav
         aria-label="Navigation principale"
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-ligne bg-nuit/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-ligne bg-nuit/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       >
         <ul className="mx-auto grid max-w-md grid-cols-5 items-end px-2">
           {TABS.map((t) =>

@@ -211,8 +211,8 @@
 }
 
 
-/* En-tête compact sur téléphone */
-@media (max-width: 639px) {
+/* En-tête compact sur téléphone, tablette et petit ordinateur */
+@media (max-width: 1279px) {
   .wallet-adapter-button.wallet-adapter-button-trigger {
     height: 2.5rem !important;
     padding: 0 0.85rem !important;

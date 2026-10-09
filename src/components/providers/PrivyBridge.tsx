@@ -80,9 +80,9 @@ function EmailLoginInner() {
       Déconnexion e-mail
     </button>
   ) : (
-    <button type="button" onClick={() => login()} className="btn-ghost h-10 px-3.5 py-0 sm:px-5">
-      <span className="sm:hidden">E-mail</span>
-      <span className="hidden sm:inline">Continuer avec un e-mail</span>
+    <button type="button" onClick={() => login()} className="btn-ghost h-10 px-3.5 py-0 xl:px-5">
+      <span className="xl:hidden">E-mail</span>
+      <span className="hidden xl:inline">Continuer avec un e-mail</span>
     </button>
   );
 }
