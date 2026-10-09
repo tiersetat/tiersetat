@@ -242,7 +242,7 @@
 @media (max-width: 1279px) {
   .wallet-adapter-button.wallet-adapter-button-trigger {
     height: 2.5rem !important;
-    padding: 0 0.85rem !important;
+    padding: 0 1rem !important;
   }
   .wallet-adapter-button-trigger .wallet-adapter-button-start-icon {
     margin-right: 6px !important;
