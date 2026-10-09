@@ -134,6 +134,7 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
         pool={token.pool}
         ticker={token.ticker}
         initialTrades={(trades ?? []) as TradeRow[]}
+        createdAt={token.created_at}
         initial={{ market_cap_sol: token.market_cap_sol, curve_progress: token.curve_progress, migrated: token.migrated }}
         warnings={buyWarnings(flags)}
         below={<Comments mint={token.mint} />}

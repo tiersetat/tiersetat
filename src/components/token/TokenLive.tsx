@@ -35,8 +35,10 @@ export function TokenLive(props: {
   sidebar?: React.ReactNode;
   /** Contenu affiché sous l'historique (discussion) */
   below?: React.ReactNode;
+  /** Date de lancement (point de départ du graphique) */
+  createdAt?: string;
 }) {
-  const { mint, pool, ticker } = props;
+  const { mint, pool, ticker, createdAt } = props;
   const [trades, setTrades] = useState(props.initialTrades);
   const [live, setLive] = useState(props.initial);
 
@@ -95,7 +97,7 @@ export function TokenLive(props: {
           ))}
         </dl>
 
-        <PriceChart trades={trades} />
+        <PriceChart trades={trades} createdAt={createdAt} />
 
         <section className="surface space-y-3 p-5">
           <div className="flex items-baseline justify-between">
