@@ -27,7 +27,7 @@ export const viewport: Viewport = { themeColor: "#030206", viewportFit: "cover" 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="fr" className={`${geist.variable} ${geistMono.variable} h-full`}>
-      <body className="flex min-h-full flex-col overflow-x-hidden">
+      <body className="flex min-h-full flex-col">
         <WalletProviders>
           <InviteCapture />
           <RegisterSW />

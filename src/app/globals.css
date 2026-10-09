@@ -238,3 +238,12 @@
 .chip:active {
   transform: scale(0.97);
 }
+
+/*
+ * Les décors (arcs, halos) dépassent de l'écran : « clip » les rogne au bord sans que les
+ * navigateurs mobiles n'élargissent la page pour eux (contrairement à « hidden » sur body).
+ */
+html,
+body {
+  overflow-x: clip;
+}
