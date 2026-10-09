@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Notification } from "@/app/api/notifications/route";
+import { PushToggle } from "@/components/app/PushToggle";
 import { displayName } from "@/lib/display";
 
 const KEY = "te_notif_seen_v1";
@@ -131,6 +132,9 @@ export function NotificationBell() {
               ))}
             </ul>
           )}
+          <div className="border-t border-ligne p-3">
+            <PushToggle />
+          </div>
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@ import { Connection, PublicKey, type VersionedTransactionResponse } from "@solan
 import { DBC_PROGRAM_ID, isPlatformConfig } from "@/lib/solana/config";
 import { MIGRATION_QUOTE_THRESHOLD_LAMPORTS, PLATFORM_CURVE } from "@/lib/solana/platform";
 import { computePoolStats, decodePoolAccount } from "@/lib/solana/pool-stats";
+import { notifyTradeEvents } from "@/lib/push-events";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
 export type ParsedTrade = {
@@ -109,6 +110,8 @@ export async function indexTrade(
 
   const trade = parseTrade(tx, token.mint, { base: pool.baseVault.toBase58(), quote: pool.quoteVault.toBase58() });
   const db = supabaseAdmin();
+  // État avant mise à jour, pour détecter la prise de la Bastille et adresser les alertes
+  const { data: before } = await db.from("tokens").select("name, ticker, creator_wallet, curve_progress, hidden").eq("mint", token.mint).maybeSingle();
   const stats = computePoolStats(pool, MIGRATION_QUOTE_THRESHOLD_LAMPORTS);
   const blockTime = new Date((tx.blockTime ?? Date.now() / 1000) * 1000).toISOString();
 
@@ -141,5 +144,13 @@ export async function indexTrade(
     })
     .eq("mint", token.mint);
   if (uErr) throw uErr;
+
+  if (before && !before.hidden) {
+    await notifyTradeEvents(
+      { mint: token.mint, name: before.name, ticker: before.ticker, creator_wallet: before.creator_wallet },
+      trade ? { trader: trade.trader, side: trade.side, solAmount: trade.solAmount } : null,
+      Number(before.curve_progress) < 100 && stats.progress >= 100,
+    ).catch(() => undefined);
+  }
   return { ok: true, trade };
 }
