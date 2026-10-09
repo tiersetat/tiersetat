@@ -14,6 +14,7 @@
   --color-indigo: var(--indigo);
   --color-achat: var(--achat);
   --color-vente: var(--vente);
+  --color-electrique: var(--electrique);
 
   --font-sans: var(--font-geist);
   --font-mono: var(--font-geist-mono);
@@ -45,14 +46,16 @@
 }
 
 :root {
-  --nuit: #030206;
+  --nuit: #05040b;
   --surface: rgb(255 255 255 / 0.035);
   --ligne: rgb(255 255 255 / 0.09);
   --lueur: #ece6f6;
   --pervenche: #8c93c9;
   --indigo: #545a92;
-  --achat: #7fe3b8;
-  --vente: #ff7a93;
+  /* Révolution néon : bleu électrique pour l'action, rouge néon pour ce qui brûle, vert néon pour les gains */
+  --electrique: #4d7cff;
+  --achat: #3dffa8;
+  --vente: #ff3b5c;
 
   --background: var(--nuit);
   --foreground: #f4f1fa;
@@ -71,7 +74,7 @@
   --destructive: var(--vente);
   --border: var(--ligne);
   --input: rgb(255 255 255 / 0.12);
-  --ring: var(--pervenche);
+  --ring: var(--electrique);
   --radius: 0.75rem;
   color-scheme: dark;
 }
@@ -83,8 +86,9 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     background-image:
-      radial-gradient(60rem 40rem at 50% -10%, rgb(140 147 201 / 0.18), transparent 70%),
-      radial-gradient(40rem 30rem at 100% 0%, rgb(84 90 146 / 0.14), transparent 70%),
+      radial-gradient(60rem 40rem at 50% -10%, rgb(77 124 255 / 0.16), transparent 70%),
+      radial-gradient(40rem 30rem at 100% 0%, rgb(140 92 255 / 0.12), transparent 70%),
+      radial-gradient(36rem 28rem at 0% 100%, rgb(255 59 92 / 0.06), transparent 70%),
       radial-gradient(1px 1px at 12% 22%, rgb(255 255 255 / 0.35), transparent),
       radial-gradient(1px 1px at 78% 14%, rgb(255 255 255 / 0.3), transparent),
       radial-gradient(1px 1px at 42% 68%, rgb(255 255 255 / 0.25), transparent),
@@ -95,7 +99,7 @@
     background-attachment: fixed;
   }
   ::selection {
-    background: var(--pervenche);
+    background: var(--electrique);
     color: var(--nuit);
   }
 }
@@ -117,12 +121,12 @@
   }
   /* Bouton principal : grande pilule lumineuse */
   .btn-primary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-bold tracking-tight text-nuit transition disabled:opacity-50;
-    background: linear-gradient(180deg, #ffffff 0%, #dcdaf7 45%, #a4a9e0 100%);
-    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.4) inset, 0 -2px 0 0 rgb(84 90 146 / 0.35) inset, 0 10px 34px -8px rgb(140 147 201 / 0.75);
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-bold tracking-tight text-white transition disabled:opacity-50;
+    background: linear-gradient(135deg, #4d7cff 0%, #6a6bff 50%, #9b6bff 100%);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.18) inset, 0 1px 0 0 rgb(255 255 255 / 0.35) inset, 0 10px 34px -8px rgb(77 124 255 / 0.85);
   }
   .btn-primary:hover:not(:disabled) {
-    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.5) inset, 0 -2px 0 0 rgb(84 90 146 / 0.35) inset, 0 14px 44px -6px rgb(140 147 201 / 0.95);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.28) inset, 0 1px 0 0 rgb(255 255 255 / 0.45) inset, 0 14px 46px -6px rgb(77 124 255 / 1);
   }
   /* Bouton secondaire : pilule de verre */
   .btn-ghost {
@@ -131,28 +135,28 @@
   /* Achat / vente : pilules pleines, couleur franche */
   .btn-buy {
     @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-bold text-nuit transition disabled:opacity-50;
-    background: linear-gradient(180deg, #b5f5d8 0%, #7fe3b8 100%);
-    box-shadow: 0 10px 30px -10px rgb(127 227 184 / 0.8);
+    background: linear-gradient(180deg, #8dffd0 0%, #3dffa8 100%);
+    box-shadow: 0 10px 30px -10px rgb(61 255 168 / 0.8);
   }
   .btn-sell {
     @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-bold text-nuit transition disabled:opacity-50;
-    background: linear-gradient(180deg, #ffb3c1 0%, #ff7a93 100%);
-    box-shadow: 0 10px 30px -10px rgb(255 122 147 / 0.8);
+    background: linear-gradient(180deg, #ff8ea1 0%, #ff3b5c 100%);
+    box-shadow: 0 10px 30px -10px rgb(255 59 92 / 0.8);
   }
   .chip {
     @apply inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[13px] font-semibold text-muted-foreground transition hover:border-white/20 hover:text-foreground;
   }
   .chip-active {
-    @apply border-transparent bg-lueur text-nuit hover:text-nuit;
+    @apply border-transparent bg-electrique text-white shadow-[0_6px_20px_-8px_rgb(77_124_255/0.9)] hover:text-white;
   }
   .field {
-    @apply w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-pervenche/70 focus:ring-4 focus:ring-pervenche/20;
+    @apply w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-electrique/70 focus:ring-4 focus:ring-electrique/20;
   }
   .label {
     @apply text-xs font-medium text-muted-foreground;
   }
   .text-lueur-gradient {
-    background: linear-gradient(180deg, #ffffff 10%, #c8c6ee 60%, #8c93c9 100%);
+    background: linear-gradient(180deg, #ffffff 10%, #c9d4ff 55%, #7f9bff 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -163,8 +167,8 @@
   }
   .progress-fill {
     @apply h-full rounded-full transition-[width] duration-700;
-    background: linear-gradient(90deg, #545a92, #8c93c9 55%, #f1ecfa);
-    box-shadow: 0 0 12px rgb(140 147 201 / 0.7);
+    background: linear-gradient(90deg, #4d7cff, #9b6bff 60%, #ff3b5c);
+    box-shadow: 0 0 12px rgb(77 124 255 / 0.8);
   }
 }
 

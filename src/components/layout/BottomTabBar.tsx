@@ -79,7 +79,7 @@ export function BottomTabBar() {
                 <Link
                   href={t.href}
                   aria-label="Frapper un mème"
-                  className="-mt-6 grid size-14 place-items-center rounded-full bg-gradient-to-b from-lueur to-pervenche text-3xl font-light text-nuit shadow-[0_8px_30px_-6px_rgba(140,147,201,0.9)] transition active:scale-90"
+                  className="-mt-6 grid size-14 place-items-center rounded-full bg-gradient-to-br from-electrique via-[#6a6bff] to-[#9b6bff] text-3xl font-light text-white shadow-[0_8px_30px_-6px_rgb(77_124_255/0.95)] transition active:scale-90"
                 >
                   +
                 </Link>

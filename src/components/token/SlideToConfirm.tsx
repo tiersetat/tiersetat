@@ -31,7 +31,7 @@ export function SlideToConfirm({ label, tone, disabled, busy, onConfirm }: { lab
     onConfirm();
   };
 
-  const color = tone === "buy" ? "from-[#b5f5d8] to-achat" : "from-[#ffb3c1] to-vente";
+  const color = tone === "buy" ? "from-[#8dffd0] to-achat" : "from-[#ff8ea1] to-vente";
   const max = width - KNOB - 8;
   const progress = max > 0 ? offset / max : 0;
 

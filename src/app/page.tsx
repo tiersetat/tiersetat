@@ -53,7 +53,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       {/* Hero, compact sur téléphone pour montrer vite les mèmes */}
       <section className="relative isolate left-1/2 -mt-10 flex w-screen -translate-x-1/2 flex-col items-center overflow-hidden px-4 pt-10 pb-6 text-center sm:pt-16 sm:pb-10">
         <HeroArcs />
-        <div aria-hidden className="pointer-events-none absolute top-8 left-1/2 -z-10 size-[28rem] -translate-x-1/2 rounded-full bg-pervenche/20 blur-[110px]" />
+        <div aria-hidden className="pointer-events-none absolute top-8 left-1/2 -z-10 size-[28rem] -translate-x-1/2 rounded-full bg-electrique/25 blur-[110px]" />
         <LogoMark size={104} className="drop-shadow-[0_0_40px_rgba(140,147,201,0.55)] sm:hidden" />
         <LogoMark size={132} className="hidden drop-shadow-[0_0_40px_rgba(140,147,201,0.55)] sm:block" />
         <p className="mt-8 hidden rounded-full border border-ligne bg-white/[0.03] px-4 py-1.5 text-xs text-muted-foreground sm:block">

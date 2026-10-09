@@ -26,12 +26,12 @@ export function PriceChart({ trades }: { trades: TradeRow[] }) {
       localization: { locale: "fr-FR" },
     });
     seriesRef.current = chart.addSeries(CandlestickSeries, {
-      upColor: "#7fe3b8",
-      borderUpColor: "#7fe3b8",
-      wickUpColor: "#7fe3b8",
-      downColor: "#ff7a93",
-      borderDownColor: "#ff7a93",
-      wickDownColor: "#ff7a93",
+      upColor: "#3dffa8",
+      borderUpColor: "#3dffa8",
+      wickUpColor: "#3dffa8",
+      downColor: "#ff3b5c",
+      borderDownColor: "#ff3b5c",
+      wickDownColor: "#ff3b5c",
       priceFormat: { type: "price", precision: 3, minMove: 0.001 },
     });
     chartRef.current = chart;

@@ -31,7 +31,7 @@ export default async function Image({ params }: { params: Promise<{ mint: string
 
   const p = data?.position;
   const gain = (p?.pnlSol ?? 0) >= 0;
-  const accent = gain ? "#4ade80" : "#f87171";
+  const accent = gain ? "#3dffa8" : "#ff3b5c";
   const pctText = p?.pnlPct == null ? "—" : `${p.pnlPct >= 0 ? "+" : ""}${p.pnlPct.toLocaleString("fr-FR", { maximumFractionDigits: Math.abs(p.pnlPct) < 10 ? 1 : 0 })} %`;
   const multiple = p?.multiple == null ? null : `x${p.multiple.toLocaleString("fr-FR", { maximumFractionDigits: 2 })}`;
   const end = p?.closed && p.lastSellAt ? p.lastSellAt : new Date().toISOString();

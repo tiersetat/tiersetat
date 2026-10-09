@@ -48,7 +48,7 @@ function Item({ href, label, d, active }: { href: string; label: string; d: stri
         active ? "bg-white/[0.09] text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.07)]" : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
       }`}
     >
-      <svg viewBox="0 0 24 24" className={`size-5 shrink-0 ${active ? "text-lueur" : ""}`} fill="none" stroke="currentColor" strokeWidth={active ? 2.1 : 1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <svg viewBox="0 0 24 24" className={`size-5 shrink-0 ${active ? "text-electrique drop-shadow-[0_0_8px_rgb(77_124_255/0.8)]" : ""}`} fill="none" stroke="currentColor" strokeWidth={active ? 2.1 : 1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d={d} />
       </svg>
       <span className="truncate">{label}</span>
