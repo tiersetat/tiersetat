@@ -14,6 +14,24 @@ import { LogoMark } from "@/components/brand/Logo";
 import { Eur } from "@/components/Eur";
 import { TokenGrid } from "@/components/home/TokenGrid";
 import { getStats, listTokens, parseTab, TABS, type PlatformStats, type Tab, type TokenCard } from "@/lib/tokens";
+import { CashBar } from "@/components/market/CashBar";
+import { MarketRow, type MarketItem } from "@/components/market/MarketRow";
+import { WatchlistView } from "@/components/market/WatchlistView";
+import { cryptos, solanaTrending } from "@/lib/market-data";
+
+/** Listes du marché : nos mèmes (onglets Tiers-État) + tout Solana (données publiques). */
+const EXTERNAL = { solana: "Tendances Solana", cryptos: "Cryptos établies" } as const;
+type External = keyof typeof EXTERNAL;
+type MarketTab = Tab | External | "liste";
+const MARKET_TABS: { key: MarketTab; label: string }[] = [
+  { key: "liste", label: "⭐ Ma liste" },
+  ...(Object.keys(TABS) as Tab[]).map((k) => ({ key: k, label: TABS[k] })),
+  { key: "solana", label: EXTERNAL.solana },
+  { key: "cryptos", label: EXTERNAL.cryptos },
+];
+function parseMarketTab(v: unknown): MarketTab {
+  return v === "liste" || v === "solana" || v === "cryptos" ? v : parseTab(v);
+}
 
 const STEPS = [
   {
@@ -36,14 +54,23 @@ const STEPS = [
 const fmt = (n: number, d = 0) => n.toLocaleString("fr-FR", { maximumFractionDigits: d });
 
 export default async function Home({ searchParams }: PageProps<"/">) {
-  const tab = parseTab((await searchParams).tri);
+  const market = parseMarketTab((await searchParams).tri);
+  const tab = parseTab(market);
+  let external: MarketItem[] | null = null;
+  if (market === "solana" || market === "cryptos") {
+    try {
+      external = market === "solana" ? await solanaTrending() : await cryptos();
+    } catch {
+      external = [];
+    }
+  }
   let tokens: TokenCard[] = [];
   let stats: PlatformStats = { tokens: 0, volumeSol: 0, traders: 0 };
   let dette: DetteToken | null = null;
   let waitlist: number | null = null;
   let founders: Founders | null = null;
   try {
-    [tokens, stats, dette, waitlist, founders] = await Promise.all([listTokens(tab), getStats(), getOfficialDette(), getWaitlistCount(), getFounders()]);
+    [tokens, stats, dette, waitlist, founders] = await Promise.all([external || market === "liste" ? Promise.resolve([]) : listTokens(tab), getStats(), getOfficialDette(), getWaitlistCount(), getFounders()]);
   } catch (err) {
     console.error("accueil", err);
   }
@@ -53,6 +80,9 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       {/* Hero, compact sur téléphone pour montrer vite les mèmes */}
       <section className="relative isolate left-1/2 -mt-[6.5rem] flex w-screen -translate-x-1/2 flex-col items-center overflow-hidden px-4 pt-[6.5rem] pb-6 text-center sm:-mt-[7rem] sm:pt-[8.5rem] sm:pb-10">
         <HeroArcs />
+        <div className="mb-8 w-full max-w-xl empty:hidden">
+          <CashBar />
+        </div>
         <LogoMark size={96} className="rise-in drop-shadow-[0_10px_30px_rgba(61,90,254,0.6)] sm:hidden" />
         <LogoMark size={124} className="rise-in hidden drop-shadow-[0_10px_30px_rgba(61,90,254,0.6)] sm:block" />
         <p className="rise-in mt-7 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-4 py-1.5 text-xs font-semibold text-foreground">
@@ -102,24 +132,39 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       <section id="explorer" className="scroll-mt-24 space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-extrabold sm:text-4xl">Explorer les mèmes</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Mis à jour en temps réel depuis la blockchain.</p>
+            <h2 className="text-3xl font-extrabold sm:text-4xl">Le marché</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Nos mèmes en temps réel, et tous les tokens de Solana.</p>
           </div>
           <nav className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Trier les tokens">
-            {(Object.keys(TABS) as Tab[]).map((key) => (
+            {MARKET_TABS.map(({ key, label }) => (
               <Link
                 key={key}
                 href={key === "nouveaux" ? "/#explorer" : `/?tri=${key}#explorer`}
                 scroll={false}
-                aria-current={tab === key ? "page" : undefined}
-                className={`chip shrink-0 ${tab === key ? "chip-active" : ""}`}
+                aria-current={market === key ? "page" : undefined}
+                className={`chip shrink-0 ${market === key ? "chip-active" : ""}`}
               >
-                {TABS[key]}
+                {label}
               </Link>
             ))}
           </nav>
         </div>
-        <TokenGrid key={tab} tab={tab} initial={tokens} />
+        {market === "liste" ? (
+          <WatchlistView />
+        ) : external ? (
+          external.length ? (
+            <ul className="surface divide-y divide-ligne/60 p-1.5">
+              {external.map((t, i) => (
+                <MarketRow key={t.address} t={t} rank={i + 1} />
+              ))}
+            </ul>
+          ) : (
+            <p className="surface p-8 text-center text-sm text-muted-foreground">Les données du marché sont momentanément indisponibles. Réessaie dans une minute.</p>
+          )
+        ) : (
+          <TokenGrid key={tab} tab={tab} initial={tokens} />
+        )}
+        {external && <p className="text-xs text-muted-foreground">Données publiques (DexScreener, GeckoTerminal), pour information. Ces tokens ne sont ni vérifiés ni recommandés par Tiers-État.</p>}
       </section>
 
       {/* Le Mème de la semaine */}

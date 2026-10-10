@@ -6,6 +6,7 @@ import { HoldersPanel } from "@/components/token/HoldersPanel";
 import { getHolders } from "@/lib/holders";
 import { Comments } from "@/components/token/Comments";
 import { ShareButton } from "@/components/token/ShareButton";
+import { WatchStar } from "@/components/market/WatchStar";
 import { TrustBadge } from "@/components/trust/TrustBadge";
 import { getCreatorTrust } from "@/lib/creator-trust-data";
 import { MyPositionLink } from "@/components/token/MyPositionLink";
@@ -123,6 +124,7 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
               Créé le {new Date(token.created_at).toLocaleDateString("fr-FR")}
             </span>
             <MyPositionLink mint={token.mint} />
+            <WatchStar address={token.mint} />
             <ShareButton name={token.name} ticker={token.ticker} path={`/token/${token.mint}`} />
             <ReportButton mint={token.mint} />
           </div>
