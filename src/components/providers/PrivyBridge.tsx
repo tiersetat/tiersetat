@@ -29,7 +29,7 @@ export function PrivyBridge({ children }: { children: ReactNode }) {
       config={{
         // Apple nécessite un compte Apple Developer : à ajouter avec l'appli mobile
         loginMethods: ["email", "google"],
-        appearance: { theme: "dark", accentColor: "#8C93C9", walletChainType: "solana-only", logo: "/images/logo.png" },
+        appearance: { theme: "dark", accentColor: "#3D5AFE", walletChainType: "solana-only", logo: "/images/logo.png" },
         embeddedWallets: { solana: { createOnLogin: "all-users" } },
         solana: { rpcs: { [chain]: { rpc: createSolanaRpc(RPC_URL), rpcSubscriptions: createSolanaRpcSubscriptions(wsUrl) } } },
       }}
