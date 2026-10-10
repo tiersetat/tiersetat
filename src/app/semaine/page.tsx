@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { RankNav } from "@/components/layout/RankNav";
 import Link from "next/link";
 import { Countdown } from "@/components/weekly/Countdown";
 import { WeekRow } from "@/components/weekly/WeekRow";
@@ -20,9 +22,12 @@ export default async function SemainePage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-12">
+      <Suspense fallback={<h1 className="text-4xl font-extrabold">Classement</h1>}>
+        <RankNav />
+      </Suspense>
       <header className="space-y-3">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-soleil">Concours hebdomadaire</p>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Le Mème de la semaine</h1>
+        <h2 className="text-4xl font-extrabold sm:text-5xl">Le Mème de la semaine</h2>
         <p className="max-w-2xl text-lg text-muted-foreground">
           Du lundi au dimanche, les mèmes s&apos;affrontent. Celui que la communauté échange le plus fait la Une de Tiers-État.
         </p>

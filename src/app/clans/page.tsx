@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { RankNav } from "@/components/layout/RankNav";
 import Link from "next/link";
 import { getSessionWallet } from "@/lib/auth/session";
 import { clanRanking } from "@/lib/leaderboards";
@@ -18,8 +20,11 @@ export default async function ClansPage() {
 
   return (
     <div className="space-y-8">
+      <Suspense fallback={<h1 className="text-4xl font-extrabold">Classement</h1>}>
+        <RankNav />
+      </Suspense>
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Les clans</h1>
+        <h2 className="text-3xl font-extrabold">Les clans</h2>
         <p className="max-w-2xl text-muted-foreground">
           Rejoins le clan de ta région et fais-le grimper au classement de la semaine. Un changement de clan possible par semaine.
         </p>

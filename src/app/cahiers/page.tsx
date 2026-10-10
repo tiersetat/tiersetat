@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { RankNav } from "@/components/layout/RankNav";
 import Link from "next/link";
 import { Avatar } from "@/components/social/Avatar";
 import { ClanBadge } from "@/components/social/ClanBadge";
@@ -24,9 +26,12 @@ export default async function CahiersPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-12">
+      <Suspense fallback={<h1 className="text-4xl font-extrabold">Classement</h1>}>
+        <RankNav />
+      </Suspense>
       <header className="space-y-3">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Programme de points</p>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Les Cahiers de doléances</h1>
+        <h2 className="text-4xl font-extrabold sm:text-5xl">Les Cahiers de doléances</h2>
         <p className="max-w-2xl text-lg text-muted-foreground">
           En 1789, le peuple a écrit ses doléances. Ici, chaque action utile est inscrite dans ton cahier : créer, échanger, rassembler. Les
           premiers bâtisseurs seront reconnus.

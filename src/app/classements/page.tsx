@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { RankNav } from "@/components/layout/RankNav";
 import Link from "next/link";
 import { Avatar } from "@/components/social/Avatar";
 import { ClanBadge } from "@/components/social/ClanBadge";
@@ -113,20 +115,12 @@ export default async function ClassementsPage({ searchParams }: PageProps<"/clas
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Classements de la semaine</h1>
-        <p className="text-sm text-muted-foreground">Remise à zéro chaque lundi à minuit (heure de Paris). Classement au volume échangé, pas aux gains.</p>
-        <Link href="/semaine" className="inline-flex text-sm text-soleil underline-offset-4 hover:underline">
-          🏆 Voir le concours du Mème de la semaine →
-        </Link>
-      </header>
-      <nav className="flex gap-2" aria-label="Type de classement">
-        {(Object.keys(TABS) as Tab[]).map((k) => (
-          <Link key={k} href={k === "createurs" ? "/classements" : `/classements?tab=${k}`} className={`chip ${tab === k ? "chip-active" : ""}`} aria-current={tab === k ? "page" : undefined}>
-            {TABS[k]}
-          </Link>
-        ))}
-      </nav>
+      <Suspense fallback={<h1 className="text-4xl font-extrabold">Classement</h1>}>
+        <RankNav />
+      </Suspense>
+      <p className="text-sm text-muted-foreground">
+        {TABS[tab]} de la semaine · remise à zéro chaque lundi à minuit (heure de Paris), au volume échangé et pas aux gains.
+      </p>
       <section className="surface overflow-hidden">{body}</section>
     </div>
   );

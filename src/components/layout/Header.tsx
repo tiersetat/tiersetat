@@ -23,7 +23,13 @@ export function Header() {
               <circle cx="11" cy="11" r="7" />
               <path d="m20 20-3.5-3.5" />
             </svg>
-            Rechercher un mème, un créateur…
+            Rechercher un token, un trader…
+          </Link>
+          <Link href="/recherche" aria-label="Rechercher" className="grid size-10 place-items-center rounded-full bg-white/[0.06] text-muted-foreground lg:hidden">
+            <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden>
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
           </Link>
           <CitizenButton />
           <EmailLoginButton />

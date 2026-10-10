@@ -2,9 +2,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { HomeBuzz } from "@/components/buzz/HomeBuzz";
 import { HomeWeekly } from "@/components/weekly/HomeWeekly";
-import { DebtLive } from "@/components/dette/DebtLive";
-import { DETTE } from "@/lib/dette";
-import { getOfficialDette, type DetteToken } from "@/lib/dette-token";
 import { JoinWaitlist } from "@/components/waitlist/JoinWaitlist";
 import { getWaitlistCount } from "@/lib/waitlist";
 import { FounderGauge } from "@/components/trust/FounderBadge";
@@ -15,6 +12,8 @@ import { Eur } from "@/components/Eur";
 import { TokenGrid } from "@/components/home/TokenGrid";
 import { getStats, listTokens, parseTab, TABS, type PlatformStats, type Tab, type TokenCard } from "@/lib/tokens";
 import { CashBar } from "@/components/market/CashBar";
+import { SearchBox } from "@/components/market/SearchBox";
+import { GuestOnly } from "@/components/layout/GuestOnly";
 import { MarketRow, type MarketItem } from "@/components/market/MarketRow";
 import { WatchlistView } from "@/components/market/WatchlistView";
 import { cryptos, solanaTrending } from "@/lib/market-data";
@@ -66,23 +65,20 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   }
   let tokens: TokenCard[] = [];
   let stats: PlatformStats = { tokens: 0, volumeSol: 0, traders: 0 };
-  let dette: DetteToken | null = null;
   let waitlist: number | null = null;
   let founders: Founders | null = null;
   try {
-    [tokens, stats, dette, waitlist, founders] = await Promise.all([external || market === "liste" ? Promise.resolve([]) : listTokens(tab), getStats(), getOfficialDette(), getWaitlistCount(), getFounders()]);
+    [tokens, stats, waitlist, founders] = await Promise.all([external || market === "liste" ? Promise.resolve([]) : listTokens(tab), getStats(), getWaitlistCount(), getFounders()]);
   } catch (err) {
     console.error("accueil", err);
   }
 
   return (
     <div className="space-y-16 sm:space-y-24">
-      {/* Hero, compact sur téléphone pour montrer vite les mèmes */}
+      {/* Vitrine : réservée aux visiteurs ; une fois connecté, on arrive directement sur le marché */}
+      <GuestOnly>
       <section className="relative isolate left-1/2 -mt-[6.5rem] flex w-screen -translate-x-1/2 flex-col items-center overflow-hidden px-4 pt-[6.5rem] pb-6 text-center sm:-mt-[7rem] sm:pt-[8.5rem] sm:pb-10">
         <HeroArcs />
-        <div className="mb-8 w-full max-w-xl empty:hidden">
-          <CashBar />
-        </div>
         <LogoMark size={96} className="rise-in drop-shadow-[0_10px_30px_rgba(61,90,254,0.6)] sm:hidden" />
         <LogoMark size={124} className="rise-in hidden drop-shadow-[0_10px_30px_rgba(61,90,254,0.6)] sm:block" />
         <p className="rise-in mt-7 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-4 py-1.5 text-xs font-semibold text-foreground">
@@ -128,11 +124,17 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         )}
       </section>
 
+      </GuestOnly>
+
       {/* Les mèmes : le cœur du launchpad, juste après le titre */}
       <section id="explorer" className="scroll-mt-24 space-y-5">
+        <div className="space-y-3 empty:hidden">
+          <CashBar />
+        </div>
+        <SearchBox />
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-extrabold sm:text-4xl">Le marché</h2>
+            <h2 className="text-3xl font-extrabold sm:text-4xl">Marché</h2>
             <p className="mt-1 text-sm text-muted-foreground">Nos mèmes en temps réel, et tous les tokens de Solana.</p>
           </div>
           <nav className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Trier les tokens">
@@ -177,6 +179,8 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         <HomeBuzz />
       </Suspense>
 
+      <GuestOnly>
+        <div className="space-y-16 sm:space-y-24">
       {/* Comment ça marche, compact */}
       <section className="space-y-5">
         <h2 className="text-3xl font-extrabold sm:text-4xl">Comment ça marche</h2>
@@ -211,29 +215,8 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         )}
       </section>
 
-      {/* La dette en direct */}
-      <section className="surface relative overflow-hidden p-6 sm:p-8">
-        <div aria-hidden className="pointer-events-none absolute -right-24 -top-28 size-96 rounded-full bg-[radial-gradient(closest-side,rgb(255_61_104/0.3),transparent)]" />
-        <div className="relative flex flex-wrap items-center justify-between gap-6">
-          <div className="min-w-0 space-y-2">
-            <p className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-vente">La dette de la France, en direct</p>
-            <DebtLive className="block whitespace-nowrap font-mono text-[1.7rem] font-semibold text-foreground sm:text-5xl" />
-            <p className="text-sm text-muted-foreground">
-              +{Math.round(DETTE.eurPerSecond).toLocaleString("fr-FR")} € chaque seconde. L&apos;État imprime de la dette, le peuple frappe sa monnaie.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {dette ? (
-              <Link href={`/token/${dette.mint}`} className="btn-primary">
-                Acheter $DETTE
-              </Link>
-            ) : null}
-            <Link href="/dette" className={dette ? "btn-ghost" : "btn-primary"}>
-              Voir le compteur
-            </Link>
-          </div>
         </div>
-      </section>
+      </GuestOnly>
     </div>
   );
 }
