@@ -259,6 +259,14 @@
   background: rgb(255 255 255 / 0.06) !important;
 }
 
+/* Le Tiers-État perdu dans l'espace : flottement lent (transform uniquement) */
+@keyframes adrift {
+  0%, 100% { transform: translateY(0) rotate(-12deg); }
+  50% { transform: translateY(-18px) rotate(-6deg); }
+}
+.adrift { animation: adrift 9s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .adrift { animation: none; transform: rotate(-10deg); } }
+
 /* Confettis de l'accueil : flottement lent, uniquement en transform (fluide) */
 @keyframes confetti-float {
   0%, 100% { transform: translateY(0) rotate(0deg); }

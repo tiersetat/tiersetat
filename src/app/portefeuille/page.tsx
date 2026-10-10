@@ -5,7 +5,6 @@ import { CashWallet } from "@/components/wallet/CashWallet";
 import { MeHeader } from "@/components/me/MeHeader";
 import { PushToggle } from "@/components/app/PushToggle";
 import { InstallApp } from "@/components/app/InstallApp";
-import { DISCOVER } from "@/components/layout/nav";
 import { ConnectedOnly } from "@/components/layout/ConnectedOnly";
 
 export const metadata: Metadata = { title: "Profil — Tiers-État" };
@@ -53,23 +52,6 @@ export default function MoiPage() {
           <PushToggle />
           <InstallApp />
         </div>
-      </section>
-      <section className="space-y-3">
-        <h2 className="text-lg font-extrabold">En savoir plus</h2>
-        <ul className="flex flex-wrap gap-2">
-          {DISCOVER.map((d) => (
-            <li key={d.href}>
-              <Link href={d.href} className="chip">
-                {d.label}
-              </Link>
-            </li>
-          ))}
-          <li>
-            <Link href="/cgu" className="chip">
-              CGU
-            </Link>
-          </li>
-        </ul>
       </section>
     </div>
   );

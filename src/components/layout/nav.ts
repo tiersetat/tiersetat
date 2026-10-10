@@ -23,7 +23,6 @@ export const PRIMARY: NavItem[] = [
 /** Pages utiles mais secondaires : en bas du Profil (téléphone) et du menu (ordinateur). */
 export const DISCOVER = [
   { href: "/ca-buzz", label: "Idées de mèmes", d: ICONS.buzz },
-  { href: "/verifier", label: "Fiabilité", d: ICONS.shield },
 ];
 
 export function isActive(item: NavItem, path: string): boolean {
