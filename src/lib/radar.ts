@@ -201,3 +201,13 @@ export async function trendingWithImages(): Promise<RadarToken[]> {
     return d ? { ...t, name: d.name, imageUrl: d.imageUrl, links: d.links } : t;
   });
 }
+
+/** Fiche d'un token sur n'importe quelle blockchain suivie (Solana, Robinhood, Base, BNB, Ethereum). */
+export function tokenOnChain(chain: string, address: string): Promise<RadarToken | null> {
+  return memo(`radar:chain:${chain}:${address.toLowerCase()}`, 30_000, async () => {
+    const pairs = await getJson<DexPair[]>(`https://api.dexscreener.com/tokens/v1/${chain}/${address}`);
+    const mine = pairs.filter((p) => p.chainId === chain && p.baseToken.address.toLowerCase() === address.toLowerCase());
+    const best = mine.sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
+    return best ? fromPair(best) : null;
+  });
+}

@@ -5,23 +5,23 @@ import { MarketRow, type MarketItem } from "@/components/market/MarketRow";
 import { WatchlistView } from "@/components/market/WatchlistView";
 import { GuestOnly } from "@/components/layout/GuestOnly";
 import { TopTradersBand } from "@/components/rank/TopTradersBand";
-import { cryptos, solanaTrending } from "@/lib/market-data";
+import { CHAINS, dexPaidTrending, isChain, topCryptos, type ChainId } from "@/lib/market-feeds";
+import { NewTokensLive } from "@/components/market/NewTokensLive";
 import { solUsd } from "@/lib/feed";
 import { listTokens, type Tab, type TokenCard } from "@/lib/tokens";
 import { TOTAL_SUPPLY } from "@/lib/traders";
 
-/** Onglets de la liste : nos mèmes (launchpad), puis tout le marché. */
+/** Onglets de la liste : tout le marché (multi-blockchains), puis nos mèmes (launchpad). */
 const TABS = [
   { key: "liste", label: "⭐" },
   { key: "tendances", label: "Tendances" },
   { key: "nouveaux", label: "Nouveaux" },
-  { key: "bastille", label: "Bientôt DEX" },
   { key: "cryptos", label: "Cryptos" },
-  { key: "solana", label: "Solana 🔥" },
+  { key: "tiers-etat", label: "Tiers-État" },
   { key: "bourse", label: "Actions · Forex" },
 ] as const;
 type Key = (typeof TABS)[number]["key"];
-const parseKey = (v: unknown): Key | null => (TABS.some((t) => t.key === v) ? (v as Key) : null);
+const parseKey = (v: unknown): Key => (TABS.some((t) => t.key === v) ? (v as Key) : "tendances");
 
 function fromMeme(t: TokenCard, sol: number | null): MarketItem {
   const mcapUsd = sol === null ? null : Number(t.market_cap_sol) * sol;
@@ -38,31 +38,30 @@ function fromMeme(t: TokenCard, sol: number | null): MarketItem {
   };
 }
 
-async function loadList(key: Key): Promise<MarketItem[] | null> {
-  if (key === "liste" || key === "bourse") return null;
-  if (key === "cryptos") return cryptos();
-  if (key === "solana") return solanaTrending();
-  const [memes, sol] = await Promise.all([listTokens(key as Tab), solUsd().catch(() => null)]);
+async function loadList(key: Key, chain: ChainId | null): Promise<MarketItem[] | null> {
+  if (key === "liste" || key === "bourse" || key === "nouveaux") return null;
+  if (key === "cryptos") return topCryptos();
+  if (key === "tendances") {
+    const all = await dexPaidTrending();
+    return chain ? all.filter((t) => t.chain === chain) : all;
+  }
+  const [memes, sol] = await Promise.all([listTokens("tendances" as Tab), solUsd().catch(() => null)]);
   return memes.map((m) => fromMeme(m, sol));
 }
 
 export default async function Home({ searchParams }: PageProps<"/">) {
-  const asked = parseKey((await searchParams).tri);
-  let key: Key = asked ?? "tendances";
+  const sp = await searchParams;
+  const key = parseKey(sp.tri);
+  const chain = isChain(sp.chaine) ? sp.chaine : null;
   let items: MarketItem[] | null = null;
   let failed = false;
   try {
-    items = await loadList(key);
-    // Pas encore de mème actif : on ouvre l'appli sur les cryptos plutôt que sur une liste vide
-    if (!asked && items?.length === 0) {
-      key = "cryptos";
-      items = await loadList(key);
-    }
+    items = await loadList(key, chain);
   } catch (err) {
     console.error("accueil", err);
     failed = true;
   }
-  const memeTab = key === "tendances" || key === "nouveaux" || key === "bastille";
+  const memeTab = key === "tiers-etat";
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -111,8 +110,24 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           ))}
         </nav>
 
+        {key === "tendances" && (
+          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
+            <Link href="/?tri=tendances" scroll={false} className={`chip shrink-0 py-1.5 ${!chain ? "chip-active" : ""}`}>
+              Toutes
+            </Link>
+            {(Object.keys(CHAINS) as ChainId[]).map((c) => (
+              <Link key={c} href={`/?tri=tendances&chaine=${c}`} scroll={false} className={`chip shrink-0 gap-1.5 py-1.5 ${chain === c ? "chip-active" : ""}`}>
+                <span className="size-2 rounded-full" style={{ background: CHAINS[c].color }} />
+                {CHAINS[c].label}
+              </Link>
+            ))}
+          </div>
+        )}
+
         {key === "liste" ? (
           <WatchlistView />
+        ) : key === "nouveaux" ? (
+          <NewTokensLive />
         ) : key === "bourse" ? (
           <div className="rounded-3xl bg-surface p-6 text-center ring-1 ring-white/[0.08]">
             <p className="text-3xl" aria-hidden>
@@ -144,9 +159,12 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             ))}
           </ul>
         )}
-        {(key === "cryptos" || key === "solana") && (
-          <p className="px-1 text-xs text-muted-foreground">Données publiques (DexScreener, GeckoTerminal), pour information. Ce n&apos;est pas une recommandation.</p>
+        {key === "tendances" && (
+          <p className="px-1 text-xs text-muted-foreground">
+            Tokens « DEX payé » et boostés sur DexScreener, avec de l&apos;activité, classés par volume des 6 dernières heures. Ni vérifiés ni recommandés par Tiers-État.
+          </p>
         )}
+        {key === "cryptos" && <p className="px-1 text-xs text-muted-foreground">Les plus grandes cryptos du monde (CoinGecko), hors stablecoins. Pour information.</p>}
       </section>
     </div>
   );

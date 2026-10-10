@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { searchRadar } from "@/lib/radar";
+import { searchRadar, tokenOnChain } from "@/lib/radar";
+import { CHAINS, isChain } from "@/lib/market-feeds";
 import { age, alertes, isSolanaAddress } from "@/lib/radar-utils";
 import { pct, usd } from "@/lib/market-format";
 import { supabasePublic } from "@/lib/supabase/public";
@@ -10,26 +11,33 @@ import { BuyPanel } from "@/components/market/BuyPanel";
 import { CopyAddress } from "@/components/radar/CopyAddress";
 import { feteColor } from "@/components/brand/TokenCard";
 
-async function load(mint: string) {
+const isEvmAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
+
+async function load(mint: string, chain: string) {
+  if (chain !== "solana") return isEvmAddress(mint) ? tokenOnChain(chain, mint).catch(() => null) : null;
   if (!isSolanaAddress(mint)) return null;
   const [t] = await searchRadar(mint).catch(() => []);
   return t ?? null;
 }
+const chainOf = (c: unknown) => (isChain(c) ? c : "solana");
 
-export async function generateMetadata({ params }: PageProps<"/marche/[mint]">): Promise<Metadata> {
-  const t = await load((await params).mint);
+export async function generateMetadata({ params, searchParams }: PageProps<"/marche/[mint]">): Promise<Metadata> {
+  const t = await load((await params).mint, chainOf((await searchParams).c));
   return { title: t ? `${t.symbol} — ${usd(t.priceUsd)} — Tiers-État` : "Token — Tiers-État" };
 }
 
 /** Fiche d'un token Solana (hors Tiers-État) : cours, graphique, chiffres clés, alertes, achat en dollars. */
-export default async function MarchePage({ params }: PageProps<"/marche/[mint]">) {
+export default async function MarchePage({ params, searchParams }: PageProps<"/marche/[mint]">) {
   const { mint } = await params;
-  if (!isSolanaAddress(mint)) notFound();
+  const chain = chainOf((await searchParams).c);
+  if (chain === "solana" ? !isSolanaAddress(mint) : !isEvmAddress(mint)) notFound();
   // Un mème Tiers-État a sa propre page, plus complète
-  const { data: ours } = await supabasePublic().from("tokens").select("mint").eq("mint", mint).maybeSingle();
-  if (ours) redirect(`/token/${mint}`);
+  if (chain === "solana") {
+    const { data: ours } = await supabasePublic().from("tokens").select("mint").eq("mint", mint).maybeSingle();
+    if (ours) redirect(`/token/${mint}`);
+  }
 
-  const t = await load(mint);
+  const t = await load(mint, chain);
   if (!t) {
     return (
       <div className="surface mx-auto max-w-lg space-y-3 p-8 text-center">
@@ -41,7 +49,7 @@ export default async function MarchePage({ params }: PageProps<"/marche/[mint]">
       </div>
     );
   }
-  const pair = t.dexUrl.match(/dexscreener\.com\/solana\/([a-z0-9]{32,44})/i)?.[1];
+  const pair = t.dexUrl.match(/dexscreener\.com\/[a-z]+\/([a-z0-9]{32,44})/i)?.[1];
   const c = feteColor(t.symbol + t.name);
   const warnings = alertes(t);
   const up = (t.change.h24 ?? 0) >= 0;
@@ -70,7 +78,9 @@ export default async function MarchePage({ params }: PageProps<"/marche/[mint]">
           )}
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-3xl font-extrabold">{t.symbol}</h1>
-            <p className="truncate text-sm text-muted-foreground">{t.name}</p>
+            <p className="truncate text-sm text-muted-foreground">
+              {t.name} · <span style={{ color: CHAINS[chain].color }}>{CHAINS[chain].label}</span>
+            </p>
             <CopyAddress address={t.address} />
           </div>
           <WatchStar address={t.address} />
@@ -85,7 +95,7 @@ export default async function MarchePage({ params }: PageProps<"/marche/[mint]">
           <div className="surface overflow-hidden p-0">
             <iframe
               title={`Graphique ${t.symbol}`}
-              src={`https://dexscreener.com/solana/${pair}?embed=1&loadChartSettings=0&trades=0&info=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=marketCap&interval=15`}
+              src={`https://dexscreener.com/${chain}/${pair}?embed=1&loadChartSettings=0&trades=0&info=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=marketCap&interval=15`}
               className="h-[26rem] w-full border-0 sm:h-[30rem]"
               loading="lazy"
             />

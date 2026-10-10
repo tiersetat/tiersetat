@@ -2,6 +2,14 @@ import Link from "next/link";
 import { feteColor } from "@/components/brand/TokenCard";
 import { pct, usd } from "@/lib/market-format";
 
+const CHAIN_DOT: Record<string, { label: string; color: string }> = {
+  solana: { label: "SOL", color: "#9945ff" },
+  robinhood: { label: "HOOD", color: "#ccff00" },
+  base: { label: "BASE", color: "#0052ff" },
+  bsc: { label: "BNB", color: "#f3ba2f" },
+  ethereum: { label: "ETH", color: "#8a92b2" },
+};
+
 export type MarketItem = {
   address: string;
   name: string;
@@ -12,6 +20,9 @@ export type MarketItem = {
   change24: number | null;
   /** Mème Tiers-État encore sur sa courbe : progression vers la Bastille (0–100), affichée à la place de la variation */
   progress?: number;
+  /** Blockchain (pastille de couleur) et badge « DEX payé » pour les listes multi-chaînes */
+  chain?: string;
+  paid?: boolean;
   /** Mème lancé sur Tiers-État : lien vers sa page complète */
   href?: string;
 };
@@ -37,7 +48,16 @@ export function MarketRow({ t, rank }: { t: MarketItem; rank?: number }) {
         )}
         <div className="min-w-0 flex-1">
           <p className="truncate font-bold">{t.symbol}</p>
-          <p className="truncate text-xs text-muted-foreground">{t.name}</p>
+          <p className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+            {t.chain && CHAIN_DOT[t.chain] && (
+              <span className="inline-flex shrink-0 items-center gap-1 font-bold">
+                <span className="size-1.5 rounded-full" style={{ background: CHAIN_DOT[t.chain].color }} />
+                {CHAIN_DOT[t.chain].label}
+              </span>
+            )}
+            {t.paid && <span className="shrink-0 rounded bg-electrique/20 px-1 font-bold text-[#8fa2ff]">DEX payé</span>}
+            <span className="truncate">{t.name}</span>
+          </p>
         </div>
         <div className="shrink-0 text-right">
           <p className="font-mono text-sm font-bold">{usd(t.priceUsd)}</p>

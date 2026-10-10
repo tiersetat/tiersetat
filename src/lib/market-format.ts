@@ -13,6 +13,7 @@ export function usd(n: number | null | undefined): string {
 
 export function pct(n: number | null | undefined): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return "—";
-  const v = Math.abs(n) >= 100 ? Math.round(n).toLocaleString("fr-FR") : n.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+  const a = Math.abs(n);
+  const v = a >= 10_000 ? `${Math.round(n / 1000).toLocaleString("fr-FR")} k` : a >= 100 ? Math.round(n).toLocaleString("fr-FR") : n.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
   return `${n >= 0 ? "▲" : "▼"} ${v.replace("-", "")} %`;
 }
