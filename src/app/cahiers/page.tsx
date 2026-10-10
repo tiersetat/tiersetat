@@ -26,7 +26,7 @@ export default async function CahiersPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-12">
-      <Suspense fallback={<h1 className="text-4xl font-extrabold">Le Palmarès</h1>}>
+      <Suspense fallback={<h1 className="text-4xl font-extrabold">Classement</h1>}>
         <RankNav />
       </Suspense>
       <header className="space-y-3">

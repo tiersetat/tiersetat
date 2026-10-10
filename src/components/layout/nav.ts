@@ -4,7 +4,6 @@
  */
 export const ICONS = {
   market: "M3 17l5-5 4 4 8-8M15 8h5v5",
-  gazette: "M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M7 9h7M7 12h7M7 15h4",
   fil: "M4 5h16v11H8l-4 4zM8 9h8M8 12h5",
   trophy: "M8 4h8v4a4 4 0 0 1-8 0zM6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M12 12v4m-4 4h8m-6-4h4v4h-4z",
   me: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",
@@ -19,9 +18,9 @@ export const ICONS = {
 export type NavItem = { href: string; label: string; d: string; color: string; match: string[] };
 
 export const PRIMARY: NavItem[] = [
-  { href: "/", label: "Gazette", d: ICONS.gazette, color: "text-ciel", match: ["/marche", "/token", "/recherche", "/radar"] },
-  { href: "/fil", label: "Dépêches", d: ICONS.fil, color: "text-bonbon", match: ["/abonnements"] },
-  { href: "/classements", label: "Palmarès", d: ICONS.trophy, color: "text-soleil", match: ["/semaine", "/clans", "/cahiers"] },
+  { href: "/", label: "Marché", d: ICONS.market, color: "text-ciel", match: ["/marche", "/token", "/recherche", "/radar"] },
+  { href: "/fil", label: "Fil", d: ICONS.fil, color: "text-bonbon", match: ["/abonnements"] },
+  { href: "/classements", label: "Classement", d: ICONS.trophy, color: "text-soleil", match: ["/semaine", "/clans", "/cahiers"] },
   { href: "/portefeuille", label: "Moi", d: ICONS.me, color: "text-achat", match: ["/profil"] },
 ];
 

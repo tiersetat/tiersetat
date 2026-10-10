@@ -20,7 +20,7 @@ export default async function ClansPage() {
 
   return (
     <div className="space-y-8">
-      <Suspense fallback={<h1 className="text-4xl font-extrabold">Le Palmarès</h1>}>
+      <Suspense fallback={<h1 className="text-4xl font-extrabold">Classement</h1>}>
         <RankNav />
       </Suspense>
       <header className="space-y-2">
