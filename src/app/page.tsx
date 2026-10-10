@@ -7,6 +7,7 @@ import { GuestOnly } from "@/components/layout/GuestOnly";
 import { TopTradersBand } from "@/components/rank/TopTradersBand";
 import { CHAINS, dexPaidTrending, isChain, topCryptos, type ChainId } from "@/lib/market-feeds";
 import { NewTokensLive } from "@/components/market/NewTokensLive";
+import { HomeBuzz } from "@/components/buzz/HomeBuzz";
 import { solUsd } from "@/lib/feed";
 import { listTokens, type Tab, type TokenCard } from "@/lib/tokens";
 import { TOTAL_SUPPLY } from "@/lib/traders";
@@ -92,6 +93,11 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       {/* La petite bande : les plus gros gains du moment */}
       <Suspense fallback={null}>
         <TopTradersBand />
+      </Suspense>
+
+      {/* La une des journaux : l'actu du jour, à transformer en mème en un clic */}
+      <Suspense fallback={<div className="h-[26rem] animate-pulse rounded-3xl bg-surface" />}>
+        <HomeBuzz />
       </Suspense>
 
       {/* La liste des tokens */}
