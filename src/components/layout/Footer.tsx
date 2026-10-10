@@ -24,7 +24,7 @@ export function Footer() {
             Donner mon avis
           </a>
           <Link href="/verifier" className="hover:text-foreground">
-            Vérifier
+            Fiabilité
           </Link>
           <Link href="/cgu" className="hover:text-foreground">
             CGU

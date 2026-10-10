@@ -79,6 +79,9 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           <p className="relative mt-3 max-w-md text-[15px] text-white/85">
             Le launchpad et l&apos;appli de trading du peuple : lance ton mème en une minute, trade toutes les cryptos et suis ce que tes amis achètent.
           </p>
+          <Link href="/verifier" className="relative mt-3 inline-flex items-center gap-1.5 rounded-full bg-black/20 px-3 py-1 text-xs font-bold">
+            🛡 Règles 100 % vérifiables sur la blockchain →
+          </Link>
           <div className="relative mt-5 flex flex-wrap gap-2">
             <Link href="/portefeuille" className="btn-fete min-h-11 px-6">
               Commencer

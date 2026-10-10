@@ -7,7 +7,7 @@ import { getSealedSnapshots } from "@/lib/snapshot-data";
 import { DBC_CONFIG, DBC_PROGRAM_ID, explorerUrl, TREASURY_WALLET } from "@/lib/solana/config";
 
 export const metadata: Metadata = {
-  title: "Vérifie par toi-même — Tiers-État",
+  title: "Fiabilité — Tiers-État",
   description: "Les règles de Tiers-État relues en direct sur la blockchain Solana : frais, offre fixe, liquidité bloquée, trésorerie.",
 };
 
@@ -48,16 +48,65 @@ export default async function VerifierPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-12">
       <header className="space-y-3">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Transparence</p>
-        <h1 className="text-4xl font-bold tracking-tight">Vérifie par toi-même</h1>
+        <p className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-achat">🛡 Fiabilité</p>
+        <h1 className="text-4xl font-extrabold sm:text-5xl">Pourquoi tu peux faire confiance à Tiers-État</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
-          Ne nous crois pas sur parole. Les règles de Tiers-État sont inscrites sur la blockchain Solana : cette page les relit en direct, depuis
-          ton navigateur, sans passer par nos serveurs.
+          Ne nous crois pas sur parole : chaque règle est inscrite sur la blockchain Solana, et cette page la relit en direct, depuis ton navigateur, sans passer par nos serveurs.
         </p>
       </header>
 
+      {/* Les 3 garanties */}
+      <section className="grid gap-3 md:grid-cols-3">
+        {[
+          { t: "Ton argent reste à toi", d: "Tes fonds sont dans ton wallet, jamais chez nous. Personne chez Tiers-État ne peut les bouger ni les bloquer.", c: "text-achat" },
+          { t: "Liquidité bloquée à vie", d: "Quand un mème prend la Bastille, 100 % de sa liquidité est verrouillée pour toujours. Impossible de la retirer, même pour nous.", c: "text-soleil" },
+          { t: "Règles gravées, mêmes pour tous", d: "Frais, offre, part du créateur : inscrits une fois pour toutes. Aucun nom ni aucune image ne peut être changé après coup.", c: "text-ciel" },
+        ].map((g) => (
+          <div key={g.t} className="rounded-3xl bg-surface p-5 ring-1 ring-white/[0.08]">
+            <p className={`text-lg font-extrabold ${g.c}`}>✓ {g.t}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{g.d}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* Audits */}
+      <section className="space-y-3">
+        <h2 className="text-2xl font-extrabold">Un programme audité par des experts en sécurité</h2>
+        <p className="max-w-2xl text-sm text-muted-foreground">
+          Les mèmes de Tiers-État sont créés et échangés par le programme « Dynamic Bonding Curve » de Meteora, l&apos;un des plus utilisés de Solana. Son code a été
+          examiné par plusieurs cabinets de sécurité indépendants.
+        </p>
+        <ul className="grid gap-2 sm:grid-cols-3">
+          {[
+            { n: "Code4rena", d: "Concours d'audit public, 2025 : aucune faille grave", u: "https://code4rena.com/reports/2025-08-meteora-dynamic-bonding-curve" },
+            { n: "OtterSec", d: "Audit de sécurité 2025", u: "https://docs.meteora.ag/resources/audits" },
+            { n: "Sec3", d: "Audit de sécurité 2025", u: "https://docs.meteora.ag/resources/audits" },
+          ].map((a) => (
+            <li key={a.n}>
+              <a href={a.u} target="_blank" rel="noreferrer" className="block rounded-2xl bg-surface p-4 ring-1 ring-white/[0.08] transition hover:ring-white/20">
+                <p className="font-extrabold">{a.n} ↗</p>
+                <p className="text-xs text-muted-foreground">{a.d}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Anti-fraude */}
+      <section className="rounded-3xl bg-surface p-5 ring-1 ring-white/[0.08]">
+        <h2 className="text-xl font-extrabold">Ce qu&apos;on fait contre les arnaques</h2>
+        <ul className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+          <li>✓ Un <strong className="text-foreground">Bouclier noté sur 100</strong> sur chaque mème : créateur, concentration, mint, gel.</li>
+          <li>✓ Un badge public dès qu&apos;un <strong className="text-foreground">créateur revend</strong> ses tokens.</li>
+          <li>✓ Des <strong className="text-foreground">frais anti-robots</strong> au lancement, pour un départ équitable.</li>
+          <li>✓ Les <strong className="text-foreground">faux volumes filtrés</strong> : on ne compte que les vrais échanges.</li>
+          <li>✓ Un <strong className="text-foreground">code public</strong> et un <strong className="text-foreground">coffre à plusieurs signatures</strong> pour la trésorerie.</li>
+          <li>✓ Un avertissement clair avant chaque achat risqué.</li>
+        </ul>
+      </section>
+
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Les règles, relues en direct</h2>
+        <h2 className="text-2xl font-extrabold">Les règles, relues en direct sur la blockchain</h2>
         <VerifyOnChain />
       </section>
 

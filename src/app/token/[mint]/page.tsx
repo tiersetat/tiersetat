@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ReportButton } from "@/components/moderation/ReportButton";
-import { RiskPanel } from "@/components/token/RiskPanel";
+import { TrustShield } from "@/components/token/TrustShield";
 import { HoldersPanel } from "@/components/token/HoldersPanel";
 import { TradersPanel } from "@/components/token/TradersPanel";
 import { aggregateTraders, TOTAL_SUPPLY } from "@/lib/traders";
@@ -168,7 +168,7 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
         sidebar={
           <>
             <CreatorEarnings compact creator={token.creator_wallet} tokens={[{ mint: token.mint, name: token.name, ticker: token.ticker, pool: token.pool }]} />
-            <RiskPanel flags={flags} />
+            <TrustShield flags={flags} />
             <HoldersPanel holders={holders} />
           </>
         }

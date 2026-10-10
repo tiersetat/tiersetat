@@ -71,3 +71,13 @@ export function riskFlags(r: RiskReport): RiskFlag[] {
 export function buyWarnings(flags: RiskFlag[]): string[] {
   return flags.filter((f) => f.level !== "ok").map((f) => f.label);
 }
+
+/** Note de fiabilité d'un token, sur 100, à partir des contrôles (pur, testé). */
+export function trustScore(flags: RiskFlag[]): { score: number; label: "Solide" | "Prudence" | "Risqué"; tone: "ok" | "warn" | "danger" } {
+  let score = 100;
+  for (const f of flags) score -= f.level === "danger" ? 30 : f.level === "warn" ? 10 : 0;
+  score = Math.max(0, Math.min(100, score));
+  if (score >= 80) return { score, label: "Solide", tone: "ok" };
+  if (score >= 50) return { score, label: "Prudence", tone: "warn" };
+  return { score, label: "Risqué", tone: "danger" };
+}
