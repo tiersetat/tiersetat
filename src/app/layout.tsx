@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ViewTransition } from "react";
-import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WalletProviders } from "@/components/providers/WalletProviders";
@@ -16,6 +16,8 @@ const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 // Titres : police d'affiche, chaleureuse et mémorable
 const display = Bricolage_Grotesque({ variable: "--font-display", subsets: ["latin"], axes: ["opsz", "wdth"] });
+// La Gazette : typographie de journal pour le titre et les manchettes
+const gazette = Playfair_Display({ variable: "--font-gazette", subsets: ["latin"], style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -30,7 +32,7 @@ export const viewport: Viewport = { themeColor: "#0b0d2a", viewportFit: "cover" 
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="fr" className={`${geist.variable} ${geistMono.variable} ${display.variable} h-full`}>
+    <html lang="fr" className={`${geist.variable} ${geistMono.variable} ${display.variable} ${gazette.variable} h-full`}>
       <body className="flex min-h-full flex-col">
         <WalletProviders>
           <InviteCapture />

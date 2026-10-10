@@ -17,7 +17,7 @@ export function RankNav() {
   const tab = useSearchParams().get("tab");
   return (
     <div className="space-y-4">
-      <h1 className="text-4xl font-extrabold">Classement</h1>
+      <h1 className="text-4xl font-extrabold">Le Palmarès</h1>
       <nav className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Classements">
         {ITEMS.map((i) => {
           const on = i.is(path, tab);

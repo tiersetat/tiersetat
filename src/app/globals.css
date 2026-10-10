@@ -18,6 +18,8 @@
   --color-soleil: var(--soleil);
   --color-bonbon: var(--bonbon);
   --color-ciel: var(--ciel);
+  --color-papier: var(--papier);
+  --color-encre: var(--encre);
 
   --font-sans: var(--font-geist);
   --font-mono: var(--font-geist-mono);
@@ -63,6 +65,9 @@
   --soleil: #ffd23f;
   --bonbon: #ff7ad9;
   --ciel: #5ec8ff;
+  /* La Gazette : papier journal et encre */
+  --papier: #f5f0e4;
+  --encre: #10122e;
 
   --background: var(--nuit);
   --foreground: #f4f1fa;
@@ -258,6 +263,18 @@
 .wallet-adapter-dropdown-list-item:hover {
   background: rgb(255 255 255 / 0.06) !important;
 }
+
+/* La Gazette : feuille de papier journal (grain léger, sans image) */
+.gazette {
+  color: var(--encre);
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.55), transparent 60%),
+    repeating-linear-gradient(0deg, rgb(16 18 46 / 0.018) 0 1px, transparent 1px 3px),
+    var(--papier);
+  box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.4) inset;
+}
+.gazette .font-gazette { font-family: var(--font-gazette), Georgia, serif; }
+.gazette-rule { border-color: var(--encre); }
 
 /* Confettis de l'accueil : flottement lent, uniquement en transform (fluide) */
 @keyframes confetti-float {

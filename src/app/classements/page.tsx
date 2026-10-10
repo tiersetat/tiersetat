@@ -115,7 +115,7 @@ export default async function ClassementsPage({ searchParams }: PageProps<"/clas
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Suspense fallback={<h1 className="text-4xl font-extrabold">Classement</h1>}>
+      <Suspense fallback={<h1 className="text-4xl font-extrabold">Le Palmarès</h1>}>
         <RankNav />
       </Suspense>
       <p className="text-sm text-muted-foreground">

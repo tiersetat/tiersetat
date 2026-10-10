@@ -22,7 +22,7 @@ export default async function SemainePage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-12">
-      <Suspense fallback={<h1 className="text-4xl font-extrabold">Classement</h1>}>
+      <Suspense fallback={<h1 className="text-4xl font-extrabold">Le Palmarès</h1>}>
         <RankNav />
       </Suspense>
       <header className="space-y-3">
