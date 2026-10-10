@@ -4,33 +4,32 @@ import { EmailLoginButton } from "@/components/providers/PrivyBridge";
 import { CitizenButton } from "./CitizenButton";
 import { WalletButton } from "./WalletButton";
 
-
-
 /**
- * En-tête : sur téléphone et tablette, îlot flottant (logo + connexion) ;
- * sur ordinateur, le menu est dans la barre latérale et l'îlot ne garde que recherche et connexion, à droite.
+ * Barre du haut façon iOS : pleine largeur, collée en haut, fine ligne de séparation.
+ * Logo Tiers-État à gauche, recherche au centre, connexion à droite.
  */
 export function Header() {
   return (
-    <header className="pointer-events-none sticky top-0 z-30 px-3 pt-[calc(env(safe-area-inset-top)+0.6rem)] sm:px-4 sm:pt-3 lg:pl-[17rem]">
-      <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-between gap-x-3 rounded-full border border-white/12 bg-[#12153a]/95 py-1.5 pr-1.5 pl-4 shadow-[0_12px_40px_-12px_rgb(0_0_0/0.8),inset_0_1px_0_rgb(255_255_255/0.08)] lg:ml-auto lg:mr-0 lg:w-fit lg:pl-1.5">
+    <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-nuit/95 pt-[env(safe-area-inset-top)] lg:pl-64">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:h-14 sm:flex-nowrap sm:py-0">
         <Link href="/" aria-label="Tiers-État, accueil" className="shrink-0 whitespace-nowrap lg:hidden">
           <Wordmark />
         </Link>
-        <div className="flex shrink-0 items-center justify-end gap-1.5">
-          <Link href="/recherche" aria-label="Rechercher un token ou un compte" title="Rechercher" className="hidden h-10 items-center gap-2 rounded-full bg-white/[0.06] pr-4 pl-3 text-sm text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground lg:flex">
-            <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-            Rechercher un token, un trader…
-          </Link>
-          <Link href="/recherche" aria-label="Rechercher" className="grid size-10 place-items-center rounded-full bg-white/[0.06] text-muted-foreground lg:hidden">
-            <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden>
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-          </Link>
+        <form action="/recherche" role="search" className="relative order-last w-full min-w-0 sm:order-none sm:w-auto sm:flex-1 lg:max-w-md">
+          <svg viewBox="0 0 24 24" className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden>
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+          <input
+            id="header-search"
+            name="q"
+            placeholder="Rechercher"
+            aria-label="Rechercher un token, un $TICKER, une adresse ou un trader"
+            autoComplete="off"
+            className="h-9 w-full rounded-xl bg-white/[0.08] pr-3 pl-9 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-electrique/50"
+          />
+        </form>
+        <div className="ml-auto flex shrink-0 items-center gap-1.5">
           <CitizenButton />
           <EmailLoginButton />
           <WalletButton />
