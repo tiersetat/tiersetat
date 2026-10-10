@@ -6,6 +6,7 @@ import { Wordmark } from "@/components/brand/Logo";
 import { InstallApp } from "@/components/app/InstallApp";
 
 const I = {
+  fil: "M4 5h16v11H8l-4 4zM8 9h8M8 12h5",
   home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
   buzz: "M12 2c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-4-1-6 1-9Z",
   radar: "M12 12 19 5M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5",
@@ -23,6 +24,7 @@ const I = {
 
 const MAIN = [
   { href: "/", label: "Accueil", d: I.home },
+  { href: "/fil", label: "Le fil", d: I.fil },
   { href: "/ca-buzz", label: "Ça buzz", d: I.buzz },
   { href: "/radar", label: "Radar", d: I.radar },
   { href: "/semaine", label: "Mème de la semaine", d: I.trophy },

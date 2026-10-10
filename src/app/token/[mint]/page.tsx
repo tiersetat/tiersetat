@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { ReportButton } from "@/components/moderation/ReportButton";
 import { RiskPanel } from "@/components/token/RiskPanel";
 import { HoldersPanel } from "@/components/token/HoldersPanel";
+import { TradersPanel } from "@/components/token/TradersPanel";
+import { aggregateTraders, TOTAL_SUPPLY } from "@/lib/traders";
+import { solUsd } from "@/lib/feed";
 import { getHolders } from "@/lib/holders";
 import { Comments } from "@/components/token/Comments";
 import { ShareButton } from "@/components/token/ShareButton";
@@ -83,6 +86,23 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
   ]);
   const flags = riskFlags(risk);
 
+  // Traders : positions au prix actuel, profils et dernière thèse de chacun
+  const traders = aggregateTraders(
+    ((trades ?? []) as { trader_wallet: string; side: "buy" | "sell"; sol_amount: number; token_amount: number; price_sol: number; block_time: string; signature: string }[]),
+    Number(token.market_cap_sol) / TOTAL_SUPPLY,
+  );
+  const traderWallets = traders.slice(0, 40).map((t) => t.wallet);
+  const [{ data: traderProfiles }, { data: traderComments }, sol] = await Promise.all([
+    traderWallets.length ? supabaseAdmin().from("profiles").select("wallet, pseudo, avatar_url").in("wallet", traderWallets) : Promise.resolve({ data: [] }),
+    traderWallets.length
+      ? supabaseAdmin().from("comments").select("author_wallet, body, created_at").eq("mint", mint).eq("hidden", false).in("author_wallet", traderWallets).order("created_at", { ascending: false }).limit(200)
+      : Promise.resolve({ data: [] }),
+    solUsd().catch(() => null),
+  ]);
+  const profilesByWallet = Object.fromEntries((traderProfiles ?? []).map((p) => [p.wallet, { pseudo: p.pseudo, avatar_url: p.avatar_url }]));
+  const theses: Record<string, string> = {};
+  for (const c of traderComments ?? []) if (!theses[c.author_wallet]) theses[c.author_wallet] = c.body;
+
   const trust = await getCreatorTrust(token.creator_wallet).catch(() => null);
   return (
     <div className="space-y-10">
@@ -139,7 +159,12 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
         createdAt={token.created_at}
         initial={{ market_cap_sol: token.market_cap_sol, curve_progress: token.curve_progress, migrated: token.migrated }}
         warnings={buyWarnings(flags)}
-        below={<Comments mint={token.mint} />}
+        below={
+          <div className="space-y-10">
+            <TradersPanel rows={traders} profiles={profilesByWallet} theses={theses} solUsd={sol} creator={token.creator_wallet} />
+            <Comments mint={token.mint} />
+          </div>
+        }
         sidebar={
           <>
             <CreatorEarnings compact creator={token.creator_wallet} tokens={[{ mint: token.mint, name: token.name, ticker: token.ticker, pool: token.pool }]} />

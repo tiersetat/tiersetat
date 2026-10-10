@@ -9,16 +9,18 @@ const icon = {
   buzz: "M12 2c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-4-1-6 1-9Z",
   trophy: "M8 4h8v4a4 4 0 0 1-8 0zM6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M12 12v4m-4 4h8m-6-4h4v4h-4z",
   more: "M5 12h.01M12 12h.01M19 12h.01",
+  fil: "M4 5h16v11H8l-4 4zM8 9h8M8 12h5",
 };
 
 const TABS = [
   { href: "/", label: "Accueil", d: icon.home, color: "text-ciel" },
-  { href: "/ca-buzz", label: "Ça buzz", d: icon.buzz, color: "text-vente" },
+  { href: "/fil", label: "Le fil", d: icon.fil, color: "text-bonbon" },
   { href: "/lancer", label: "Frapper", d: "", center: true },
-  { href: "/semaine", label: "Semaine", d: icon.trophy, color: "text-soleil" },
+  { href: "/ca-buzz", label: "Ça buzz", d: icon.buzz, color: "text-vente" },
 ];
 
 const PLUS = [
+  { href: "/semaine", label: "Semaine" },
   { href: "/radar", label: "Radar" },
   { href: "/classements", label: "Classements" },
   { href: "/clans", label: "Clans" },
