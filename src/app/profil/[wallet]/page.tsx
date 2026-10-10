@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { TokenCard } from "@/components/brand/TokenCard";
 import { Avatar } from "@/components/social/Avatar";
 import { CreatorEarnings } from "@/components/social/CreatorEarnings";
-import { ClanBadge } from "@/components/social/ClanBadge";
 import { FollowButton } from "@/components/social/FollowButton";
 import { ProfileEditor } from "@/components/social/ProfileEditor";
 import { getSessionWallet } from "@/lib/auth/session";
@@ -63,10 +62,6 @@ export default async function ProfilePage({ params }: PageProps<"/profil/[wallet
   const trades = (tradesRes.data ?? []) as unknown as TradeWithToken[];
   const volume = trades.reduce((s, t) => s + Number(t.sol_amount), 0);
 
-  const { data: clan } = profile.clan
-    ? await db.from("clans").select("slug, name, hue").eq("slug", profile.clan).maybeSingle<{ slug: string; name: string; hue: number }>()
-    : { data: null };
-
   // Pour son propre profil, tous ses tokens (même masqués) : les frais de créateur restent dus
   const earningTokens =
     me === wallet
@@ -91,13 +86,6 @@ export default async function ProfilePage({ params }: PageProps<"/profil/[wallet
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight">{displayName(profile)}</h1>
-            {clan ? (
-              <ClanBadge clan={clan} size="lg" />
-            ) : me === wallet ? (
-              <Link href="/clans" className="chip">
-                Rejoindre un clan →
-              </Link>
-            ) : null}
           </div>
           <a href={explorerUrl("address", wallet)} target="_blank" rel="noreferrer" className="block font-mono text-xs break-all text-muted-foreground hover:text-pervenche">
             {wallet} ↗

@@ -8,12 +8,10 @@ import { InstallApp } from "@/components/app/InstallApp";
 import { DISCOVER } from "@/components/layout/nav";
 import { ConnectedOnly } from "@/components/layout/ConnectedOnly";
 
-export const metadata: Metadata = { title: "Moi — Tiers-État" };
+export const metadata: Metadata = { title: "Profil — Tiers-État" };
 
 const SHORTCUTS = [
-  { href: "/abonnements", label: "Mes abonnements", sub: "Le fil des traders que je suis", color: "bg-bonbon" },
-  { href: "/cahiers", label: "Mes points", sub: "Cahiers de doléances, invitations", color: "bg-soleil" },
-  { href: "/clans", label: "Mon clan", sub: "Ma région au classement", color: "bg-ciel" },
+  { href: "/fil?vue=classement", label: "Classement", sub: "Les traders qui gagnent le plus", color: "bg-soleil" },
   { href: "/demarrer", label: "Bien démarrer", sub: "Le guide en 3 minutes", color: "bg-achat" },
 ];
 
@@ -21,7 +19,7 @@ const SHORTCUTS = [
 export default function MoiPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      <h1 className="text-4xl font-extrabold">Moi</h1>
+      <h1 className="text-4xl font-extrabold">Profil</h1>
       <MeHeader />
       <CashWallet />
       <ConnectedOnly>
@@ -57,7 +55,7 @@ export default function MoiPage() {
         </div>
       </section>
       <section className="space-y-3">
-        <h2 className="text-lg font-extrabold">Découvrir Tiers-État</h2>
+        <h2 className="text-lg font-extrabold">En savoir plus</h2>
         <ul className="flex flex-wrap gap-2">
           {DISCOVER.map((d) => (
             <li key={d.href}>

@@ -7,7 +7,7 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { CLUSTER, explorerUrl } from "@/lib/solana/config";
 import { buildSendTransaction, cashTotal, CASH, getBalances, parseRecipient, SOL_FEE_RESERVE, type AssetSymbol, type Balances } from "@/lib/solana/cash";
 import { SlideToConfirm } from "@/components/token/SlideToConfirm";
-import { PRIVY_APP_ID } from "@/components/providers/PrivyBridge";
+import { LoginCta, PRIVY_APP_ID } from "@/components/providers/PrivyBridge";
 import { PrivySecurity } from "./PrivySecurity";
 
 type Display = "EUR" | "USD";
@@ -73,11 +73,14 @@ export function CashWallet() {
       <section className="surface space-y-4 p-6 text-center">
         <h2 className="text-2xl font-extrabold">Ton portefeuille Tiers-État</h2>
         <p className="mx-auto max-w-md text-sm text-muted-foreground">
-          Connecte-toi avec ton e-mail : un portefeuille sécurisé est créé pour toi en quelques secondes. Ton argent reste à toi, Tiers-État n&apos;y a jamais accès.
+          Connecte-toi avec Google ou ton e-mail : un portefeuille sécurisé est créé pour toi en quelques secondes, sans phrase secrète ni appli à installer. Ton argent reste à toi, Tiers-État n&apos;y a jamais accès.
         </p>
-        <button type="button" onClick={() => setVisible(true)} className="btn-fete">
-          Me connecter
-        </button>
+        <div className="flex flex-wrap justify-center gap-2">
+          <LoginCta fallback={() => setVisible(true)}>Continuer avec Google ou e-mail</LoginCta>
+          <button type="button" onClick={() => setVisible(true)} className="btn-ghost">
+            J&apos;ai déjà un wallet
+          </button>
+        </div>
       </section>
     );
   }

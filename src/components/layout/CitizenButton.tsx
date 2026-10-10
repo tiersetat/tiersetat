@@ -15,12 +15,6 @@ export function CitizenButton() {
   if (status === "signed" && profile) {
     return (
       <div className="flex items-center gap-1 text-sm">
-        <Link href="/portefeuille" className="rounded-lg px-3 py-1.5 text-muted-foreground hover:bg-white/5 hover:text-foreground">
-          Portefeuille
-        </Link>
-        <Link href="/abonnements" className="hidden rounded-lg px-3 py-1.5 text-muted-foreground hover:bg-white/5 hover:text-foreground sm:inline">
-          Abonnements
-        </Link>
         {profile.role === "admin" && (
           <Link href="/admin" className="rounded-lg border border-pervenche/40 bg-pervenche/10 px-3 py-1.5 font-medium text-lueur hover:bg-pervenche/20">
             Admin

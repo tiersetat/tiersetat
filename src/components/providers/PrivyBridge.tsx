@@ -80,9 +80,41 @@ function EmailLoginInner() {
       Déconnexion e-mail
     </button>
   ) : (
-    <button type="button" onClick={() => login()} className="btn-ghost h-10 min-h-0 px-4 py-0 text-sm xl:px-5">
-      <span className="xl:hidden">E-mail</span>
-      <span className="hidden xl:inline">Continuer avec un e-mail</span>
+    <button
+      type="button"
+      onClick={() => login()}
+      className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-extrabold text-nuit shadow-[0_6px_18px_-8px_rgb(255_255_255/0.6)] transition active:scale-95 xl:px-5"
+    >
+      {/* Logo Google (couleurs officielles) */}
+      <svg viewBox="0 0 24 24" className="size-4 shrink-0" aria-hidden>
+        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z" />
+        <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z" />
+        <path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z" />
+        <path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.9 3.6-4.9 6.7-4.9z" />
+      </svg>
+      <span className="xl:hidden">Se connecter</span>
+      <span className="hidden xl:inline">Continuer avec Google ou e-mail</span>
+    </button>
+  );
+}
+
+/** Bouton « Se connecter » des pages : Google ou e-mail (Privy), sinon la fenêtre des wallets. */
+export function LoginCta({ className = "btn-fete", children, fallback }: { className?: string; children: ReactNode; fallback: () => void }) {
+  if (!PRIVY_APP_ID) {
+    return (
+      <button type="button" onClick={fallback} className={className}>
+        {children}
+      </button>
+    );
+  }
+  return <LoginCtaInner className={className} fallback={fallback}>{children}</LoginCtaInner>;
+}
+
+function LoginCtaInner({ className, children, fallback }: { className: string; children: ReactNode; fallback: () => void }) {
+  const { ready, login } = usePrivy();
+  return (
+    <button type="button" onClick={() => (ready ? login() : fallback())} className={className}>
+      {children}
     </button>
   );
 }

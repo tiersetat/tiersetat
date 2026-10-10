@@ -9,7 +9,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_auto]">
         <div className="space-y-3">
           <Wordmark />
-          <p className="max-w-md text-sm text-muted-foreground">Le peuple frappe sa monnaie. Le launchpad des mèmes français, sur Solana.</p>
+          <p className="max-w-md text-sm text-muted-foreground">Le launchpad et l&apos;appli de trading du peuple, sur Solana.</p>
           <InstallApp />
           <p className="max-w-xl text-xs text-muted-foreground/70">
             Les tokens créés sur Tiers-État sont des memecoins spéculatifs, pas une monnaie ayant cours légal. Vous pouvez tout perdre. Pas un conseil financier.
@@ -17,15 +17,6 @@ export function Footer() {
           </p>
         </div>
         <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted-foreground sm:grid-cols-4 sm:self-end">
-          <Link href="/assemblee" className="hover:text-foreground">
-            Assemblée
-          </Link>
-          <Link href="/vision" className="hover:text-foreground">
-            Vision
-          </Link>
-          <Link href="/manifeste" className="hover:text-foreground">
-            Manifeste
-          </Link>
           <Link href="/demarrer" className="hover:text-foreground">
             Bien démarrer
           </Link>

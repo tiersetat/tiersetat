@@ -25,8 +25,8 @@ function ago(iso: string) {
 }
 
 /** Le fil : achats, ventes et thèses des traders, actualisé toutes les 10 secondes. */
-export function FeedView({ initial }: { initial: FeedItem[] }) {
-  const [type, setType] = useState<Type>("tout");
+export function FeedView({ initial, defaultType = "tout" }: { initial: FeedItem[]; defaultType?: Type }) {
+  const [type, setType] = useState<Type>(defaultType);
   const [min, setMin] = useState(0);
   const [follows, setFollows] = useState(false);
   const [items, setItems] = useState<FeedItem[]>(initial);

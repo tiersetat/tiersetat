@@ -10,6 +10,8 @@ export type MarketItem = {
   priceUsd: number | null;
   mcapUsd: number | null;
   change24: number | null;
+  /** Mème Tiers-État encore sur sa courbe : progression vers la Bastille (0–100), affichée à la place de la variation */
+  progress?: number;
   /** Mème lancé sur Tiers-État : lien vers sa page complète */
   href?: string;
 };
@@ -39,13 +41,19 @@ export function MarketRow({ t, rank }: { t: MarketItem; rank?: number }) {
         </div>
         <div className="shrink-0 text-right">
           <p className="font-mono text-sm font-bold">{usd(t.priceUsd)}</p>
-          <p className="font-mono text-xs text-muted-foreground">{usd(t.mcapUsd)} cap.</p>
+          {t.mcapUsd !== null && <p className="font-mono text-xs text-muted-foreground">{usd(t.mcapUsd)} cap.</p>}
         </div>
-        <span
-          className={`w-[5.5rem] shrink-0 rounded-xl px-2 py-1.5 text-center font-mono text-xs font-bold ${t.change24 === null ? "bg-white/[0.06] text-muted-foreground" : up ? "bg-achat/15 text-achat" : "bg-vente/15 text-vente"}`}
-        >
-          {pct(t.change24)}
-        </span>
+        {t.progress !== undefined ? (
+          <span className="w-[5.5rem] shrink-0 rounded-xl bg-soleil/15 px-2 py-1.5 text-center font-mono text-xs font-bold text-soleil" title="Progression vers la Bastille">
+            🏰 {Math.round(t.progress)} %
+          </span>
+        ) : (
+          <span
+            className={`w-[5.5rem] shrink-0 rounded-xl px-2 py-1.5 text-center font-mono text-xs font-bold ${t.change24 === null ? "bg-white/[0.06] text-muted-foreground" : up ? "bg-achat/15 text-achat" : "bg-vente/15 text-vente"}`}
+          >
+            {pct(t.change24)}
+          </span>
+        )}
       </Link>
     </li>
   );

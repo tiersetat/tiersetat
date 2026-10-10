@@ -1,187 +1,153 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { HomeBuzz } from "@/components/buzz/HomeBuzz";
-import { HomeWeekly } from "@/components/weekly/HomeWeekly";
-import { JoinWaitlist } from "@/components/waitlist/JoinWaitlist";
-import { getWaitlistCount } from "@/lib/waitlist";
-import { FounderGauge } from "@/components/trust/FounderBadge";
-import { getFounders, type Founders } from "@/lib/founders-data";
-import { TokenGrid } from "@/components/home/TokenGrid";
-import { listTokens, parseTab, TABS, type Tab, type TokenCard } from "@/lib/tokens";
 import { CashBar } from "@/components/market/CashBar";
-import { LiveActivity } from "@/components/social/LiveActivity";
-import { GuestOnly } from "@/components/layout/GuestOnly";
 import { MarketRow, type MarketItem } from "@/components/market/MarketRow";
 import { WatchlistView } from "@/components/market/WatchlistView";
+import { GuestOnly } from "@/components/layout/GuestOnly";
+import { TopTradersBand } from "@/components/rank/TopTradersBand";
 import { cryptos, solanaTrending } from "@/lib/market-data";
+import { solUsd } from "@/lib/feed";
+import { listTokens, type Tab, type TokenCard } from "@/lib/tokens";
+import { TOTAL_SUPPLY } from "@/lib/traders";
 
-/** Listes du marché : nos mèmes (onglets Tiers-État) + tout Solana (données publiques). */
-const EXTERNAL = { solana: "Tendances Solana", cryptos: "Cryptos établies" } as const;
-type External = keyof typeof EXTERNAL;
-type MarketTab = Tab | External | "liste";
-const MARKET_TABS: { key: MarketTab; label: string }[] = [
-  { key: "liste", label: "⭐ Ma liste" },
-  ...(Object.keys(TABS) as Tab[]).map((k) => ({ key: k, label: TABS[k] })),
-  { key: "solana", label: EXTERNAL.solana },
-  { key: "cryptos", label: EXTERNAL.cryptos },
-];
-function parseMarketTab(v: unknown): MarketTab {
-  return v === "liste" || v === "solana" || v === "cryptos" ? v : parseTab(v);
+/** Onglets de la liste : nos mèmes (launchpad), puis tout le marché. */
+const TABS = [
+  { key: "liste", label: "⭐" },
+  { key: "tendances", label: "Tendances" },
+  { key: "nouveaux", label: "Nouveaux" },
+  { key: "bastille", label: "Bientôt DEX" },
+  { key: "cryptos", label: "Cryptos" },
+  { key: "solana", label: "Solana 🔥" },
+  { key: "bourse", label: "Actions · Forex" },
+] as const;
+type Key = (typeof TABS)[number]["key"];
+const parseKey = (v: unknown): Key | null => (TABS.some((t) => t.key === v) ? (v as Key) : null);
+
+function fromMeme(t: TokenCard, sol: number | null): MarketItem {
+  const mcapUsd = sol === null ? null : Number(t.market_cap_sol) * sol;
+  return {
+    address: t.mint,
+    name: t.name,
+    symbol: t.ticker,
+    imageUrl: t.image_url,
+    priceUsd: mcapUsd === null ? null : mcapUsd / TOTAL_SUPPLY,
+    mcapUsd,
+    change24: null,
+    progress: t.migrated ? undefined : Number(t.curve_progress),
+    href: `/token/${t.mint}`,
+  };
 }
 
-const STEPS = [
-  {
-    n: "01",
-    title: "Choisis ton mème",
-    text: "Une image, une actu qui buzze en France, une private joke nationale. Nom, ticker, description.",
-  },
-  {
-    n: "02",
-    title: "Signe une seule fois",
-    text: "Le token et sa bonding curve sont créés en une transaction depuis ton wallet. Aucune prévente, aucun initié.",
-  },
-  {
-    n: "03",
-    title: "Direction le DEX",
-    text: "Le prix suit une courbe publique, la même pour tous. Une fois la courbe remplie, le token migre sur un DEX avec une liquidité verrouillée.",
-  },
-];
-
+async function loadList(key: Key): Promise<MarketItem[] | null> {
+  if (key === "liste" || key === "bourse") return null;
+  if (key === "cryptos") return cryptos();
+  if (key === "solana") return solanaTrending();
+  const [memes, sol] = await Promise.all([listTokens(key as Tab), solUsd().catch(() => null)]);
+  return memes.map((m) => fromMeme(m, sol));
+}
 
 export default async function Home({ searchParams }: PageProps<"/">) {
-  const market = parseMarketTab((await searchParams).tri);
-  const tab = parseTab(market);
-  let external: MarketItem[] | null = null;
-  if (market === "solana" || market === "cryptos") {
-    try {
-      external = market === "solana" ? await solanaTrending() : await cryptos();
-    } catch {
-      external = [];
-    }
-  }
-  let tokens: TokenCard[] = [];
-  let waitlist: number | null = null;
-  let founders: Founders | null = null;
+  const asked = parseKey((await searchParams).tri);
+  let key: Key = asked ?? "tendances";
+  let items: MarketItem[] | null = null;
+  let failed = false;
   try {
-    [tokens, waitlist, founders] = await Promise.all([external || market === "liste" ? Promise.resolve([]) : listTokens(tab), getWaitlistCount(), getFounders()]);
+    items = await loadList(key);
+    // Pas encore de mème actif : on ouvre l'appli sur les cryptos plutôt que sur une liste vide
+    if (!asked && items?.length === 0) {
+      key = "cryptos";
+      items = await loadList(key);
+    }
   } catch (err) {
     console.error("accueil", err);
+    failed = true;
   }
+  const memeTab = key === "tendances" || key === "nouveaux" || key === "bastille";
 
   return (
-    <div className="space-y-16 sm:space-y-24">
-      {/* En-tête façon iOS : grand titre, ton cash, puis qui achète en ce moment */}
-      <div className="space-y-5">
-        <GuestOnly>
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-electrique via-[#4a49f0] to-[#7b3fe0] p-5 text-white sm:p-6">
-            <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 size-44 rounded-full bg-[radial-gradient(closest-side,rgb(255_210_63/0.5),transparent)]" />
-            <p className="relative font-[family-name:var(--font-display)] text-2xl font-extrabold leading-tight sm:text-3xl">
-              Le launchpad des <span className="sticker text-nuit">mèmes français</span>
-            </p>
-            <p className="relative mt-3 max-w-md text-sm text-white/85">Transforme un mème ou une actu en token, et suis en direct ce que le monde et tes amis achètent.</p>
-            <div className="relative mt-4 flex flex-wrap gap-2">
-              <Link href="/lancer" className="btn-fete min-h-10 px-5 py-2 text-sm">
-                Créer un token
-              </Link>
-              <Link href="/demarrer" className="inline-flex min-h-10 items-center rounded-full bg-white/15 px-5 text-sm font-bold">
-                Bien démarrer
-              </Link>
-            </div>
-          </div>
-        </GuestOnly>
-        <div className="empty:hidden">
-          <CashBar />
-        </div>
-        <LiveActivity />
+    <div className="mx-auto max-w-3xl space-y-6">
+      {/* Solde et dépôt (connecté) ; bienvenue (visiteur) */}
+      <div className="empty:hidden">
+        <CashBar />
       </div>
-
-      {/* Les mèmes : le cœur du launchpad, juste après le titre */}
-      <section id="explorer" className="scroll-mt-24 space-y-5">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-extrabold sm:text-4xl">Tokens</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Nos mèmes en temps réel, et tous les tokens de Solana.</p>
-          </div>
-          <nav className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Trier les tokens">
-            {MARKET_TABS.map(({ key, label }) => (
-              <Link
-                key={key}
-                href={key === "nouveaux" ? "/#explorer" : `/?tri=${key}#explorer`}
-                scroll={false}
-                aria-current={market === key ? "page" : undefined}
-                className={`chip shrink-0 ${market === key ? "chip-active" : ""}`}
-              >
-                {label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-        {market === "liste" ? (
-          <WatchlistView />
-        ) : external ? (
-          external.length ? (
-            <ul className="surface divide-y divide-ligne/60 p-1.5">
-              {external.map((t, i) => (
-                <MarketRow key={t.address} t={t} rank={i + 1} />
-              ))}
-            </ul>
-          ) : (
-            <p className="surface p-8 text-center text-sm text-muted-foreground">Les données du marché sont momentanément indisponibles. Réessaie dans une minute.</p>
-          )
-        ) : (
-          <TokenGrid key={tab} tab={tab} initial={tokens} />
-        )}
-        {external && <p className="text-xs text-muted-foreground">Données publiques (DexScreener, GeckoTerminal), pour information. Ces tokens ne sont ni vérifiés ni recommandés par Tiers-État.</p>}
-      </section>
-
-      {/* Le Mème de la semaine */}
-      <Suspense fallback={<div className="h-56 animate-pulse rounded-2xl border border-ligne bg-white/[0.02]" />}>
-        <HomeWeekly />
-      </Suspense>
-
-      {/* Ça brûle en France : actus chaudes (streamées, n'attendent pas les flux RSS) */}
-      <Suspense fallback={<div className="h-[26rem] animate-pulse rounded-2xl border border-ligne bg-white/[0.02]" />}>
-        <HomeBuzz />
-      </Suspense>
-
       <GuestOnly>
-        <div className="space-y-16 sm:space-y-24">
-      {/* Comment ça marche, compact */}
-      <section className="space-y-5">
-        <h2 className="text-3xl font-extrabold sm:text-4xl">Comment ça marche</h2>
-        <ol className="grid gap-3 md:grid-cols-3">
-          {STEPS.map((s, i) => (
-            <li key={s.n} className="surface flex gap-4 p-4 sm:p-5">
-              <span
-                className={`grid size-10 shrink-0 -rotate-3 place-items-center rounded-2xl font-mono text-sm font-extrabold ${["bg-electrique text-white", "bg-soleil text-nuit", "bg-vente text-white"][i]}`}
-              >
-                {s.n}
-              </span>
-              <div>
-                <h3 className="font-semibold">{s.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* Lancement officiel : liste d'attente + places de Fondateur */}
-      <section className="surface grid gap-8 p-6 sm:p-8 md:grid-cols-2 md:items-center">
-        <div className="space-y-3">
-          <p className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-soleil">Lancement officiel</p>
-          <h2 className="text-3xl font-extrabold">Sois prévenu en premier.</h2>
-          <JoinWaitlist initialCount={waitlist} />
-        </div>
-        {founders && (
-          <div className="flex md:justify-end">
-            <FounderGauge taken={founders.taken} seats={founders.seats} />
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-electrique via-[#4a49f0] to-[#7b3fe0] p-5 text-white sm:p-7">
+          <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 size-44 rounded-full bg-[radial-gradient(closest-side,rgb(255_210_63/0.5),transparent)]" />
+          <h1 className="relative font-[family-name:var(--font-display)] text-3xl leading-tight font-extrabold sm:text-4xl">
+            Crée. Trade. <span className="sticker text-nuit">Gagne ensemble.</span>
+          </h1>
+          <p className="relative mt-3 max-w-md text-[15px] text-white/85">
+            Le launchpad et l&apos;appli de trading du peuple : lance ton mème en une minute, trade toutes les cryptos et suis ce que tes amis achètent.
+          </p>
+          <div className="relative mt-5 flex flex-wrap gap-2">
+            <Link href="/portefeuille" className="btn-fete min-h-11 px-6">
+              Commencer
+            </Link>
+            <Link href="/lancer" className="inline-flex min-h-11 items-center rounded-full bg-white/15 px-6 font-bold">
+              Créer un mème
+            </Link>
           </div>
+        </section>
+      </GuestOnly>
+
+      {/* La petite bande : les plus gros gains du moment */}
+      <Suspense fallback={null}>
+        <TopTradersBand />
+      </Suspense>
+
+      {/* La liste des tokens */}
+      <section id="tokens" className="scroll-mt-20 space-y-3">
+        <nav className="no-scrollbar -mx-4 flex gap-1 overflow-x-auto border-b border-white/[0.08] px-4" aria-label="Listes de tokens">
+          {TABS.map((t) => (
+            <Link
+              key={t.key}
+              href={`/?tri=${t.key}`}
+              scroll={false}
+              aria-current={key === t.key ? "page" : undefined}
+              className={`shrink-0 border-b-2 px-3 pb-2.5 pt-1 text-[15px] font-bold transition ${key === t.key ? "border-soleil text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              {t.label}
+            </Link>
+          ))}
+        </nav>
+
+        {key === "liste" ? (
+          <WatchlistView />
+        ) : key === "bourse" ? (
+          <div className="rounded-3xl bg-surface p-6 text-center ring-1 ring-white/[0.08]">
+            <p className="text-3xl" aria-hidden>
+              📈
+            </p>
+            <p className="mt-2 text-lg font-extrabold">Actions, indices, forex, matières premières et pré-IPO</p>
+            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
+              Bientôt sur Tiers-État : Tesla, l&apos;or, l&apos;euro-dollar, le Nasdaq ou les futures introductions en bourse, depuis le même solde que tes mèmes.
+            </p>
+          </div>
+        ) : failed || !items ? (
+          <p className="rounded-3xl bg-surface p-8 text-center text-sm text-muted-foreground">Liste momentanément indisponible. Réessaie dans une minute.</p>
+        ) : items.length === 0 ? (
+          <div className="rounded-3xl bg-surface p-8 text-center ring-1 ring-white/[0.08]">
+            <p className="font-bold">{memeTab ? "Aucun mème ici pour l'instant" : "Rien à afficher"}</p>
+            {memeTab && (
+              <>
+                <p className="mt-1 text-sm text-muted-foreground">Le premier mème de Tiers-État reste à créer. Ce sera peut-être le tien.</p>
+                <Link href="/lancer" className="btn-fete mt-4 min-h-11 px-6">
+                  Créer un mème
+                </Link>
+              </>
+            )}
+          </div>
+        ) : (
+          <ul className="overflow-hidden rounded-3xl bg-surface p-1.5 ring-1 ring-white/[0.08]">
+            {items.map((t) => (
+              <MarketRow key={t.address} t={t} />
+            ))}
+          </ul>
+        )}
+        {(key === "cryptos" || key === "solana") && (
+          <p className="px-1 text-xs text-muted-foreground">Données publiques (DexScreener, GeckoTerminal), pour information. Ce n&apos;est pas une recommandation.</p>
         )}
       </section>
-
-        </div>
-      </GuestOnly>
     </div>
   );
 }

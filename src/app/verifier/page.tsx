@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { VerifyOnChain } from "@/components/verify/VerifyOnChain";
 import secours from "@/lib/secours.json";
 import { VerifySnapshots } from "@/components/verify/VerifySnapshots";
@@ -136,9 +135,6 @@ export default async function VerifierPage() {
           <a href={CODE_SOURCE} target="_blank" rel="noreferrer" className="mr-6 underline underline-offset-4 hover:text-foreground">
             Lire le code source sur GitHub
           </a>
-          <Link href="/vision" className="underline underline-offset-4 hover:text-foreground">
-            Voir la feuille de route complète
-          </Link>
         </p>
       </section>
 

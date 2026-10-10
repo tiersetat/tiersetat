@@ -1,27 +1,41 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { FeedView } from "@/components/social/FeedView";
-import { getFeed, type FeedItem } from "@/lib/feed";
-import { CLUSTER } from "@/lib/solana/config";
+import { LiveActivity } from "@/components/social/LiveActivity";
+import { PnlLeaderboard } from "@/components/rank/PnlLeaderboard";
+import { topTradersByPnl } from "@/lib/pnl-leaderboard";
 
-export const metadata: Metadata = { title: "Le fil — Tiers-État" };
+export const metadata: Metadata = { title: "Social — Tiers-État" };
 
-export default async function FilPage() {
-  let initial: FeedItem[] = [];
-  try {
-    initial = await getFeed({ type: "tout", minUsd: 0, wallets: null });
-  } catch (err) {
-    console.error("fil", err);
-  }
+const VUES = [
+  { key: "fil", label: "Le fil" },
+  { key: "classement", label: "Classement" },
+  { key: "theses", label: "Thèses" },
+] as const;
+
+/** Social : qui achète (Mondial / Amis), le classement des traders par gains, et les thèses. */
+export default async function SocialPage({ searchParams }: PageProps<"/fil">) {
+  const raw = (await searchParams).vue;
+  const vue = VUES.find((v) => v.key === raw)?.key ?? "fil";
+  const rows = vue === "classement" ? await topTradersByPnl(50).catch(() => []) : [];
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-4xl font-extrabold">Le fil</h1>
-        <p className="text-sm text-muted-foreground">
-          Les achats, les ventes et les thèses des traders, en direct. Une thèse, c&apos;est l&apos;avis d&apos;un détenteur, affiché avec sa position et son gain ou sa perte.
-          {(CLUSTER as string) === "devnet" ? " Bêta : montants fictifs." : ""}
-        </p>
-      </header>
-      <FeedView initial={initial} />
+    <div className="mx-auto max-w-2xl space-y-5">
+      <h1 className="text-4xl font-extrabold">Social</h1>
+      <nav className="flex gap-1 border-b border-white/[0.08]" aria-label="Social">
+        {VUES.map((v) => (
+          <Link
+            key={v.key}
+            href={v.key === "fil" ? "/fil" : `/fil?vue=${v.key}`}
+            aria-current={vue === v.key ? "page" : undefined}
+            className={`border-b-2 px-3 pb-2.5 text-[15px] font-bold ${vue === v.key ? "border-soleil text-foreground" : "border-transparent text-muted-foreground"}`}
+          >
+            {v.label}
+          </Link>
+        ))}
+      </nav>
+      {vue === "fil" && <LiveActivity limit={40} />}
+      {vue === "classement" && <PnlLeaderboard rows={rows} />}
+      {vue === "theses" && <FeedView initial={[]} defaultType="theses" />}
     </div>
   );
 }

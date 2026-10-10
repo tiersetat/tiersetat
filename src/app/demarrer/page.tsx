@@ -83,10 +83,6 @@ export default function DemarrerPage() {
               <p className="font-medium">Ça buzz</p>
               <p className="mt-1 text-muted-foreground">Transforme l&apos;actu du jour en token.</p>
             </Link>
-            <Link href="/clans" className="rounded-xl border border-ligne p-4 text-sm hover:border-white/20 hover:bg-white/[0.03]">
-              <p className="font-medium">Rejoins un clan</p>
-              <p className="mt-1 text-muted-foreground">Fais grimper ta région au classement.</p>
-            </Link>
           </div>
         </li>
       </ol>

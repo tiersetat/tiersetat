@@ -115,9 +115,6 @@ export function LiveActivity({ limit = 12 }: { limit?: number }) {
           </ul>
         )}
       </div>
-      <Link href="/fil" className="block text-center text-sm font-bold text-electrique">
-        Tout le fil →
-      </Link>
     </section>
   );
 }
