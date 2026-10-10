@@ -57,3 +57,22 @@ describe("transaction de création de config", () => {
     expect(PublicKey.isOnCurve(configKeypair.publicKey.toBytes())).toBe(true);
   });
 });
+
+describe("réglage du lancement réel", () => {
+  it("donne le seuil inscrit et reste au-dessus des 10 SOL de la migration automatique", async () => {
+    const { CURVE_PRESETS, PLATFORM_CURVE } = await import("@/lib/solana/platform");
+    const { buildPlatformCurve } = await import("@/lib/solana/curve");
+    const saved = { ...PLATFORM_CURVE };
+    const mutable = PLATFORM_CURVE as { initialMarketCapSol: number; migrationMarketCapSol: number };
+    mutable.initialMarketCapSol = CURVE_PRESETS.mainnet.initialMarketCapSol;
+    mutable.migrationMarketCapSol = CURVE_PRESETS.mainnet.migrationMarketCapSol;
+    try {
+      const threshold = buildPlatformCurve().migrationQuoteThreshold.toString();
+      expect(threshold).toBe(CURVE_PRESETS.mainnet.thresholdLamports);
+      expect(Number(threshold) / 1e9).toBeGreaterThanOrEqual(10);
+    } finally {
+      mutable.initialMarketCapSol = saved.initialMarketCapSol;
+      mutable.migrationMarketCapSol = saved.migrationMarketCapSol;
+    }
+  });
+});

@@ -1,14 +1,28 @@
+import { CLUSTER } from "./config";
+
+/** Réseau principal (argent réel) : réglage « Accessible » choisi pour le lancement. */
+const MAINNET = (CLUSTER as string) === "mainnet-beta";
+
+/** Réglages de la courbe selon le réseau (capitalisations en SOL). */
+export const CURVE_PRESETS = {
+  /** Bêta : petits montants fictifs pour tester la Bastille facilement */
+  devnet: { initialMarketCapSol: 2, migrationMarketCapSol: 20, thresholdLamports: "4805061467" },
+  /** Lancement réel : départ ~10 SOL, Bastille après ~24 SOL achetés (≥ 10 SOL : migration automatique par les robots Meteora) */
+  mainnet: { initialMarketCapSol: 10, migrationMarketCapSol: 100, thresholdLamports: "24025307335" },
+} as const;
+const PRESET = MAINNET ? CURVE_PRESETS.mainnet : CURVE_PRESETS.devnet;
+
 /**
- * Paramètres économiques de la plateforme (devnet), sans dépendance au SDK Meteora
+ * Paramètres économiques de la plateforme, sans dépendance au SDK Meteora
  * pour pouvoir être importés partout (pages serveur, navigateur).
  */
 export const PLATFORM_CURVE = {
   totalSupply: 1_000_000_000,
   tokenDecimals: 6,
   /** Market cap de départ, en SOL */
-  initialMarketCapSol: 2,
+  initialMarketCapSol: PRESET.initialMarketCapSol,
   /** Market cap à laquelle le mème « prend la Bastille » (migration DAMM v2), en SOL */
-  migrationMarketCapSol: 20,
+  migrationMarketCapSol: PRESET.migrationMarketCapSol,
   /** Frais de trading sur la courbe : 1 % */
   tradingFeeBps: 100,
   /**
@@ -30,4 +44,4 @@ export const PLATFORM_CURVE = {
  * SOL à lever sur la courbe avant migration (en lamports), tel que calculé par
  * buildPlatformCurve() et inscrit dans la config on-chain (vérifié par les tests).
  */
-export const MIGRATION_QUOTE_THRESHOLD_LAMPORTS = BigInt("4805061467");
+export const MIGRATION_QUOTE_THRESHOLD_LAMPORTS = BigInt(PRESET.thresholdLamports);
