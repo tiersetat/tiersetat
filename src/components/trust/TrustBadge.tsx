@@ -3,7 +3,7 @@ import type { Trust } from "@/lib/creator-trust";
 const STYLE: Record<Trust["niveau"], string> = {
   nouveau: "bg-white/5 text-muted-foreground",
   fiable: "bg-achat/15 text-achat",
-  mitige: "bg-amber-400/15 text-amber-300",
+  mitige: "bg-soleil/15 text-soleil",
   risque: "bg-vente/15 text-vente",
 };
 

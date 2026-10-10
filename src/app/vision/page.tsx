@@ -69,7 +69,7 @@ const ETAPES: { phase: string; titre: string; points: string[] }[] = [
 
 const STATUT_STYLE: Record<Brique["statut"], string> = {
   "En ligne": "bg-achat/15 text-achat",
-  "En construction": "bg-amber-400/15 text-amber-300",
+  "En construction": "bg-soleil/15 text-soleil",
   "À venir": "bg-white/5 text-muted-foreground",
 };
 
@@ -77,7 +77,7 @@ export default function VisionPage() {
   return (
     <article className="mx-auto max-w-5xl space-y-20">
       <header className="flex flex-col items-center space-y-6 text-center">
-        <LogoMark size={96} className="drop-shadow-[0_0_40px_rgba(140,147,201,0.55)]" />
+        <LogoMark size={96} className="drop-shadow-[0_0_40px_rgba(61,90,254,0.55)]" />
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Vision</p>
         <h1 className="text-lueur-gradient max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">L&apos;écosystème financier du peuple.</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">

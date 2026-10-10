@@ -45,10 +45,10 @@ function Item({ href, label, d, active }: { href: string; label: string; d: stri
       href={href}
       aria-current={active ? "page" : undefined}
       className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-[14px] font-medium transition ${
-        active ? "bg-white/[0.09] text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.07)]" : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
+        active ? "bg-white/[0.1] font-semibold text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.08)]" : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
       }`}
     >
-      <svg viewBox="0 0 24 24" className={`size-5 shrink-0 ${active ? "text-electrique drop-shadow-[0_0_8px_rgb(77_124_255/0.8)]" : ""}`} fill="none" stroke="currentColor" strokeWidth={active ? 2.1 : 1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <svg viewBox="0 0 24 24" className={`size-5 shrink-0 ${active ? "text-soleil" : ""}`} fill="none" stroke="currentColor" strokeWidth={active ? 2.1 : 1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d={d} />
       </svg>
       <span className="truncate">{label}</span>
@@ -61,11 +61,11 @@ export function Sidebar() {
   const path = usePathname();
   const active = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/[0.06] bg-nuit/70 px-3 py-5 backdrop-blur-2xl lg:flex">
+    <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/[0.07] bg-[#0d1033] px-3 py-5 lg:flex">
       <Link href="/" aria-label="Tiers-État, accueil" className="px-3">
         <Wordmark />
       </Link>
-      <Link href="/lancer" className="btn-primary mx-1 mt-6">
+      <Link href="/lancer" className="btn-fete mx-1 mt-6">
         + Frapper un mème
       </Link>
       <nav aria-label="Navigation principale" className="no-scrollbar mt-6 flex flex-1 flex-col gap-0.5 overflow-y-auto">

@@ -53,7 +53,7 @@ export default async function PositionPage({ params }: PageProps<"/token/[mint]/
       <section className="surface relative overflow-hidden p-6 sm:p-8">
         <div
           aria-hidden
-          className={`pointer-events-none absolute -top-24 right-0 size-72 rounded-full blur-[100px] ${gain ? "bg-achat/25" : "bg-vente/25"}`}
+          className={`pointer-events-none absolute -top-24 right-0 size-72 rounded-full ${gain ? "bg-[radial-gradient(closest-side,rgb(61_255_176/0.28),transparent)]" : "bg-[radial-gradient(closest-side,rgb(255_61_104/0.28),transparent)]"}`}
         />
         <div className="flex items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element -- image IPFS du token */}

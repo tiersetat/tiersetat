@@ -22,7 +22,7 @@ export function PriceChart({ trades, createdAt }: { trades: TradeRow[]; createdA
       autoSize: true,
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
-        textColor: "#9b98ad",
+        textColor: "#a7acd9",
         fontFamily: "var(--font-geist-mono), monospace",
       },
       grid: { vertLines: { color: "rgba(255,255,255,0.04)" }, horzLines: { color: "rgba(255,255,255,0.04)" } },
@@ -31,12 +31,12 @@ export function PriceChart({ trades, createdAt }: { trades: TradeRow[]; createdA
       localization: { locale: "fr-FR" },
     });
     seriesRef.current = chart.addSeries(CandlestickSeries, {
-      upColor: "#3dffa8",
-      borderUpColor: "#3dffa8",
-      wickUpColor: "#3dffa8",
-      downColor: "#ff3b5c",
-      borderDownColor: "#ff3b5c",
-      wickDownColor: "#ff3b5c",
+      upColor: "#3dffb0",
+      borderUpColor: "#3dffb0",
+      wickUpColor: "#3dffb0",
+      downColor: "#ff3d68",
+      borderDownColor: "#ff3d68",
+      wickDownColor: "#ff3d68",
       priceFormat: { type: "price", precision: 3, minMove: 0.001 },
     });
     chartRef.current = chart;

@@ -8,7 +8,7 @@ function Meme({ m, label }: { m: WeekMeme; label: string }) {
       {/* eslint-disable-next-line @next/next/no-img-element -- image IPFS du mème */}
       <img src={m.image_url} alt="" className="size-12 rounded-xl object-cover" />
       <span className="min-w-0">
-        <span className="block text-[11px] uppercase tracking-widest text-amber-300">{label}</span>
+        <span className="block text-[11px] uppercase tracking-widest text-soleil">{label}</span>
         <span className="block truncate font-semibold">
           {m.name} <span className="font-mono text-sm font-normal text-pervenche">${m.ticker}</span>
         </span>
@@ -23,10 +23,10 @@ export async function HomeWeekly() {
   if (!current) return null;
   return (
     <section className="surface relative overflow-hidden p-6 sm:p-8">
-      <div aria-hidden className="pointer-events-none absolute -left-20 -top-24 size-72 rounded-full bg-amber-400/10 blur-[100px]" />
+      <div aria-hidden className="pointer-events-none absolute -left-20 -top-24 size-72 rounded-full bg-[radial-gradient(closest-side,rgb(255_210_63/0.16),transparent)]" />
       <div className="relative flex flex-wrap items-start justify-between gap-6">
         <div className="space-y-1">
-          <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber-300">Le Mème de la semaine</p>
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-soleil">Le Mème de la semaine</p>
           <h2 className="text-2xl font-bold tracking-tight">La Une de Tiers-État</h2>
           <p className="text-sm text-muted-foreground">
             Fin du concours dans <Countdown end={current.end} />

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { ViewTransition } from "react";
+import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WalletProviders } from "@/components/providers/WalletProviders";
@@ -13,6 +14,8 @@ import { RegisterSW } from "@/components/app/RegisterSW";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// Titres : police d'affiche, chaleureuse et mémorable
+const display = Bricolage_Grotesque({ variable: "--font-display", subsets: ["latin"], axes: ["opsz", "wdth"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -23,18 +26,21 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "Tiers-État", statusBarStyle: "black-translucent" },
 };
 
-export const viewport: Viewport = { themeColor: "#030206", viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#0b0d2a", viewportFit: "cover" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="fr" className={`${geist.variable} ${geistMono.variable} h-full`}>
+    <html lang="fr" className={`${geist.variable} ${geistMono.variable} ${display.variable} h-full`}>
       <body className="flex min-h-full flex-col">
         <WalletProviders>
           <InviteCapture />
           <RegisterSW />
           <Header />
           <div className="flex flex-1 flex-col lg:pl-64">
-            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
+            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
+              {/* Fondu enchaîné entre les pages (API View Transitions du navigateur) */}
+              <ViewTransition>{children}</ViewTransition>
+            </main>
             <Footer />
           </div>
           <Sidebar />

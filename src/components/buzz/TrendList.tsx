@@ -3,7 +3,7 @@ import type { Heat, Trend } from "@/lib/buzz-trends";
 
 export const HEAT_STYLE: Record<Heat, { dot: string; text: string; label: string }> = {
   brulant: { dot: "bg-vente shadow-[0_0_10px] shadow-vente", text: "text-vente", label: "Brûlant" },
-  chaud: { dot: "bg-amber-400 shadow-[0_0_8px] shadow-amber-400/70", text: "text-amber-300", label: "Chaud" },
+  chaud: { dot: "bg-soleil shadow-[0_0_8px] shadow-amber-400/70", text: "text-soleil", label: "Chaud" },
   tiede: { dot: "bg-pervenche", text: "text-lueur", label: "Tiède" },
 };
 

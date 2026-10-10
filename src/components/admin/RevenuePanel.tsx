@@ -99,7 +99,7 @@ export function RevenuePanel({ tokens }: { tokens: RevenueToken[] }) {
             À encaisser : <span className="font-mono text-lg font-medium text-achat">{sol(total)} SOL</span>
           </p>
           {!isTreasury && (
-            <p className="rounded-xl border border-amber-300/30 bg-amber-300/[0.07] p-3 text-xs text-amber-100">
+            <p className="rounded-xl border border-soleil/30 bg-soleil/[0.07] p-3 text-xs text-amber-100">
               Pour encaisser, connecte le wallet fondateur ({CLAIMER?.toBase58().slice(0, 4)}…{CLAIMER?.toBase58().slice(-4)}).
             </p>
           )}

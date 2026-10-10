@@ -20,7 +20,7 @@ export default async function Image() {
           alignItems: "center",
           justifyContent: "center",
           gap: 28,
-          background: "radial-gradient(900px 520px at 50% 20%, rgba(140,147,201,0.4), #030206 70%)",
+          background: "radial-gradient(900px 520px at 50% 20%, rgba(61,90,254,0.4), #0b0d2a 70%)",
           color: "#f4f1fa",
           fontFamily: "sans-serif",
         }}

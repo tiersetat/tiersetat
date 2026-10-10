@@ -4,7 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Identité « pro » : nuit profonde + lueur lavande du logo. */
+/* Identité « Fête républicaine » : nuit bleu marine + couleurs de fête (bleu roi, cerise, soleil, bonbon, menthe). */
 @theme inline {
   --color-nuit: var(--nuit);
   --color-surface: var(--surface);
@@ -15,10 +15,14 @@
   --color-achat: var(--achat);
   --color-vente: var(--vente);
   --color-electrique: var(--electrique);
+  --color-soleil: var(--soleil);
+  --color-bonbon: var(--bonbon);
+  --color-ciel: var(--ciel);
 
   --font-sans: var(--font-geist);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-geist);
+  --font-heading: var(--font-display);
+  --font-display: var(--font-display);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -46,36 +50,39 @@
 }
 
 :root {
-  --nuit: #05040b;
-  --surface: rgb(255 255 255 / 0.035);
-  --ligne: rgb(255 255 255 / 0.09);
-  --lueur: #ece6f6;
-  --pervenche: #8c93c9;
-  --indigo: #545a92;
-  /* Révolution néon : bleu électrique pour l'action, rouge néon pour ce qui brûle, vert néon pour les gains */
-  --electrique: #4d7cff;
-  --achat: #3dffa8;
-  --vente: #ff3b5c;
+  --nuit: #0b0d2a;
+  --surface: #12153a;
+  --ligne: rgb(255 255 255 / 0.1);
+  --lueur: #f3f4ff;
+  --pervenche: #a9b6ff;
+  --indigo: #3a438f;
+  /* Fête républicaine : bleu roi pour l'action, cerise pour ce qui brûle, menthe pour les gains, soleil et bonbon pour la fête */
+  --electrique: #3d5afe;
+  --achat: #3dffb0;
+  --vente: #ff3d68;
+  --soleil: #ffd23f;
+  --bonbon: #ff7ad9;
+  --ciel: #5ec8ff;
 
   --background: var(--nuit);
   --foreground: #f4f1fa;
-  --card: #0b0a12;
+  --card: #12153a;
   --card-foreground: var(--foreground);
-  --popover: #0e0d17;
+  --popover: #161a48;
   --popover-foreground: var(--foreground);
   --primary: var(--lueur);
-  --primary-foreground: #0b0a12;
+  --primary-foreground: #0b0d2a;
   --secondary: #16152200;
   --secondary-foreground: var(--foreground);
-  --muted: #14131d;
-  --muted-foreground: #9b98ad;
-  --accent: #191826;
+  --muted: #171b4a;
+  --muted-foreground: #a7acd9;
+  --accent: #1c2156;
   --accent-foreground: var(--foreground);
   --destructive: var(--vente);
   --border: var(--ligne);
-  --input: rgb(255 255 255 / 0.12);
+  --input: rgb(255 255 255 / 0.14);
   --ring: var(--electrique);
-  --radius: 0.75rem;
+  --radius: 0.9rem;
   color-scheme: dark;
 }
 
@@ -85,90 +92,117 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    /* Halos de fête en haut de page : défilent avec la page (pas de fond fixe, plus fluide sur téléphone) */
     background-image:
-      radial-gradient(60rem 40rem at 50% -10%, rgb(77 124 255 / 0.16), transparent 70%),
-      radial-gradient(40rem 30rem at 100% 0%, rgb(140 92 255 / 0.12), transparent 70%),
-      radial-gradient(36rem 28rem at 0% 100%, rgb(255 59 92 / 0.06), transparent 70%),
-      radial-gradient(1px 1px at 12% 22%, rgb(255 255 255 / 0.35), transparent),
-      radial-gradient(1px 1px at 78% 14%, rgb(255 255 255 / 0.3), transparent),
-      radial-gradient(1px 1px at 42% 68%, rgb(255 255 255 / 0.25), transparent),
-      radial-gradient(1px 1px at 88% 58%, rgb(255 255 255 / 0.3), transparent),
-      radial-gradient(1px 1px at 24% 88%, rgb(255 255 255 / 0.2), transparent),
-      radial-gradient(1.5px 1.5px at 62% 34%, rgb(200 198 238 / 0.35), transparent);
+      radial-gradient(50rem 32rem at 15% -8%, rgb(61 90 254 / 0.32), transparent 70%),
+      radial-gradient(40rem 28rem at 90% -6%, rgb(255 61 104 / 0.2), transparent 70%),
+      radial-gradient(30rem 22rem at 55% 0%, rgb(255 210 63 / 0.1), transparent 70%);
     background-repeat: no-repeat;
-    background-attachment: fixed;
+  }
+  h1,
+  h2 {
+    font-family: var(--font-display), var(--font-geist), system-ui, sans-serif;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
   ::selection {
-    background: var(--electrique);
+    background: var(--soleil);
     color: var(--nuit);
   }
 }
 
 @layer components {
-  /* Carte en verre : liseré lumineux en haut, coins très arrondis (Tiers-État 2.0) */
+  /* Carte : aplat bleu nuit, liseré clair (pas de flou d'arrière-plan : beaucoup plus fluide sur téléphone) */
   .surface {
-    @apply rounded-3xl backdrop-blur-md;
+    @apply rounded-3xl;
     border: 1px solid transparent;
     background:
-      linear-gradient(rgb(14 13 23 / 0.72), rgb(14 13 23 / 0.72)) padding-box,
-      linear-gradient(180deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.04) 40%, rgb(255 255 255 / 0.03)) border-box;
+      linear-gradient(var(--surface), var(--surface)) padding-box,
+      linear-gradient(180deg, rgb(255 255 255 / 0.18), rgb(255 255 255 / 0.05) 45%, rgb(255 255 255 / 0.04)) border-box;
   }
   .surface-hover {
     @apply transition-[transform,box-shadow] duration-200;
   }
-  .surface-hover:hover {
-    box-shadow: 0 18px 50px -24px rgb(140 147 201 / 0.55);
+  @media (hover: hover) {
+    .surface-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 50px -26px rgb(61 90 254 / 0.75);
+    }
   }
-  /* Bouton principal : grande pilule lumineuse */
+  /* Bouton principal : pilule bleu roi, ombre colorée */
   .btn-primary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-bold tracking-tight text-white transition disabled:opacity-50;
-    background: linear-gradient(135deg, #4d7cff 0%, #6a6bff 50%, #9b6bff 100%);
-    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.18) inset, 0 1px 0 0 rgb(255 255 255 / 0.35) inset, 0 10px 34px -8px rgb(77 124 255 / 0.85);
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-extrabold tracking-tight text-white disabled:opacity-50;
+    background: linear-gradient(135deg, #5a72ff 0%, #3d5afe 55%, #3346e0 100%);
+    box-shadow: 0 1px 0 0 rgb(255 255 255 / 0.35) inset, 0 6px 0 -1px #2333b8, 0 14px 30px -10px rgb(61 90 254 / 0.9);
   }
   .btn-primary:hover:not(:disabled) {
-    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.28) inset, 0 1px 0 0 rgb(255 255 255 / 0.45) inset, 0 14px 46px -6px rgb(77 124 255 / 1);
+    filter: brightness(1.08);
   }
-  /* Bouton secondaire : pilule de verre */
+  /* Bouton fête : jaune soleil, pour les gros appels à l'action */
+  .btn-fete {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-extrabold tracking-tight disabled:opacity-50;
+    color: var(--nuit);
+    background: linear-gradient(180deg, #ffe17a 0%, #ffd23f 60%, #ffc21a 100%);
+    box-shadow: 0 1px 0 0 rgb(255 255 255 / 0.6) inset, 0 6px 0 -1px #c79400, 0 14px 30px -10px rgb(255 210 63 / 0.8);
+  }
+  .btn-fete:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+  /* Bouton secondaire : pilule claire */
   .btn-ghost {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-6 py-3 text-[15px] font-bold tracking-tight text-foreground backdrop-blur-md transition hover:border-white/25 hover:bg-white/[0.09] disabled:opacity-50;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.07] px-6 py-3 text-[15px] font-bold tracking-tight text-foreground hover:border-white/30 hover:bg-white/[0.12] disabled:opacity-50;
   }
   /* Achat / vente : pilules pleines, couleur franche */
   .btn-buy {
-    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-bold text-nuit transition disabled:opacity-50;
-    background: linear-gradient(180deg, #8dffd0 0%, #3dffa8 100%);
-    box-shadow: 0 10px 30px -10px rgb(61 255 168 / 0.8);
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-extrabold text-nuit transition disabled:opacity-50;
+    background: linear-gradient(180deg, #8dffd6 0%, #3dffb0 100%);
+    box-shadow: 0 6px 0 -1px #14b877, 0 14px 30px -12px rgb(61 255 176 / 0.8);
   }
   .btn-sell {
-    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-bold text-nuit transition disabled:opacity-50;
-    background: linear-gradient(180deg, #ff8ea1 0%, #ff3b5c 100%);
-    box-shadow: 0 10px 30px -10px rgb(255 59 92 / 0.8);
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-extrabold text-white transition disabled:opacity-50;
+    background: linear-gradient(180deg, #ff7a98 0%, #ff3d68 100%);
+    box-shadow: 0 6px 0 -1px #c41d47, 0 14px 30px -12px rgb(255 61 104 / 0.8);
   }
   .chip {
-    @apply inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[13px] font-semibold text-muted-foreground transition hover:border-white/20 hover:text-foreground;
+    @apply inline-flex items-center rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[13px] font-bold text-muted-foreground hover:border-white/25 hover:text-foreground;
   }
   .chip-active {
-    @apply border-transparent bg-electrique text-white shadow-[0_6px_20px_-8px_rgb(77_124_255/0.9)] hover:text-white;
+    @apply border-transparent text-nuit hover:text-nuit;
+    background: var(--soleil);
+    box-shadow: 0 6px 18px -8px rgb(255 210 63 / 0.9);
   }
   .field {
-    @apply w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-electrique/70 focus:ring-4 focus:ring-electrique/20;
+    @apply w-full rounded-2xl border border-white/12 bg-[#0e1136] px-4 py-3 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-electrique focus:ring-4 focus:ring-electrique/25;
   }
   .label {
-    @apply text-xs font-medium text-muted-foreground;
+    @apply text-xs font-semibold text-muted-foreground;
   }
   .text-lueur-gradient {
-    background: linear-gradient(180deg, #ffffff 10%, #c9d4ff 55%, #7f9bff 100%);
+    background: linear-gradient(180deg, #ffffff 20%, #dfe4ff 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
-  /* Barre de progression de la bonding curve */
+  /* Surlignage « autocollant » : mot clé sur fond de couleur, légèrement penché */
+  .sticker {
+    @apply inline-block rounded-2xl px-3 pb-1;
+    color: var(--nuit);
+    background: var(--soleil);
+    transform: rotate(-2deg);
+    box-shadow: 0 6px 0 -1px #c79400;
+  }
+  .sticker-bonbon {
+    background: var(--bonbon);
+    box-shadow: 0 6px 0 -1px #c2459f;
+  }
+  /* Barre de progression de la bonding curve : du bleu au soleil, puis cerise près de la Bastille */
   .progress-track {
-    @apply h-1.5 overflow-hidden rounded-full bg-white/[0.07];
+    @apply h-2 overflow-hidden rounded-full bg-white/[0.08];
   }
   .progress-fill {
     @apply h-full rounded-full transition-[width] duration-700;
-    background: linear-gradient(90deg, #4d7cff, #9b6bff 60%, #ff3b5c);
-    box-shadow: 0 0 12px rgb(77 124 255 / 0.8);
+    background: linear-gradient(90deg, #3d5afe, #5ec8ff 35%, #ffd23f 70%, #ff3d68);
+    background-size: 100% 100%;
   }
 }
 
@@ -195,10 +229,10 @@
   border-radius: 6px;
 }
 .wallet-adapter-modal-wrapper {
-  background: #0e0d17 !important;
+  background: #161a48 !important;
   border: 1px solid var(--ligne);
   border-radius: 1.25rem !important;
-  box-shadow: 0 30px 80px -20px rgb(140 147 201 / 0.35) !important;
+  box-shadow: 0 30px 80px -20px rgb(61 90 254 / 0.45) !important;
 }
 .wallet-adapter-modal-title {
   color: var(--foreground) !important;
@@ -213,7 +247,7 @@
   background: rgb(255 255 255 / 0.06) !important;
 }
 .wallet-adapter-dropdown-list {
-  background: #0e0d17 !important;
+  background: #161a48 !important;
   border: 1px solid var(--ligne);
   border-radius: 0.9rem !important;
 }
@@ -225,20 +259,35 @@
   background: rgb(255 255 255 / 0.06) !important;
 }
 
-/* Arcs lumineux de l'accueil : respiration lente */
-@keyframes arc-breathe {
-  0%, 100% { opacity: 0.75; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.015); }
+/* Confettis de l'accueil : flottement lent, uniquement en transform (fluide) */
+@keyframes confetti-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(12deg); }
 }
-.hero-arc {
-  animation: arc-breathe 9s ease-in-out infinite;
-  transform-origin: center;
+.confetti { animation: confetti-float 6s ease-in-out infinite; }
+.confetti-2 { animation-duration: 7.5s; animation-delay: -2s; }
+.confetti-3 { animation-duration: 9s; animation-delay: -4s; }
+
+/* Entrée en douceur des éléments de page */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
 }
-.hero-arc-delay {
-  animation-delay: -4.5s;
+.rise-in { animation: rise-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.rise-in-2 { animation-delay: 0.08s; }
+.rise-in-3 { animation-delay: 0.16s; }
+
+/* Transitions entre les pages : fondu enchaîné court (ne ralentit jamais la navigation) */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .hero-arc { animation: none; }
+  .confetti, .rise-in { animation: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
 }
 
 
@@ -259,12 +308,21 @@
 
 /* Retour tactile : les boutons s'enfoncent légèrement à l'appui */
 .btn-primary,
+.btn-fete,
 .btn-ghost,
+.btn-buy,
+.btn-sell,
 .chip {
   transition-property: transform, background-color, border-color, color, box-shadow, opacity;
   transition-duration: 120ms;
 }
 .btn-primary:active:not(:disabled),
+.btn-fete:active:not(:disabled),
+.btn-buy:active:not(:disabled),
+.btn-sell:active:not(:disabled) {
+  transform: translateY(3px) scale(0.98);
+  box-shadow: none;
+}
 .btn-ghost:active:not(:disabled),
 .chip:active {
   transform: scale(0.97);

@@ -51,22 +51,26 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   return (
     <div className="space-y-16 sm:space-y-24">
       {/* Hero, compact sur téléphone pour montrer vite les mèmes */}
-      <section className="relative isolate left-1/2 -mt-10 flex w-screen -translate-x-1/2 flex-col items-center overflow-hidden px-4 pt-10 pb-6 text-center sm:pt-16 sm:pb-10">
+      <section className="relative isolate left-1/2 -mt-[6.5rem] flex w-screen -translate-x-1/2 flex-col items-center overflow-hidden px-4 pt-[6.5rem] pb-6 text-center sm:-mt-[7rem] sm:pt-[8.5rem] sm:pb-10">
         <HeroArcs />
-        <div aria-hidden className="pointer-events-none absolute top-8 left-1/2 -z-10 size-[28rem] -translate-x-1/2 rounded-full bg-electrique/25 blur-[110px]" />
-        <LogoMark size={104} className="drop-shadow-[0_0_40px_rgba(140,147,201,0.55)] sm:hidden" />
-        <LogoMark size={132} className="hidden drop-shadow-[0_0_40px_rgba(140,147,201,0.55)] sm:block" />
-        <p className="mt-8 hidden rounded-full border border-ligne bg-white/[0.03] px-4 py-1.5 text-xs text-muted-foreground sm:block">
-          Le peuple frappe sa monnaie <span className="mx-1.5 text-ligne">|</span> Solana
+        <LogoMark size={96} className="rise-in drop-shadow-[0_10px_30px_rgba(61,90,254,0.6)] sm:hidden" />
+        <LogoMark size={124} className="rise-in hidden drop-shadow-[0_10px_30px_rgba(61,90,254,0.6)] sm:block" />
+        <p className="rise-in mt-7 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-4 py-1.5 text-xs font-semibold text-foreground">
+          <span className="flex gap-1" aria-hidden>
+            <span className="size-2 rounded-full bg-electrique" />
+            <span className="size-2 rounded-full bg-white" />
+            <span className="size-2 rounded-full bg-vente" />
+          </span>
+          Le peuple frappe sa monnaie
         </p>
-        <h1 className="text-lueur-gradient mt-5 max-w-3xl text-[2.6rem] leading-[1.05] font-bold tracking-tight sm:mt-6 sm:text-6xl lg:text-7xl">
-          Le launchpad des mèmes français.
+        <h1 className="rise-in rise-in-2 mt-5 max-w-4xl text-[2.9rem] leading-[1.02] font-extrabold sm:mt-6 sm:text-7xl lg:text-[5.5rem]">
+          Le launchpad des <span className="sticker mt-2 whitespace-nowrap">mèmes français</span>
         </h1>
-        <p className="mt-4 max-w-xl text-base text-muted-foreground sm:mt-6 sm:text-lg">
+        <p className="rise-in rise-in-3 mt-6 max-w-xl text-base text-muted-foreground sm:mt-8 sm:text-lg">
           Transforme un mème ou une actu en token, en une signature. Pas de prévente, pas d&apos;initiés&nbsp;: la même courbe pour tous.
         </p>
-        <div className="mt-7 flex w-full max-w-sm flex-col gap-3 sm:mt-9 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
-          <Link href="/lancer" className="btn-primary px-6 py-3 text-base">
+        <div className="rise-in rise-in-3 mt-7 flex w-full max-w-sm flex-col gap-3 sm:mt-9 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
+          <Link href="/lancer" className="btn-fete px-7 py-3.5 text-base">
             Créer un token
           </Link>
           <Link href="/ca-buzz" className="btn-ghost px-6 py-3 text-base">
@@ -78,15 +82,15 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         </Link>
 
         {stats.tokens > 0 && (
-          <dl className="mt-10 grid w-full max-w-2xl grid-cols-3 divide-x divide-ligne rounded-2xl border border-ligne bg-white/[0.02]">
+          <dl className="mt-10 grid w-full max-w-2xl grid-cols-3 divide-x divide-ligne rounded-3xl border border-ligne bg-surface">
             {[
-              { label: "Tokens créés", value: fmt(stats.tokens), sol: null },
-              { label: "Volume échangé", value: `${fmt(stats.volumeSol, 2)} SOL`, sol: stats.volumeSol },
-              { label: "Traders", value: fmt(stats.traders), sol: null },
+              { label: "Tokens créés", value: fmt(stats.tokens), sol: null, color: "text-soleil" },
+              { label: "Volume échangé", value: `${fmt(stats.volumeSol, 2)} SOL`, sol: stats.volumeSol, color: "text-achat" },
+              { label: "Traders", value: fmt(stats.traders), sol: null, color: "text-bonbon" },
             ].map((s) => (
               <div key={s.label} className="px-3 py-4 sm:px-4 sm:py-5">
                 <dt className="text-xs text-muted-foreground">{s.label}</dt>
-                <dd className="mt-1 font-mono text-lg font-medium sm:text-2xl">{s.value}</dd>
+                <dd className={`mt-1 font-mono text-lg font-bold sm:text-2xl ${s.color}`}>{s.value}</dd>
                 {s.sol !== null && <Eur sol={s.sol} className="text-[11px] text-muted-foreground/80" />}
               </div>
             ))}
@@ -98,7 +102,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       <section id="explorer" className="scroll-mt-24 space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Explorer les tokens</h2>
+            <h2 className="text-3xl font-extrabold sm:text-4xl">Explorer les mèmes</h2>
             <p className="mt-1 text-sm text-muted-foreground">Mis à jour en temps réel depuis la blockchain.</p>
           </div>
           <nav className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Trier les tokens">
@@ -130,11 +134,15 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
       {/* Comment ça marche, compact */}
       <section className="space-y-5">
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Comment ça marche</h2>
+        <h2 className="text-3xl font-extrabold sm:text-4xl">Comment ça marche</h2>
         <ol className="grid gap-3 md:grid-cols-3">
-          {STEPS.map((s) => (
+          {STEPS.map((s, i) => (
             <li key={s.n} className="surface flex gap-4 p-4 sm:p-5">
-              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-pervenche/15 font-mono text-sm text-lueur">{s.n}</span>
+              <span
+                className={`grid size-10 shrink-0 -rotate-3 place-items-center rounded-2xl font-mono text-sm font-extrabold ${["bg-electrique text-white", "bg-soleil text-nuit", "bg-vente text-white"][i]}`}
+              >
+                {s.n}
+              </span>
               <div>
                 <h3 className="font-semibold">{s.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
@@ -147,8 +155,8 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       {/* Lancement officiel : liste d'attente + places de Fondateur */}
       <section className="surface grid gap-8 p-6 sm:p-8 md:grid-cols-2 md:items-center">
         <div className="space-y-3">
-          <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Lancement officiel</p>
-          <h2 className="text-2xl font-bold tracking-tight">Sois prévenu en premier.</h2>
+          <p className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-soleil">Lancement officiel</p>
+          <h2 className="text-3xl font-extrabold">Sois prévenu en premier.</h2>
           <JoinWaitlist initialCount={waitlist} />
         </div>
         {founders && (
@@ -160,10 +168,10 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
       {/* La dette en direct */}
       <section className="surface relative overflow-hidden p-6 sm:p-8">
-        <div aria-hidden className="pointer-events-none absolute -right-20 -top-24 size-80 rounded-full bg-vente/20 blur-[110px]" />
+        <div aria-hidden className="pointer-events-none absolute -right-24 -top-28 size-96 rounded-full bg-[radial-gradient(closest-side,rgb(255_61_104/0.3),transparent)]" />
         <div className="relative flex flex-wrap items-center justify-between gap-6">
           <div className="min-w-0 space-y-2">
-            <p className="font-mono text-xs uppercase tracking-[0.3em] text-vente">La dette de la France, en direct</p>
+            <p className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-vente">La dette de la France, en direct</p>
             <DebtLive className="block whitespace-nowrap font-mono text-[1.7rem] font-semibold text-foreground sm:text-5xl" />
             <p className="text-sm text-muted-foreground">
               +{Math.round(DETTE.eurPerSecond).toLocaleString("fr-FR")} € chaque seconde. L&apos;État imprime de la dette, le peuple frappe sa monnaie.

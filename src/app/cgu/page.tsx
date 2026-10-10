@@ -10,7 +10,7 @@ const paysSanctionnes = SANCTIONED_COUNTRIES.map((c) => PAYS.of(c) ?? c).join(",
 
 /** Champ à compléter une fois la société constituée. */
 function Todo({ children }: { children: React.ReactNode }) {
-  return <mark className="rounded bg-amber-300/15 px-1 text-amber-200">{children}</mark>;
+  return <mark className="rounded bg-soleil/15 px-1 text-amber-200">{children}</mark>;
 }
 
 const SECTIONS: { titre: string; contenu: React.ReactNode }[] = [

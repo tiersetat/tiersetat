@@ -46,7 +46,7 @@ export default async function Image({ params }: { params: Promise<{ mint: string
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 64,
-          background: `radial-gradient(700px 420px at 85% 0%, ${gain ? "rgba(74,222,128,0.25)" : "rgba(248,113,113,0.25)"}, transparent 70%), radial-gradient(900px 500px at 10% 110%, rgba(140,147,201,0.25), #030206 70%)`,
+          background: `radial-gradient(700px 420px at 85% 0%, ${gain ? "rgba(74,222,128,0.25)" : "rgba(248,113,113,0.25)"}, transparent 70%), radial-gradient(900px 500px at 10% 110%, rgba(61,90,254,0.25), #0b0d2a 70%)`,
           color: "#f4f1fa",
           fontFamily: "sans-serif",
         }}

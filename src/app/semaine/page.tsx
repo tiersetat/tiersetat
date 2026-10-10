@@ -21,7 +21,7 @@ export default async function SemainePage() {
   return (
     <div className="mx-auto max-w-4xl space-y-12">
       <header className="space-y-3">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber-300">Concours hebdomadaire</p>
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-soleil">Concours hebdomadaire</p>
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Le Mème de la semaine</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
           Du lundi au dimanche, les mèmes s&apos;affrontent. Celui que la communauté échange le plus fait la Une de Tiers-État.
@@ -29,7 +29,7 @@ export default async function SemainePage() {
       </header>
 
       <section className="surface relative overflow-hidden p-6 sm:p-8">
-        <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 size-72 rounded-full bg-amber-400/15 blur-[100px]" />
+        <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 size-72 rounded-full bg-[radial-gradient(closest-side,rgb(255_210_63/0.22),transparent)]" />
         <div className="relative flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="text-sm text-muted-foreground">
@@ -37,7 +37,7 @@ export default async function SemainePage() {
             </p>
             {leader ? (
               <>
-                <p className="mt-3 text-xs uppercase tracking-widest text-amber-300">En tête</p>
+                <p className="mt-3 text-xs uppercase tracking-widest text-soleil">En tête</p>
                 <Link href={`/token/${leader.mint}`} className="mt-1 flex items-center gap-4 hover:opacity-90">
                   {/* eslint-disable-next-line @next/next/no-img-element -- image IPFS du mème */}
                   <img src={leader.image_url} alt="" className="size-16 rounded-2xl object-cover" />

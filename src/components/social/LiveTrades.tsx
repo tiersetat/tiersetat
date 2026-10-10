@@ -61,7 +61,7 @@ export function LiveTrades() {
   if (off || !bubble) return null;
   return (
     <div className="animate-in slide-in-from-bottom-4 fade-in fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] left-3 z-40 max-w-[calc(100vw-1.5rem)] duration-300 lg:bottom-6 lg:left-[17rem]">
-      <div className="flex items-center gap-3 rounded-2xl border border-ligne bg-popover/95 py-2 pr-2 pl-2 shadow-2xl backdrop-blur">
+      <div className="flex items-center gap-3 rounded-2xl border border-ligne bg-popover py-2 pr-2 pl-2 shadow-2xl">
         {bubble.image && (
           // eslint-disable-next-line @next/next/no-img-element -- image IPFS du mème
           <img src={bubble.image} alt="" className="size-9 rounded-xl object-cover" />

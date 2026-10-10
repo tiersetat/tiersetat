@@ -112,15 +112,15 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
             return (
               <li
                 key={item.id}
-                className={`surface surface-hover group flex flex-col overflow-hidden ${trend?.heat === "brulant" ? "ring-1 ring-vente/40" : trend?.heat === "chaud" ? "ring-1 ring-amber-400/25" : ""}`}
+                className={`surface surface-hover group flex flex-col overflow-hidden ${trend?.heat === "brulant" ? "ring-1 ring-vente/40" : trend?.heat === "chaud" ? "ring-1 ring-soleil/25" : ""}`}
               >
                 <a href={item.url} target="_blank" rel="noreferrer" tabIndex={-1} aria-hidden className="relative block">
                   <BuzzImage src={item.image} source={item.source} priority={index < 3} />
-                  <span className={`absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-0.5 text-xs font-medium backdrop-blur ${item.kind === "reddit" ? "text-vente" : item.kind === "crypto" ? "text-amber-300" : "text-lueur"}`}>
+                  <span className={`absolute left-3 top-3 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium ${item.kind === "reddit" ? "text-vente" : item.kind === "crypto" ? "text-soleil" : "text-lueur"}`}>
                     {item.source}
                   </span>
                   {trend && heat && (
-                    <span className={`absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-0.5 text-xs font-medium backdrop-blur ${heat.text}`}>
+                    <span className={`absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium ${heat.text}`}>
                       <span className={`h-1.5 w-1.5 rounded-full ${heat.dot}`} />
                       {heat.label} · {trend.sources} sources
                     </span>

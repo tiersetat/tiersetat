@@ -3,7 +3,7 @@ export function FounderBadge({ n }: { n: number }) {
   return (
     <span
       title="Parmi les 100 premiers à avoir créé ou échangé un mème sur Tiers-État"
-      className="inline-flex w-fit items-center gap-1 rounded-full border border-amber-300/40 bg-amber-300/10 px-2.5 py-0.5 text-xs font-semibold text-amber-200"
+      className="inline-flex w-fit items-center gap-1 rounded-full border border-soleil/40 bg-soleil/10 px-2.5 py-0.5 text-xs font-semibold text-amber-200"
     >
       🏛 Fondateur n°{n}
     </span>

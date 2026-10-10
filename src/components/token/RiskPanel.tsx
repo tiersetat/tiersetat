@@ -2,7 +2,7 @@ import type { RiskFlag } from "@/lib/risk-flags";
 
 const STYLE: Record<RiskFlag["level"], { dot: string; text: string }> = {
   ok: { dot: "bg-achat", text: "text-foreground" },
-  warn: { dot: "bg-amber-300", text: "text-amber-200" },
+  warn: { dot: "bg-soleil", text: "text-amber-200" },
   danger: { dot: "bg-vente", text: "text-vente" },
 };
 
@@ -15,7 +15,7 @@ export function RiskPanel({ flags }: { flags: RiskFlag[] }) {
     <section className="surface space-y-3 p-5" aria-labelledby="risk-panel-title">
       <div className="flex items-center justify-between">
         <h2 id="risk-panel-title" className="font-semibold">Transparence</h2>
-        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${alerts ? "bg-amber-300/15 text-amber-200" : "bg-achat/15 text-achat"}`}>
+        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${alerts ? "bg-soleil/15 text-amber-200" : "bg-achat/15 text-achat"}`}>
           {alerts ? `${alerts} point${alerts > 1 ? "s" : ""} d'attention` : "Aucune alerte"}
         </span>
       </div>

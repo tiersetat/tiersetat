@@ -251,7 +251,7 @@ export function TradePanel({ mint, pool, ticker, migrated, warnings, onTraded }:
               </span>
             )}
             {partialSol !== null && (
-              <span className="mt-1.5 block text-amber-300">
+              <span className="mt-1.5 block text-soleil">
                 Ton achat complète la courbe : seuls ≈ {fmt(partialSol, 4)} SOL seront utilisés, le reste reste dans ton wallet. Le mème prend
                 ensuite la Bastille 🏰
               </span>
@@ -272,7 +272,7 @@ export function TradePanel({ mint, pool, ticker, migrated, warnings, onTraded }:
       )}
 
       {side === "buy" && warnings.length > 0 && (
-        <div className="rounded-xl border border-amber-300/30 bg-amber-300/[0.07] px-3 py-2 text-xs text-amber-100">
+        <div className="rounded-xl border border-soleil/30 bg-soleil/[0.07] px-3 py-2 text-xs text-amber-100">
           <p className="font-medium">Avant d&apos;acheter :</p>
           <ul className="mt-1 list-disc space-y-0.5 pl-4">
             {warnings.map((w) => (

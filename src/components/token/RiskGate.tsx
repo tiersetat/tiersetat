@@ -21,7 +21,7 @@ export function RiskGate({ onAccept, onCancel, title = "Avant ton premier achat"
   const checked = risk && adult;
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="risk-title" className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md space-y-5 rounded-2xl border border-ligne bg-popover p-6 shadow-[0_30px_80px_-20px_rgba(140,147,201,0.35)]">
+      <div className="w-full max-w-md space-y-5 rounded-2xl border border-ligne bg-popover p-6 shadow-[0_30px_80px_-20px_rgba(61,90,254,0.35)]">
         <h2 id="risk-title" className="text-xl font-semibold">{title}</h2>
         <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted-foreground">
           <li>Un memecoin n&apos;a aucune valeur garantie : son prix peut tomber à zéro en quelques minutes.</li>

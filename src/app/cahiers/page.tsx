@@ -35,7 +35,7 @@ export default async function CahiersPage() {
 
       {mine ? (
         <section className="surface relative overflow-hidden p-6 sm:p-8">
-          <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 size-72 rounded-full bg-pervenche/20 blur-[100px]" />
+          <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 size-72 rounded-full bg-[radial-gradient(closest-side,rgb(255_122_217/0.22),transparent)]" />
           <div className="relative flex flex-wrap items-end justify-between gap-6">
             <div>
               <p className="text-sm text-muted-foreground">Ton cahier</p>

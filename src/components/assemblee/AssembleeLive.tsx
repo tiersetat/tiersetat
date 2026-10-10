@@ -97,7 +97,7 @@ export function AssembleeLive() {
                         </a>
                       )}
                     </div>
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${open ? "bg-amber-400/15 text-amber-300" : p.state === 3 || p.state === 5 ? "bg-achat/15 text-achat" : "bg-white/5 text-muted-foreground"}`}>
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${open ? "bg-soleil/15 text-soleil" : p.state === 3 || p.state === 5 ? "bg-achat/15 text-achat" : "bg-white/5 text-muted-foreground"}`}>
                       {ETATS[p.state] ?? "Inconnu"}
                     </span>
                   </div>

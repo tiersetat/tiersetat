@@ -77,8 +77,8 @@ export async function HomeBuzz() {
             <article key={item.id} className="surface group flex w-72 shrink-0 snap-start flex-col overflow-hidden sm:w-80">
               <a href={item.url} target="_blank" rel="noreferrer" tabIndex={-1} aria-hidden className="relative block">
                 <BuzzImage src={item.image} source={item.source} priority={index < 2} />
-                <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-0.5 text-xs font-medium text-lueur backdrop-blur">{item.source}</span>
-                <span className={`absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-0.5 text-xs font-medium backdrop-blur ${heat.text}`}>
+                <span className="absolute left-3 top-3 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium text-lueur">{item.source}</span>
+                <span className={`absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium ${heat.text}`}>
                   <span className={`h-1.5 w-1.5 rounded-full ${heat.dot}`} />
                   {heat.label}
                 </span>

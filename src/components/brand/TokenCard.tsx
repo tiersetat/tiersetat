@@ -14,20 +14,43 @@ export type TokenCardProps = {
 
 const fmt = (n: number) => n.toLocaleString("fr-FR", { maximumFractionDigits: n < 10 ? 2 : 1 });
 
-/** Carte d'un mème (Tiers-État 2.0) : grande image, nom, capitalisation et progression vers la Bastille. */
+/** Couleurs de fête : chaque mème garde toujours la même, tirée de son nom. */
+const FETE = [
+  { bg: "#3d5afe", fg: "#ffffff" },
+  { bg: "#ff3d68", fg: "#ffffff" },
+  { bg: "#ffd23f", fg: "#0b0d2a" },
+  { bg: "#ff7ad9", fg: "#0b0d2a" },
+  { bg: "#3dffb0", fg: "#0b0d2a" },
+  { bg: "#5ec8ff", fg: "#0b0d2a" },
+];
+export function feteColor(seed: string) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return FETE[h % FETE.length];
+}
+
+/** Carte d'un mème : grande image, pastille de couleur, capitalisation et progression vers la Bastille. */
 export function TokenCard({ name, ticker, imageUrl, marketCapSol, progress, footer, className = "" }: TokenCardProps) {
   const pct = Math.max(0, Math.min(100, progress));
+  const c = feteColor(ticker + name);
   return (
     <article className={`surface surface-hover flex h-full flex-col overflow-hidden ${className}`}>
-      <div className="relative aspect-square overflow-hidden bg-white/[0.03]">
+      <div className="relative aspect-square overflow-hidden" style={{ background: imageUrl ? "#171b4a" : c.bg }}>
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- images IPFS de domaines variables
-          <img src={imageUrl} alt="" loading="lazy" className="size-full object-cover transition duration-500 group-hover:scale-105" />
+          <img src={imageUrl} alt="" loading="lazy" decoding="async" className="size-full object-cover transition duration-500 group-hover:scale-105" />
         ) : (
-          <div className="grid size-full place-items-center text-5xl font-bold text-muted-foreground/40">{ticker.slice(0, 1) || "?"}</div>
+          <div className="grid size-full place-items-center font-[family-name:var(--font-display)] text-7xl font-extrabold" style={{ color: c.fg }}>
+            {ticker.slice(0, 1) || "?"}
+          </div>
         )}
-        <span className="absolute left-2.5 top-2.5 rounded-full bg-black/55 px-2.5 py-1 font-mono text-[11px] font-semibold text-lueur backdrop-blur">${ticker}</span>
-        {pct >= 100 && <span className="absolute right-2.5 top-2.5 rounded-full bg-achat/90 px-2.5 py-1 text-[11px] font-bold text-nuit">Bastille 🏰</span>}
+        <span
+          className="absolute left-2.5 top-2.5 -rotate-2 rounded-xl px-2.5 py-1 font-mono text-[12px] font-bold shadow-[0_3px_0_-1px_rgb(0_0_0/0.35)]"
+          style={imageUrl ? { background: c.bg, color: c.fg } : { background: c.fg, color: c.bg }}
+        >
+          ${ticker}
+        </span>
+        {pct >= 100 && <span className="absolute right-2.5 top-2.5 rotate-2 rounded-xl bg-achat px-2.5 py-1 text-[11px] font-extrabold text-nuit">Bastille prise 🏰</span>}
       </div>
       <div className="flex flex-1 flex-col gap-3 p-3.5 sm:p-4">
         <div className="min-w-0">
@@ -41,7 +64,7 @@ export function TokenCard({ name, ticker, imageUrl, marketCapSol, progress, foot
             <span className="font-mono font-semibold text-foreground">{pct.toFixed(0)} %</span>
           </div>
           <div className="progress-track" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Progression de la bonding curve">
-            <div className="progress-fill" style={{ width: `${Math.max(pct, 1.5)}%` }} />
+            <div className="progress-fill" style={{ width: `${Math.max(pct, 2)}%` }} />
           </div>
         </div>
         {footer}

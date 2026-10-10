@@ -52,7 +52,7 @@ export function RadarCard({ t }: { t: RadarToken }) {
       {warnings.length > 0 && (
         <ul className="space-y-1.5">
           {warnings.map((w) => (
-            <li key={w.texte} className={`rounded-lg px-3 py-1.5 text-xs ${w.niveau === "danger" ? "bg-vente/10 text-vente" : "bg-amber-400/10 text-amber-300"}`}>
+            <li key={w.texte} className={`rounded-lg px-3 py-1.5 text-xs ${w.niveau === "danger" ? "bg-vente/10 text-vente" : "bg-soleil/10 text-soleil"}`}>
               ⚠ {w.texte}
             </li>
           ))}

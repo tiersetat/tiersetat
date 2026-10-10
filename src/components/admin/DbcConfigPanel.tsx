@@ -104,7 +104,7 @@ export function DbcConfigPanel() {
         </p>
       )}
       {current.kind === "ok" && !current.upToDate && !created && (
-        <p className="rounded-xl border border-amber-300/30 bg-amber-300/[0.07] p-3 text-sm text-amber-100">
+        <p className="rounded-xl border border-soleil/30 bg-soleil/[0.07] p-3 text-sm text-amber-100">
           Les paramètres ont changé depuis la création de cette config (part créateur, frais de création ou trésorerie). Crée une
           nouvelle config : les nouveaux tokens l&apos;utiliseront, les anciens restent échangeables.
         </p>
