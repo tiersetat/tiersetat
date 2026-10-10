@@ -1,0 +1,15 @@
+{
+  "name": "tiersetat-indexer",
+  "private": true,
+  "type": "module",
+  "description": "Indexeur temps réel Tiers-État (lecture seule du réseau principal Solana)",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "bs58": "^6.0.0",
+    "tsx": "^4.20.0",
+    "ws": "^8.18.0"
+  },
+  "engines": { "node": ">=22" }
+}

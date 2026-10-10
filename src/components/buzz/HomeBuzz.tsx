@@ -9,7 +9,7 @@ import { computeTrends, itemHeat, keywords } from "@/lib/buzz-trends";
 
 const HEAT_RANK = { brulant: 0, chaud: 1, tiede: 2 } as const;
 
-/** Accueil : le sujet le plus brûlant du moment et les actus chaudes, en cartes qui défilent. */
+/** Accueil, « À la une » : le sujet le plus chaud du moment et les actus chaudes, en cartes qui défilent. */
 export async function HomeBuzz() {
   const items = await getBuzz().then((b) => b.items, () => []);
   const trends = computeTrends(items, 16);
@@ -41,7 +41,7 @@ export async function HomeBuzz() {
   const memeHref = `/lancer?${new URLSearchParams({
     nom: suggestName(title.replace(" · ", " ")),
     ticker: suggestTicker(tickerWord),
-    description: `Le sujet qui brûle en France : ${title}, repris par ${top.sources} médias.`,
+    description: `À la une : ${title}, repris par ${top.sources} médias.`,
     ...(topArticle ? { source: topArticle.url } : {}),
   })}`;
 
@@ -51,7 +51,7 @@ export async function HomeBuzz() {
         <div>
           <p className={`flex items-center gap-2 text-xs font-medium uppercase tracking-widest ${style.text}`}>
             <span className={`h-2 w-2 rounded-full ${style.dot}`} />
-            Ça brûle en France
+            À la une · l&apos;actu du jour, à transformer en mème
           </p>
           <h2 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
             {title}
