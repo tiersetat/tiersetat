@@ -26,6 +26,34 @@ export type PerpMarket = {
   emoji: string | null;
 };
 
+/** Noms lisibles et catégories (le reste est classé « actions » avec son symbole). */
+const INFO: Record<string, [string, Category?]> = {
+  XYZ100: ["Nasdaq 100", "indices"], SP500: ["S&P 500", "indices"], US500: ["S&P 500", "indices"], USTECH: ["Nasdaq 100", "indices"],
+  SMALL2000: ["Russell 2000", "indices"], JP225: ["Nikkei 225 (Japon)", "indices"], KR200: ["KOSPI 200 (Corée)", "indices"],
+  TOTAL2: ["Crypto hors Bitcoin", "indices"], OTHERS: ["Crypto hors top 10", "indices"], BTCD: ["Dominance du Bitcoin", "indices"], BVIV: ["Volatilité du Bitcoin", "indices"],
+  SMH: ["ETF semi-conducteurs", "indices"], SOXL: ["ETF semi-conducteurs ×3", "indices"], XLE: ["ETF énergie", "indices"], XBI: ["ETF biotech", "indices"],
+  IGV: ["ETF logiciels", "indices"], MAGS: ["ETF « 7 Magnifiques »", "indices"], EWY: ["ETF Corée du Sud", "indices"], EWJ: ["ETF Japon", "indices"],
+  EWZ: ["ETF Brésil", "indices"], EWT: ["ETF Taïwan", "indices"], URNM: ["ETF uranium", "indices"], KORU: ["ETF Corée ×3", "indices"],
+  GOLD: ["Or", "matieres"], SILVER: ["Argent", "matieres"], PLATINUM: ["Platine", "matieres"], PALLADIUM: ["Palladium", "matieres"], COPPER: ["Cuivre", "matieres"],
+  CL: ["Pétrole WTI", "matieres"], BRENTOIL: ["Pétrole Brent", "matieres"], NATGAS: ["Gaz naturel", "matieres"], HO: ["Fioul", "matieres"],
+  EUR: ["Euro / Dollar", "devises"], JPY: ["Dollar / Yen", "devises"], GBP: ["Livre / Dollar", "devises"],
+  TLT: ["Obligations US 20 ans (ETF)", "taux"], USBOND: ["Obligations US", "taux"], "10Y": ["Taux US 10 ans", "taux"], "30Y": ["Taux US 30 ans", "taux"], "2Y": ["Taux US 2 ans", "taux"],
+  SPCX: ["SpaceX", "pre-ipo"], OAI: ["OpenAI", "pre-ipo"], ANTH: ["Anthropic", "pre-ipo"], SHEIN: ["Shein", "pre-ipo"], MINIMAX: ["MiniMax", "pre-ipo"],
+  ZHIPU: ["Zhipu AI", "pre-ipo"], UNITREE: ["Unitree Robotics", "pre-ipo"], CXMT: ["CXMT", "pre-ipo"], OURA: ["Oura", "pre-ipo"], KIOXIA: ["Kioxia"],
+  TSLA: ["Tesla"], NVDA: ["Nvidia"], HOOD: ["Robinhood"], INTC: ["Intel"], PLTR: ["Palantir"], COIN: ["Coinbase"], META: ["Meta"], AAPL: ["Apple"],
+  MSFT: ["Microsoft"], ORCL: ["Oracle"], GOOGL: ["Google (Alphabet)"], AMZN: ["Amazon"], AMD: ["AMD"], MU: ["Micron"], SNDK: ["SanDisk"],
+  MSTR: ["Strategy (MicroStrategy)"], CRCL: ["Circle"], NFLX: ["Netflix"], COST: ["Costco"], LLY: ["Eli Lilly"], SKHX: ["SK Hynix"], SKHY: ["SK Hynix"],
+  TSM: ["TSMC"], RIVN: ["Rivian"], BABA: ["Alibaba"], SMSN: ["Samsung"], USAR: ["USA Rare Earth"], CRWV: ["CoreWeave"], GME: ["GameStop"],
+  SOFTBANK: ["SoftBank"], HYUNDAI: ["Hyundai"], HIMS: ["Hims & Hers"], DKNG: ["DraftKings"], LITE: ["Lumentum"], BX: ["Blackstone"],
+  MRVL: ["Marvell"], RKLB: ["Rocket Lab"], DRAM: ["Mémoire DRAM"], CBRS: ["Cerebras"], ZM: ["Zoom"], EBAY: ["eBay"], ARM: ["Arm"],
+  ASML: ["ASML"], BB: ["BlackBerry"], QNT: ["Quantum"], DELL: ["Dell"], IBM: ["IBM"], AVGO: ["Broadcom"], NOW: ["ServiceNow"], NBIS: ["Nebius"],
+  WDC: ["Western Digital"], NOK: ["Nokia"], BE: ["Bloom Energy"], QCOM: ["Qualcomm"], AMAT: ["Applied Materials"], GEV: ["GE Vernova"],
+  IREN: ["IREN"], NET: ["Cloudflare"], CRWD: ["CrowdStrike"], RDDT: ["Reddit"], AAOI: ["Applied Optoelectronics"], MRNA: ["Moderna"],
+  BMNR: ["BitMine"], CVX: ["Chevron"], LRCX: ["Lam Research"], UMC: ["UMC"], TWST: ["Twist Bioscience"], GLW: ["Corning"], COHR: ["Coherent"],
+  CRDO: ["Credo"], STX: ["Seagate"], VST: ["Vistra"], TER: ["Teradyne"], CIEN: ["Ciena"], MELI: ["MercadoLibre"], SMCI: ["Super Micro"],
+  SOFI: ["SoFi"], TTWO: ["Take-Two"], CIFR: ["Cipher Mining"], IONQ: ["IonQ"], GPRO: ["GoPro"], TCNT: ["Tencent"], PURRDAT: ["Purr Data"],
+};
+
 /** Vraie image du marché (logo officiel ou photo), hébergée par Tiers-État. */
 function logoOf(symbol: string): { imageUrl: string | null; emoji: null } {
   return { imageUrl: MARKET_LOGOS.has(symbol) ? `/images/marches/${encodeURIComponent(symbol)}.webp` : null, emoji: null };
