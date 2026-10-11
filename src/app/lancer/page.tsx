@@ -9,7 +9,7 @@ export default function LancerPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <h1 className="text-4xl font-extrabold">Frapper un mème</h1>
+        <h1 className="text-4xl font-extrabold">Créer un mème</h1>
         <p className="text-muted-foreground">Un nom, un ticker, une image. Une seule signature, et ton token est en ligne.</p>
         <Link
           href="/ca-buzz"

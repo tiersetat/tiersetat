@@ -39,7 +39,7 @@ export function Sidebar() {
         })}
       </nav>
       <Link href="/lancer" className="btn-fete mx-1 mt-5">
-        + Frapper un mème
+        + Créer un mème
       </Link>
       <details className="group mt-6">
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/80 hover:text-foreground">

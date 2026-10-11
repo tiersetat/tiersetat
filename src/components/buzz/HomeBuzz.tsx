@@ -62,7 +62,7 @@ export async function HomeBuzz() {
         </div>
         <div className="flex gap-2">
           <Link href={memeHref} className="btn-primary">
-            Frapper le mème
+            Créer le mème
           </Link>
           <Link href="/ca-buzz" className="btn-ghost">
             Toute l&apos;actu

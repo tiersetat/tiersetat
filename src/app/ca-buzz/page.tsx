@@ -74,7 +74,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
             </p>
           </div>
           <Link href={trendLaunchHref(activeTrend, shown[0]?.item)} className="btn-primary">
-            Frapper le mème « {activeTrend.label} »
+            Créer le mème « {activeTrend.label} »
           </Link>
         </section>
       )}

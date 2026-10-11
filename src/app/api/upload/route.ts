@@ -17,7 +17,7 @@ const EXT = { "image/png": "png", "image/jpeg": "jpg", "image/gif": "gif", "imag
 export async function POST(req: NextRequest) {
   try {
     const wallet = await getSessionWallet();
-    if (!wallet) return jsonError(401, "Connecte ton wallet et signe pour entrer avant de frapper un mème.");
+    if (!wallet) return jsonError(401, "Connecte ton wallet et signe pour entrer avant de créer un mème.");
     if (!rateLimit(`upload:${wallet}`, 6, 10 * 60_000)) return tooMany(10);
 
     const form = await req.formData();

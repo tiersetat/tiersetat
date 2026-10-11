@@ -56,8 +56,8 @@ export function LiveActivity({ limit = 12 }: { limit?: number }) {
         />
         {(
           [
-            ["mondial", "🌍 Mondial"],
-            ["amis", "👥 Amis"],
+            ["mondial", "Mondial"],
+            ["amis", "Amis"],
           ] as [Scope, string][]
         ).map(([k, label]) => (
           <button

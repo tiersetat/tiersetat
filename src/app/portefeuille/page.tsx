@@ -6,6 +6,7 @@ import { MeHeader } from "@/components/me/MeHeader";
 import { PushToggle } from "@/components/app/PushToggle";
 import { InstallApp } from "@/components/app/InstallApp";
 import { ConnectedOnly } from "@/components/layout/ConnectedOnly";
+import { LogoutButtons } from "@/components/me/LogoutButtons";
 
 export const metadata: Metadata = { title: "Profil — Tiers-État" };
 
@@ -45,6 +46,11 @@ export default function MoiPage() {
             </li>
           ))}
         </ul>
+      </section>
+      <section className="surface space-y-3 p-5">
+        <h2 className="text-lg font-extrabold">Compte</h2>
+        <p className="text-sm text-muted-foreground">Pour te connecter avec un autre compte Google ou un autre wallet, déconnecte-toi d&apos;abord.</p>
+        <LogoutButtons />
       </section>
       <section className="surface space-y-3 p-5">
         <h2 className="text-lg font-extrabold">Notifications et appli</h2>

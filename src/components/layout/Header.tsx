@@ -10,7 +10,7 @@ import { WalletButton } from "./WalletButton";
  */
 export function Header() {
   return (
-    <header className="ios-glass sticky top-0 z-30 pt-[env(safe-area-inset-top)] lg:pl-64">
+    <header className="header-glass sticky top-0 z-30 pt-[env(safe-area-inset-top)] lg:pl-64">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:h-14 sm:flex-nowrap sm:py-0">
         <Link href="/" aria-label="Tiers-État, accueil" className="shrink-0 whitespace-nowrap lg:hidden">
           <Wordmark />
@@ -26,7 +26,7 @@ export function Header() {
             placeholder="Rechercher"
             aria-label="Rechercher un token, un $TICKER, une adresse ou un trader"
             autoComplete="off"
-            className="h-9 w-full rounded-xl bg-white/[0.08] pr-3 pl-9 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-electrique/50"
+            className="h-9 w-full rounded-xl border border-white/12 bg-white/[0.06] pr-3 pl-9 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-electrique/50"
           />
         </form>
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
