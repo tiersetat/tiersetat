@@ -14,6 +14,7 @@ import { RegisterSW } from "@/components/app/RegisterSW";
 import { AuthGate } from "@/components/layout/AuthGate";
 import { Starfield } from "@/components/layout/Starfield";
 import { DemoMode } from "@/components/app/DemoMode";
+import { InstallSheet } from "@/components/app/InstallSheet";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* Fond d'écran : ciel vivant d'étoiles bleu-blanc-rouge */}
         <Starfield />
         <DemoMode />
+        <InstallSheet />
         <WalletProviders>
           <InviteCapture />
           <RegisterSW />

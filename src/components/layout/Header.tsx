@@ -10,7 +10,7 @@ import { WalletButton } from "./WalletButton";
  */
 export function Header() {
   return (
-    <header className="header-glass sticky top-0 z-30 pt-[env(safe-area-inset-top)] lg:pl-64">
+    <header className="relative z-30 bg-transparent pt-[env(safe-area-inset-top)] lg:pl-64">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:h-14 sm:flex-nowrap sm:py-0">
         <Link href="/" aria-label="Tiers-État, accueil" className="shrink-0 whitespace-nowrap lg:hidden">
           <Wordmark />
