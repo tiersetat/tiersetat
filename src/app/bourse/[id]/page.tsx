@@ -46,7 +46,7 @@ export default async function BoursePage({ params }: PageProps<"/bourse/[id]">) 
           <p className="font-[family-name:var(--font-display)] text-5xl font-extrabold">{usd(m.priceUsd)}</p>
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(m.change24)} 24 h</p>
         </div>
-        <ChartPanel source={{ kind: "hyperliquid", coin: m.id }} tvSymbol={tvForMarket(m.symbol, m.category)} />
+        <ChartPanel source={{ kind: "hyperliquid", coin: m.id }} tvSymbol={tvForMarket(m.symbol)} />
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {stats.map(([k, v]) => (
             <div key={k} className="rounded-2xl bg-surface px-4 py-3 ring-1 ring-white/[0.08]">

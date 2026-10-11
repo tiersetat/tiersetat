@@ -46,7 +46,7 @@ const INFO: Record<string, [string, Category?]> = {
   TSM: ["TSMC"], RIVN: ["Rivian"], BABA: ["Alibaba"], SMSN: ["Samsung"], USAR: ["USA Rare Earth"], CRWV: ["CoreWeave"], GME: ["GameStop"],
   SOFTBANK: ["SoftBank"], HYUNDAI: ["Hyundai"], HIMS: ["Hims & Hers"], DKNG: ["DraftKings"], LITE: ["Lumentum"], BX: ["Blackstone"],
   MRVL: ["Marvell"], RKLB: ["Rocket Lab"], DRAM: ["Mémoire DRAM"], CBRS: ["Cerebras"], ZM: ["Zoom"], EBAY: ["eBay"], ARM: ["Arm"],
-  ASML: ["ASML"], BB: ["BlackBerry"], QNT: ["Quantum"], DELL: ["Dell"], IBM: ["IBM"], AVGO: ["Broadcom"], NOW: ["ServiceNow"], NBIS: ["Nebius"],
+  ASML: ["ASML"], BB: ["BlackBerry"], QNT: ["Quantinuum"], DELL: ["Dell"], IBM: ["IBM"], AVGO: ["Broadcom"], NOW: ["ServiceNow"], NBIS: ["Nebius"],
   WDC: ["Western Digital"], NOK: ["Nokia"], BE: ["Bloom Energy"], QCOM: ["Qualcomm"], AMAT: ["Applied Materials"], GEV: ["GE Vernova"],
   IREN: ["IREN"], NET: ["Cloudflare"], CRWD: ["CrowdStrike"], RDDT: ["Reddit"], AAOI: ["Applied Optoelectronics"], MRNA: ["Moderna"],
   BMNR: ["BitMine"], CVX: ["Chevron"], LRCX: ["Lam Research"], UMC: ["UMC"], TWST: ["Twist Bioscience"], GLW: ["Corning"], COHR: ["Coherent"],
