@@ -96,7 +96,7 @@ export function CashWallet() {
   return (
     <section className="space-y-4">
       {/* Carte Cash */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-electrique via-[#4a49f0] to-[#7b3fe0] p-6 text-white shadow-[0_24px_60px_-24px_rgb(61_90_254/0.9)] sm:p-8">
+      <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-electrique/35 via-[#4a49f0]/25 to-[#7b3fe0]/30 shadow-[inset_0_1px_0_rgb(255_255_255/0.15)] p-6 text-white shadow-[0_24px_60px_-24px_rgb(61_90_254/0.9)] sm:p-8">
         <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[radial-gradient(closest-side,rgb(255_210_63/0.45),transparent)]" />
         <div className="relative flex flex-wrap items-start justify-between gap-3">
           <div>

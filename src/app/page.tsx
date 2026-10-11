@@ -88,7 +88,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         <CashBar />
       </div>
       <GuestOnly>
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-electrique via-[#4a49f0] to-[#7b3fe0] p-5 text-white sm:p-7">
+        <section className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-electrique/35 via-[#4a49f0]/25 to-[#7b3fe0]/30 shadow-[inset_0_1px_0_rgb(255_255_255/0.15)] p-5 text-white sm:p-7">
           <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 size-44 rounded-full bg-[radial-gradient(closest-side,rgb(255_210_63/0.5),transparent)]" />
           <h1 className="relative font-[family-name:var(--font-display)] text-3xl leading-tight font-extrabold sm:text-4xl">
             Crée. Trade. <span className="sticker text-nuit">Gagne ensemble.</span>
