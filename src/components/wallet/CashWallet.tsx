@@ -11,6 +11,8 @@ import { LoginCta, PRIVY_APP_ID } from "@/components/providers/PrivyBridge";
 import { PrivySecurity } from "./PrivySecurity";
 import { DepositOptions, SellOptions } from "./FundingOptions";
 import { DEMO_CASH_EUR, useDemo } from "@/lib/demo";
+import { PortfolioChart } from "./PortfolioChart";
+import { addSnapshot, demoHistory, type Point } from "@/lib/portfolio-history";
 
 type Display = "EUR" | "USD";
 type Sheet = null | "deposer" | "recevoir" | "envoyer" | "vendre" | "securite";
@@ -38,6 +40,7 @@ export function CashWallet() {
   const [display, setDisplay] = useState<Display>("EUR");
   const [sheet, setSheet] = useState<Sheet>(null);
   const demo = useDemo();
+  const [history, setHistory] = useState<{ now: number; points: Point[] } | null>(null);
 
   useEffect(() => {
     Promise.resolve().then(() => setDisplay(readDisplay()));
@@ -61,6 +64,32 @@ export function CashWallet() {
     const id = setInterval(refresh, 20_000);
     return () => clearInterval(id);
   }, [refresh]);
+
+  // Courbe du portefeuille : relevés réels du solde sur cet appareil (démo : progression de démonstration)
+  useEffect(() => {
+    const now = Date.now();
+    if (demo) {
+      Promise.resolve().then(() => setHistory({ now, points: demoHistory(now) }));
+      return;
+    }
+    if (!publicKey || !balances) return;
+    const usd = cashTotal(balances, "USD", usdEur);
+    if (usd === null) return;
+    const key = `te_value_history_${publicKey.toBase58()}`;
+    let pts: Point[] = [];
+    try {
+      pts = JSON.parse(localStorage.getItem(key) ?? "[]") as Point[];
+    } catch {
+      pts = [];
+    }
+    pts = addSnapshot(pts, usd, now);
+    try {
+      localStorage.setItem(key, JSON.stringify(pts));
+    } catch {
+      /* stockage indisponible */
+    }
+    Promise.resolve().then(() => setHistory({ now, points: pts }));
+  }, [demo, publicKey, balances, usdEur]);
 
   const choose = (d: Display) => {
     setDisplay(d);
@@ -97,7 +126,7 @@ export function CashWallet() {
     <section className="space-y-4">
       {/* Carte Cash */}
       <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-electrique/35 via-[#4a49f0]/25 to-[#7b3fe0]/30 shadow-[inset_0_1px_0_rgb(255_255_255/0.15)] p-6 text-white shadow-[0_24px_60px_-24px_rgb(61_90_254/0.9)] sm:p-8">
-        <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[radial-gradient(closest-side,rgb(255_210_63/0.45),transparent)]" />
+        <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[radial-gradient(closest-side,rgb(217_204_255/0.35),transparent)]" />
         <div className="relative flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-white/80">Cash{DEVNET && !demo ? " · bêta, argent fictif" : ""}</p>
@@ -113,6 +142,13 @@ export function CashWallet() {
             ))}
           </div>
         </div>
+        {history && history.points.length > 1 ? (
+          <div className="relative mt-4">
+            <PortfolioChart points={history.points} now={history.now} />
+          </div>
+        ) : (
+          <p className="relative mt-3 text-xs text-white/60">La courbe de ton portefeuille apparaîtra au fil de tes visites.</p>
+        )}
         <div className="relative mt-6 grid grid-cols-4 gap-2">
           {(
             [
@@ -127,7 +163,7 @@ export function CashWallet() {
               type="button"
               onClick={() => setSheet(sheet === k ? null : k)}
               aria-expanded={sheet === k}
-              className={`rounded-2xl px-2 py-3 text-sm font-extrabold transition active:scale-95 ${sheet === k ? "bg-soleil text-nuit" : "bg-white/15 hover:bg-white/25"}`}
+              className={`rounded-2xl px-2 py-3 text-sm font-extrabold transition active:scale-95 ${sheet === k ? "bg-white text-nuit" : "bg-white/12 hover:bg-white/20"}`}
             >
               {label}
             </button>
