@@ -15,6 +15,13 @@ export function Footer() {
             Les tokens créés sur Tiers-État sont des memecoins spéculatifs, pas une monnaie ayant cours légal. Vous pouvez tout perdre. Pas un conseil financier.
             {CLUSTER === "devnet" && <span data-beta> Réseau de test Solana (devnet) : les tokens n&apos;ont aucune valeur réelle.</span>}
           </p>
+          <p className="text-[10px] text-muted-foreground/60">
+            Fond : nébuleuse de la Carène,{" "}
+            <a href="https://www.eso.org/public/images/eso1208a/" target="_blank" rel="noreferrer" className="underline underline-offset-2">
+              ESO/T. Preibisch
+            </a>{" "}
+            (CC BY 4.0), couleurs retouchées. Estampe : musée Carnavalet (domaine public).
+          </p>
         </div>
         <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted-foreground sm:grid-cols-4 sm:self-end">
           <Link href="/demarrer" className="hover:text-foreground">
