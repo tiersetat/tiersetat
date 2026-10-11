@@ -22,8 +22,8 @@ export function intervalsOf(s: ChartSource): Interval[] {
 
 /** Fréquence d'actualisation quand il n'y a pas de flux en direct (ms). */
 export function pollMs(s: ChartSource): number | null {
-  if (s.kind === "gecko") return 15_000;
-  if (s.kind === "coingecko") return 60_000;
+  if (s.kind === "gecko") return 20_000;
+  if (s.kind === "coingecko") return 120_000;
   return null;
 }
 
@@ -31,7 +31,33 @@ export function pollMs(s: ChartSource): number | null {
 const GECKO_NET: Record<string, string> = { solana: "solana", base: "base", bsc: "bsc", ethereum: "eth", robinhood: "robinhood" };
 export const geckoNetwork = (chain: string) => GECKO_NET[chain] ?? chain;
 
+/** D'abord notre relais (cache partagé), sinon directement le service. Lève une erreur si les deux échouent. */
+async function viaRelay(relay: string, direct: () => string): Promise<unknown> {
+  for (const url of [relay, direct()]) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return await res.json();
+    } catch {
+      /* source suivante */
+    }
+  }
+  throw new Error("indisponible");
+}
+
+/** Mémoire des derniers graphiques chargés : changer de durée de bougie est instantané. */
+const memory = new Map<string, Bar[]>();
+export const memoryKey = (s: ChartSource, i: Interval) => (s.kind === "local" ? "" : `${JSON.stringify(s)}:${i}`);
+export function remembered(s: ChartSource, i: Interval): Bar[] | null {
+  return memory.get(memoryKey(s, i)) ?? null;
+}
+
 export async function loadBars(s: ChartSource, i: Interval): Promise<Bar[]> {
+  const bars = await fetchBars(s, i);
+  if (s.kind !== "local" && bars.length) memory.set(memoryKey(s, i), bars);
+  return bars;
+}
+
+async function fetchBars(s: ChartSource, i: Interval): Promise<Bar[]> {
   if (s.kind === "hyperliquid") {
     const lookback: Record<Interval, number> = { "1m": 6 * 3600_000, "5m": 2 * 86_400_000, "15m": 5 * 86_400_000, "1h": 20 * 86_400_000, "4h": 80 * 86_400_000, "1d": 400 * 86_400_000 };
     const res = await fetch("https://api.hyperliquid.xyz/info", {
@@ -43,19 +69,21 @@ export async function loadBars(s: ChartSource, i: Interval): Promise<Bar[]> {
     return list.map((c) => ({ time: Math.floor(c.t / 1000) as UTCTimestamp, open: +c.o, high: +c.h, low: +c.l, close: +c.c, volume: +c.v }));
   }
   if (s.kind === "gecko") {
-    const [tf, agg] = i === "1d" ? ["day", 1] : i === "4h" ? ["hour", 4] : i === "1h" ? ["hour", 1] : ["minute", parseInt(i, 10)];
-    const res = await fetch(`https://api.geckoterminal.com/api/v2/networks/${s.network}/pools/${s.pool}/ohlcv/${tf}?aggregate=${agg}&limit=1000&currency=usd`);
-    const json = (await res.json()) as { data?: { attributes?: { ohlcv_list?: number[][] } } };
-    const list = json.data?.attributes?.ohlcv_list ?? [];
+    const json = (await viaRelay(`/api/ohlc?src=gecko&network=${s.network}&pool=${s.pool}&i=${i}`, () => {
+      const [tf, agg] = i === "1d" ? ["day", 1] : i === "4h" ? ["hour", 4] : i === "1h" ? ["hour", 1] : ["minute", parseInt(i, 10)];
+      return `https://api.geckoterminal.com/api/v2/networks/${s.network}/pools/${s.pool}/ohlcv/${tf}?aggregate=${agg}&limit=1000&currency=usd`;
+    })) as { data?: { attributes?: { ohlcv_list?: number[][] } } };
+    const list = json.data?.attributes?.ohlcv_list;
+    if (!list) throw new Error("vide");
     return list
       .map((r) => ({ time: r[0] as UTCTimestamp, open: r[1], high: r[2], low: r[3], close: r[4], volume: r[5] }))
       .sort((a, b) => a.time - b.time);
   }
   if (s.kind === "coingecko") {
     const days = i === "15m" ? 1 : i === "4h" ? 30 : 365;
-    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${s.id}/ohlc?vs_currency=usd&days=${days}`);
-    const list = (await res.json()) as number[][];
-    return Array.isArray(list) ? list.map((r) => ({ time: Math.floor(r[0] / 1000) as UTCTimestamp, open: r[1], high: r[2], low: r[3], close: r[4], volume: 0 })) : [];
+    const list = (await viaRelay(`/api/ohlc?src=coingecko&id=${s.id}&i=${i}`, () => `https://api.coingecko.com/api/v3/coins/${s.id}/ohlc?vs_currency=usd&days=${days}`)) as number[][];
+    if (!Array.isArray(list)) throw new Error("vide");
+    return list.map((r) => ({ time: Math.floor(r[0] / 1000) as UTCTimestamp, open: r[1], high: r[2], low: r[3], close: r[4], volume: 0 }));
   }
   // Mèmes Tiers-État : bougies de capitalisation (SOL) calculées à partir des échanges
   const sec = SECONDS[i];

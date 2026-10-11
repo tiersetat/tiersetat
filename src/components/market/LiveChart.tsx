@@ -17,7 +17,7 @@ import {
   type UTCTimestamp,
 } from "lightweight-charts";
 
-import { intervalsOf, LABELS, loadBars, pollMs, subscribeBars, type Bar, type ChartSource, type Interval } from "@/lib/chart-feeds";
+import { intervalsOf, LABELS, loadBars, pollMs, remembered, subscribeBars, type Bar, type ChartSource, type Interval } from "@/lib/chart-feeds";
 
 type Kind = "bougies" | "ligne" | "aire";
 type Tool = null | "horizontale" | "tendance";
@@ -73,6 +73,7 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
   const [live, setLive] = useState(false);
   const [legend, setLegend] = useState<Bar | null>(null);
   const [full, setFull] = useState(false);
+  const [limited, setLimited] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const wrap = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -212,19 +213,39 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
       vol?.update({ time: b.time, value: b.volume, color: b.close >= b.open ? "rgba(61,255,176,0.35)" : "rgba(255,61,104,0.35)" });
       setLegend(b);
     };
+    let retry: ReturnType<typeof setTimeout> | null = null;
+    let attempt = 0;
+    const show = (list: Bar[]) => {
+      bars.current = list;
+      render();
+      if (first) chartRef.current?.timeScale().fitContent();
+      first = false;
+      setLegend(list[list.length - 1] ?? null);
+    };
     const load = () =>
       loadBars(source, interval)
         .then((list) => {
           if (stop) return;
-          bars.current = list;
-          render();
-          if (first) chartRef.current?.timeScale().fitContent();
-          first = false;
-          setLegend(list[list.length - 1] ?? null);
+          attempt = 0;
+          setLimited(false);
+          // Une réponse vide ne remplace jamais un graphique déjà affiché
+          if (list.length || !bars.current.length) show(list);
           if (source.kind !== "hyperliquid") setLive(list.length > 0);
         })
-        .catch(() => undefined);
-    Promise.resolve().then(() => !stop && setLive(false));
+        .catch(() => {
+          if (stop) return;
+          // Service momentanément limité : on garde le graphique affiché et on réessaie
+          setLimited(true);
+          if (!bars.current.length && attempt < 5) {
+            attempt++;
+            retry = setTimeout(load, 1500 * 2 ** attempt);
+          }
+        });
+    // Affichage immédiat de ce qui est en mémoire
+    const cached = remembered(source, interval);
+    bars.current = [];
+    if (cached) show(cached);
+    Promise.resolve().then(() => !stop && setLive(Boolean(cached) && source.kind !== "hyperliquid"));
     void load();
     const unsub = subscribeBars(source, interval, apply, (on) => !stop && setLive(on));
     const every = pollMs(source);
@@ -233,6 +254,7 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
       stop = true;
       unsub();
       if (timer) clearInterval(timer);
+      if (retry) clearTimeout(retry);
     };
     // la source est suivie par sa clé (sourceKey) ; le rendu suit kind/indics via render
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -334,6 +356,7 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
             O {fmt(legend.open)} · H {fmt(legend.high)} · B {fmt(legend.low)} · C {fmt(legend.close)} {unit}
           </span>
         )}
+        {limited && <span className="font-sans text-white/60">Données très demandées, nouvel essai…</span>}
         {tool && <span className="font-sans font-bold text-soleil">{tool === "horizontale" ? "Touche le graphique pour placer la ligne" : step === 2 ? "Touche le 2e point" : "Touche le 1er point"}</span>}
       </div>
 
