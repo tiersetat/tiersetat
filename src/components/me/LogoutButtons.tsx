@@ -36,13 +36,19 @@ function useLogoutAll(privyLogout: (() => Promise<void>) | null) {
   };
 }
 
-function Buttons({ logout }: { logout: () => Promise<void> }) {
+function Buttons({ logout, compact }: { logout: () => Promise<void>; compact?: boolean }) {
   const [busy, setBusy] = useState(false);
   const run = async () => {
     if (busy) return;
     setBusy(true);
     await logout();
   };
+  if (compact)
+    return (
+      <button type="button" onClick={run} disabled={busy} className="chip shrink-0 px-3 py-1.5 text-xs disabled:opacity-50">
+        {busy ? "Déconnexion…" : "Déconnexion"}
+      </button>
+    );
   return (
     <div className="grid gap-2 sm:grid-cols-2">
       <button type="button" onClick={run} disabled={busy} className="btn-ghost w-full">
@@ -55,14 +61,15 @@ function Buttons({ logout }: { logout: () => Promise<void> }) {
   );
 }
 
-function WithPrivy() {
+function WithPrivy({ compact }: { compact?: boolean }) {
   const { logout } = usePrivy();
-  return <Buttons logout={useLogoutAll(logout)} />;
+  return <Buttons logout={useLogoutAll(logout)} compact={compact} />;
 }
-function WithoutPrivy() {
-  return <Buttons logout={useLogoutAll(null)} />;
+function WithoutPrivy({ compact }: { compact?: boolean }) {
+  return <Buttons logout={useLogoutAll(null)} compact={compact} />;
 }
 
-export function LogoutButtons() {
-  return PRIVY_APP_ID ? <WithPrivy /> : <WithoutPrivy />;
+/** `compact` : un seul petit bouton « Déconnexion » (en-tête du profil). */
+export function LogoutButtons({ compact }: { compact?: boolean }) {
+  return PRIVY_APP_ID ? <WithPrivy compact={compact} /> : <WithoutPrivy compact={compact} />;
 }
