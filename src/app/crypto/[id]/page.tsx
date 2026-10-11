@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LiveActivity } from "@/components/social/LiveActivity";
 import { notFound } from "next/navigation";
 import { memo } from "@/lib/memo";
 import { pct, usd } from "@/lib/market-format";
@@ -111,8 +112,12 @@ export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) 
         </dl>
         <p className="text-xs text-muted-foreground">Données CoinGecko, pour information : ce n&apos;est pas une recommandation d&apos;achat.</p>
       </div>
-      <aside className="lg:sticky lg:top-24 lg:self-start">
+      <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
         <BuyPanel symbol={coin.symbol.toUpperCase()} />
+        <div className="space-y-2">
+          <h2 className="px-1 text-lg font-extrabold">Ce que le monde achète</h2>
+          <LiveActivity limit={6} />
+        </div>
       </aside>
     </div>
   );

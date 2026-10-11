@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LiveActivity } from "@/components/social/LiveActivity";
 import { notFound } from "next/navigation";
 import { hyperliquidMarket } from "@/lib/hyperliquid";
 import { pct, usd } from "@/lib/market-format";
@@ -61,8 +62,12 @@ export default async function BoursePage({ params }: PageProps<"/bourse/[id]">) 
           </Link>
         </p>
       </div>
-      <aside className="lg:sticky lg:top-24 lg:self-start">
+      <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
         <PerpPanel symbol={m.symbol} maxLeverage={m.maxLeverage} />
+        <div className="space-y-2">
+          <h2 className="px-1 text-lg font-extrabold">Ce que le monde achète</h2>
+          <LiveActivity limit={6} />
+        </div>
       </aside>
     </div>
   );

@@ -6,7 +6,7 @@ import { memo, useEffect, useRef } from "react";
  * Graphique officiel TradingView (widget gratuit) avec tous ses outils : dessin, indicateurs, échelles, plein écran.
  * `symbol` : symbole TradingView, ex. « NASDAQ:TSLA », « TVC:GOLD », « FX:EURUSD », « BINANCE:BTCUSDT ».
  */
-function TradingViewChartInner({ symbol, height = 480 }: { symbol: string; height?: number }) {
+function TradingViewChartInner({ symbol }: { symbol: string }) {
   const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = box.current;
@@ -39,7 +39,7 @@ function TradingViewChartInner({ symbol, height = 480 }: { symbol: string; heigh
       el.innerHTML = "";
     };
   }, [symbol]);
-  return <div ref={box} className="tradingview-widget-container w-full overflow-hidden rounded-2xl" style={{ height }} />;
+  return <div ref={box} className="tradingview-widget-container h-full w-full overflow-hidden rounded-2xl" />;
 }
 
 export const TradingViewChart = memo(TradingViewChartInner);

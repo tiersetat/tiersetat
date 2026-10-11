@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LiveActivity } from "@/components/social/LiveActivity";
 import { notFound, redirect } from "next/navigation";
 import { searchRadar, tokenOnChain } from "@/lib/radar";
 import { CHAINS, isChain } from "@/lib/market-feeds";
@@ -131,6 +132,10 @@ export default async function MarchePage({ params, searchParams }: PageProps<"/m
 
       <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
         <BuyPanel symbol={t.symbol} />
+        <div className="space-y-2">
+          <h2 className="px-1 text-lg font-extrabold">Ce que le monde achète</h2>
+          <LiveActivity limit={6} />
+        </div>
       </aside>
     </div>
   );
