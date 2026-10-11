@@ -7,7 +7,7 @@ import { aggregateTraders, TOTAL_SUPPLY } from "@/lib/traders";
 /** Fil social : les échanges et les thèses de la communauté, du plus récent au plus ancien. */
 
 export type FeedToken = { mint: string; name: string; ticker: string; image_url: string };
-export type FeedAuthor = { wallet: string; pseudo: string | null; avatar_url: string | null; clan?: string | null };
+export type FeedAuthor = { wallet: string; pseudo: string | null; avatar_url: string | null; clan?: string | null; country?: string | null };
 
 export type FeedItem =
   | { kind: "trade"; id: string; at: string; author: FeedAuthor; token: FeedToken; side: "buy" | "sell"; usd: number | null; mcapUsd: number | null }
@@ -34,7 +34,7 @@ type TradeRow = {
   price_sol: number;
   block_time: string;
   tokens: (FeedToken & { market_cap_sol: number; hidden: boolean }) | null;
-  profiles: { pseudo: string | null; avatar_url: string | null; clan?: string | null } | null;
+  profiles: { pseudo: string | null; avatar_url: string | null; clan?: string | null; country?: string | null } | null;
 };
 type CommentRow = {
   id: number;
@@ -54,11 +54,12 @@ export function solUsd(): Promise<number | null> {
   });
 }
 
-const author = (wallet: string, p: { pseudo: string | null; avatar_url: string | null; clan?: string | null } | null): FeedAuthor => ({
+const author = (wallet: string, p: { pseudo: string | null; avatar_url: string | null; clan?: string | null; country?: string | null } | null): FeedAuthor => ({
   wallet,
   pseudo: p?.pseudo ?? null,
   avatar_url: p?.avatar_url ?? null,
   clan: p?.clan ?? null,
+  country: p?.country ?? null,
 });
 const token = (t: FeedToken): FeedToken => ({ mint: t.mint, name: t.name, ticker: t.ticker, image_url: t.image_url });
 
@@ -69,23 +70,29 @@ export async function getFeed(filter: FeedFilter): Promise<FeedItem[]> {
 
   const wantTrades = filter.type !== "theses";
   const wantTheses = filter.type !== "echanges";
-  const tradesQ = db
-    .from("trades")
-    .select("signature, mint, trader_wallet, side, sol_amount, token_amount, price_sol, block_time, tokens(mint, name, ticker, image_url, market_cap_sol, hidden), profiles(pseudo, avatar_url, clan)")
-    .order("block_time", { ascending: false })
-    .limit(150);
+  const tradesQuery = (profileCols: string) => {
+    const q = db
+      .from("trades")
+      .select(`signature, mint, trader_wallet, side, sol_amount, token_amount, price_sol, block_time, tokens(mint, name, ticker, image_url, market_cap_sol, hidden), profiles(${profileCols})`)
+      .order("block_time", { ascending: false })
+      .limit(150);
+    if (filter.wallets) q.in("trader_wallet", filter.wallets);
+    return q;
+  };
+  // Le pays du trader (carte « Le monde qui trade ») : colonne récente, on s'en passe si la base ne l'a pas encore
+  const loadTrades = async () => {
+    const withCountry = await tradesQuery("pseudo, avatar_url, clan, country");
+    return withCountry.error ? tradesQuery("pseudo, avatar_url, clan") : withCountry;
+  };
   const commentsQ = db
     .from("comments")
     .select("id, mint, author_wallet, body, created_at, tokens(mint, name, ticker, image_url, market_cap_sol, hidden), profiles!comments_author_wallet_fkey(pseudo, avatar_url)")
     .eq("hidden", false)
     .order("created_at", { ascending: false })
     .limit(80);
-  if (filter.wallets) {
-    tradesQ.in("trader_wallet", filter.wallets);
-    commentsQ.in("author_wallet", filter.wallets);
-  }
+  if (filter.wallets) commentsQ.in("author_wallet", filter.wallets);
   const [{ data: trades }, { data: comments }] = await Promise.all([
-    wantTrades ? tradesQ : Promise.resolve({ data: [] }),
+    wantTrades ? loadTrades() : Promise.resolve({ data: [] }),
     wantTheses ? commentsQ : Promise.resolve({ data: [] }),
   ]);
 

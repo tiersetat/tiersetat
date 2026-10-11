@@ -65,6 +65,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Pays de connexion (code à 2 lettres, aucune autre donnée de localisation) : pour la carte « Le monde qui trade »
+    const country = req.headers.get("x-vercel-ip-country");
+    if (country && /^[A-Z]{2}$/.test(country)) await db.from("profiles").update({ country }).eq("wallet", wallet);
+
     await setSessionCookie(wallet);
     const res = NextResponse.json({ profile });
     if (inviteCode) res.cookies.delete(INVITE_COOKIE);

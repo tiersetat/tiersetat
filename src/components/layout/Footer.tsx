@@ -16,9 +16,9 @@ export function Footer() {
             {CLUSTER === "devnet" && <span data-beta> Réseau de test Solana (devnet) : les tokens n&apos;ont aucune valeur réelle.</span>}
           </p>
           <p className="text-[10px] text-muted-foreground/60">
-            Fond : la France la nuit vue de l&apos;espace,{" "}
-            <a href="https://svs.gsfc.nasa.gov/30693" target="_blank" rel="noreferrer" className="underline underline-offset-2">
-              NASA Earth Observatory / Suomi NPP VIIRS
+            Fond : la Terre la nuit vue de l&apos;espace,{" "}
+            <a href="https://earthobservatory.nasa.gov/features/NightLights" target="_blank" rel="noreferrer" className="underline underline-offset-2">
+              NASA Earth Observatory (Black Marble, Suomi NPP VIIRS)
             </a>{" "}
             (domaine public), couleurs retouchées. Estampe : musée Carnavalet (domaine public).
           </p>

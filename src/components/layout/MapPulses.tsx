@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { FeedItem } from "@/lib/feed";
-import { nightLevel, pointForClan } from "@/lib/france-map";
+import { nightLevel, pulsePoint, type MapView, type Variant } from "@/lib/france-map";
 
 type Pulse = { id: string; x: number; y: number; side: "buy" | "sell" };
 
@@ -17,10 +17,11 @@ function parisHour(): number {
 
 /**
  * Les ondes de « La France qui trade » : uniquement pour de vrais achats et ventes (aucune fausse activité).
- * Chaque échange nouveau fait partir une onde de la ville du clan du trader (centre de la France s'il n'a pas de clan).
+ * Chaque échange nouveau fait partir une onde de la capitale du pays du trader (vue France : ville de son clan régional) ;
+ * un trader hors de la zone affichée ne fait pas d'onde.
  * La carte est aussi plus lumineuse la nuit (heure de Paris) qu'en journée.
  */
-export function MapPulses({ variant }: { variant: "m" | "d" }) {
+export function MapPulses({ view, variant }: { view: MapView; variant: Variant }) {
   const [pulses, setPulses] = useState<Pulse[]>([]);
   const [night, setNight] = useState(1);
   const seen = useRef<Set<string> | null>(null);
@@ -49,9 +50,10 @@ export function MapPulses({ variant }: { variant: "m" | "d" }) {
           return;
         }
         const fresh = trades.filter((t) => !seen.current!.has(t.id)).slice(0, 8);
+        fresh.forEach((t) => seen.current!.add(t.id));
         fresh.forEach((t, k) => {
-          seen.current!.add(t.id);
-          const p = pointForClan(t.author.clan)[variant];
+          const p = pulsePoint(view, variant, t.author);
+          if (!p) return;
           // Léger décalage pour que plusieurs achats d'une même région ne se superposent pas
           const jitter = (n: number) => ((parseInt(t.id.slice(-n - 2, -n) || "0", 36) % 9) - 4) * 0.35;
           timers.push(
@@ -74,7 +76,7 @@ export function MapPulses({ variant }: { variant: "m" | "d" }) {
       clearInterval(id);
       timers.forEach(clearTimeout);
     };
-  }, [variant]);
+  }, [view, variant]);
 
   return (
     <>

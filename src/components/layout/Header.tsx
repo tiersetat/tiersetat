@@ -3,6 +3,7 @@ import { Wordmark } from "@/components/brand/Logo";
 import { EmailLoginButton } from "@/components/providers/PrivyBridge";
 import { CitizenButton } from "./CitizenButton";
 import { WalletButton } from "./WalletButton";
+import { MapViewPicker } from "./MapViewPicker";
 
 /**
  * Barre du haut façon iOS : pleine largeur, collée en haut, fine ligne de séparation.
@@ -30,6 +31,7 @@ export function Header() {
           />
         </form>
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          <MapViewPicker />
           <CitizenButton />
           <EmailLoginButton />
           <WalletButton />

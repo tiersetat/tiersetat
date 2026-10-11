@@ -396,10 +396,10 @@ body {
   overflow-x: clip;
 }
 
-/* « La France qui trade » : villes qui scintillent et ondes des vrais échanges sur la carte */
+/* « Le monde qui trade » : villes qui scintillent (or) et ondes des vrais échanges sur la carte */
 .city-glow {
-  background: #dfe7ff;
-  box-shadow: 0 0 10px 3px rgb(157 176 255 / 0.75), 0 0 28px 8px rgb(127 155 255 / 0.35);
+  background: #fff3d6;
+  box-shadow: 0 0 10px 3px rgb(255 214 138 / 0.75), 0 0 28px 8px rgb(255 190 100 / 0.35);
   animation: city-glow 6s ease-in-out infinite;
 }
 @keyframes city-glow {
@@ -415,3 +415,6 @@ body {
   100% { opacity: 0; transform: translate(-50%, -50%) scale(7); }
 }
 @media (prefers-reduced-motion: reduce) { .city-glow, .map-pulse { animation: none; } }
+/* Changement de carte : fondu doux */
+.map-fade { animation: map-fade 0.9s ease-out; }
+@keyframes map-fade { from { opacity: 0; } to { opacity: 1; } }
