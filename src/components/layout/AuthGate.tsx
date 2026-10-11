@@ -33,15 +33,21 @@ function WalletGate({ children, privy }: { children: ReactNode; privy: { ready: 
   const { setVisible } = useWalletModal();
   const [mounted, setMounted] = useState(false);
   const [settled, setSettled] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
   useEffect(() => {
     Promise.resolve().then(() => setMounted(true));
     // Laisse le temps à la reconnexion automatique (wallet ou session Google) avant d'afficher l'écran de connexion
     const id = setTimeout(() => setSettled(true), 1200);
-    return () => clearTimeout(id);
+    // Sécurité : une reconnexion qui traîne ne doit jamais bloquer l'écran de connexion
+    const max = setTimeout(() => setTimedOut(true), 6000);
+    return () => {
+      clearTimeout(id);
+      clearTimeout(max);
+    };
   }, []);
 
   if (connected) return <>{children}</>;
-  const waiting = !mounted || connecting || !settled || (privy !== null && (!privy.ready || privy.authenticated));
+  const waiting = !timedOut && (!mounted || connecting || !settled || (privy !== null && (!privy.ready || privy.authenticated)));
   if (waiting) {
     return (
       <div className="fixed inset-0 z-[60] grid place-items-center bg-nuit">

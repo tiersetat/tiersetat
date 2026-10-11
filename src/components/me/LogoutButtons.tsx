@@ -6,27 +6,40 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useSession } from "@/components/providers/SessionProvider";
 import { PRIVY_APP_ID } from "@/components/providers/PrivyBridge";
 
-/** Déconnexion complète : session Tiers-État, wallet (Phantom, Solflare…) et compte Google / e-mail. */
+/** Une étape de déconnexion ne doit jamais bloquer les suivantes (certains wallets ne répondent pas sur iPhone). */
+function withTimeout(p: Promise<unknown> | undefined, ms = 2500) {
+  return Promise.race([Promise.resolve(p).catch(() => undefined), new Promise((r) => setTimeout(r, ms))]);
+}
+
+/** Efface du téléphone les traces de connexion (wallet choisi, jetons Google / e-mail de Privy). */
+function clearLocalSession() {
+  try {
+    for (const k of Object.keys(localStorage)) {
+      if (k === "walletName" || k.startsWith("privy:") || k.startsWith("privy-")) localStorage.removeItem(k);
+    }
+    for (const k of Object.keys(sessionStorage)) if (k.startsWith("privy")) sessionStorage.removeItem(k);
+  } catch {
+    /* stockage indisponible */
+  }
+}
+
+/** Déconnexion complète : compte Google / e-mail, wallet et session Tiers-État, puis retour à l'écran de connexion. */
 function useLogoutAll(privyLogout: (() => Promise<void>) | null) {
   const { disconnect } = useWallet();
   const { signOut } = useSession();
   return async () => {
-    await signOut().catch(() => undefined);
-    await disconnect().catch(() => undefined);
-    if (privyLogout) await privyLogout().catch(() => undefined);
-    try {
-      // évite la reconnexion automatique au même wallet
-      localStorage.removeItem("walletName");
-    } catch {
-      /* stockage indisponible */
-    }
-    window.location.assign("/");
+    if (privyLogout) await withTimeout(privyLogout());
+    await withTimeout(disconnect());
+    await withTimeout(signOut());
+    clearLocalSession();
+    window.location.replace("/");
   };
 }
 
 function Buttons({ logout }: { logout: () => Promise<void> }) {
   const [busy, setBusy] = useState(false);
   const run = async () => {
+    if (busy) return;
     setBusy(true);
     await logout();
   };
