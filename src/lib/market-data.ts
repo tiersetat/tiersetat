@@ -37,7 +37,7 @@ export async function itemsFor(addresses: string[]): Promise<MarketItem[]> {
   const perpItems = new Map(
     perps
       .filter((m) => perpIds.includes(m.id))
-      .map((m) => [m.id, { address: m.id, name: m.name, symbol: m.symbol, imageUrl: null, priceUsd: m.priceUsd, mcapUsd: null, change24: m.change24, leverage: m.maxLeverage, href: `/bourse/${encodeURIComponent(m.id)}` } as MarketItem]),
+      .map((m) => [m.id, { address: m.id, name: m.name, symbol: m.symbol, imageUrl: m.imageUrl, emoji: m.emoji, priceUsd: m.priceUsd, mcapUsd: null, change24: m.change24, leverage: m.maxLeverage, href: `/bourse/${encodeURIComponent(m.id)}` } as MarketItem]),
   );
   const list = all.filter((a) => !a.includes(":"));
   if (list.length === 0) return all.flatMap((a) => (perpItems.has(a) ? [perpItems.get(a)!] : []));

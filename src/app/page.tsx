@@ -55,7 +55,7 @@ async function loadList(key: Key, chain: ChainId | null, cat: Category | null): 
     const all = await hyperliquidMarkets();
     return all
       .filter((m) => !cat || m.category === cat)
-      .map((m) => ({ address: m.id, name: m.name, symbol: m.symbol, imageUrl: null, priceUsd: m.priceUsd, mcapUsd: null, change24: m.change24, leverage: m.maxLeverage, href: `/bourse/${encodeURIComponent(m.id)}` }));
+      .map((m) => ({ address: m.id, name: m.name, symbol: m.symbol, imageUrl: m.imageUrl, emoji: m.emoji, priceUsd: m.priceUsd, mcapUsd: null, change24: m.change24, leverage: m.maxLeverage, href: `/bourse/${encodeURIComponent(m.id)}` }));
   }
   if (key === "cryptos") return topCryptos();
   if (key === "tendances") {

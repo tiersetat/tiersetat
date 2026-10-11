@@ -23,7 +23,7 @@ export function Starfield({ dim = true }: { dim?: boolean }) {
             width: t.size,
             height: t.size,
             background: t.color,
-            boxShadow: `0 0 ${t.size * 4}px ${t.color}`,
+            boxShadow: `0 0 ${t.size * 2}px ${t.color}`,
             animationDelay: `${t.delay}s`,
             animationDuration: `${t.dur}s`,
           }}

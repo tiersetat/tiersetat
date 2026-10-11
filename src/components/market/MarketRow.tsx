@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { feteColor } from "@/components/brand/TokenCard";
+import { TokenLogo } from "./TokenLogo";
 import { pct, usd } from "@/lib/market-format";
 
 const CHAIN_DOT: Record<string, { label: string; color: string }> = {
@@ -23,6 +23,8 @@ export type MarketItem = {
   /** Blockchain (pastille de couleur) et badge « DEX payé » pour les listes multi-chaînes */
   chain?: string;
   paid?: boolean;
+  /** Pictogramme (indices, matières premières, devises) quand il n'y a pas de logo */
+  emoji?: string | null;
   /** Effet de levier maximal (contrats perpétuels Hyperliquid) */
   leverage?: number;
   /** Mème lancé sur Tiers-État : lien vers sa page complète */
@@ -31,7 +33,6 @@ export type MarketItem = {
 
 /** Ligne compacte d'une liste de tokens : image, nom, prix, capitalisation, variation 24 h. */
 export function MarketRow({ t, rank }: { t: MarketItem; rank?: number }) {
-  const c = feteColor(t.symbol + t.name);
   const up = (t.change24 ?? 0) >= 0;
   return (
     <li>
@@ -40,14 +41,7 @@ export function MarketRow({ t, rank }: { t: MarketItem; rank?: number }) {
         className="flex items-center gap-3 rounded-2xl px-3 py-2.5 transition hover:bg-white/[0.05] active:scale-[0.99]"
       >
         {rank !== undefined && <span className="w-5 shrink-0 text-right font-mono text-xs text-muted-foreground">{rank}</span>}
-        {t.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- images de domaines variables
-          <img src={t.imageUrl} alt="" loading="lazy" decoding="async" className="size-11 shrink-0 rounded-2xl bg-muted object-cover" />
-        ) : (
-          <span className="grid size-11 shrink-0 place-items-center rounded-2xl text-lg font-extrabold" style={{ background: c.bg, color: c.fg }}>
-            {t.symbol.slice(0, 1)}
-          </span>
-        )}
+        <TokenLogo src={t.imageUrl} emoji={t.emoji} symbol={t.symbol} name={t.name} />
         <div className="min-w-0 flex-1">
           <p className="truncate font-bold">{t.symbol}</p>
           <p className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">

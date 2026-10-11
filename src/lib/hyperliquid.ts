@@ -20,7 +20,32 @@ export type PerpMarket = {
   maxLeverage: number;
   /** Financement horaire (en %) */
   fundingPct: number | null;
+  /** Logo de l'entreprise, ou pictogramme pour les indices, matières premières, devises et taux */
+  imageUrl: string | null;
+  emoji: string | null;
 };
+
+/** Pictogrammes des marchés qui ne sont pas des entreprises. */
+const EMOJI: Record<string, string> = {
+  GOLD: "🥇", SILVER: "🥈", PLATINUM: "⚪", PALLADIUM: "🔘", COPPER: "🟤", CL: "🛢️", BRENTOIL: "🛢️", NATGAS: "🔥", HO: "⛽",
+  EUR: "🇪🇺", JPY: "🇯🇵", GBP: "🇬🇧", TLT: "🏛️", USBOND: "🏛️", "10Y": "📈", "30Y": "📈", "2Y": "📈",
+  XYZ100: "🇺🇸", SP500: "🇺🇸", US500: "🇺🇸", USTECH: "🇺🇸", SMALL2000: "🇺🇸", JP225: "🇯🇵", KR200: "🇰🇷", EWY: "🇰🇷", KORU: "🇰🇷",
+  EWJ: "🇯🇵", EWZ: "🇧🇷", EWT: "🇹🇼", TOTAL2: "🪙", OTHERS: "🪙", BTCD: "₿", BVIV: "₿", SMH: "💾", SOXL: "💾", XLE: "⚡", XBI: "🧬",
+  IGV: "💻", MAGS: "✨", URNM: "☢️", DRAM: "💾",
+};
+/** Sites des entreprises non cotées aux États-Unis (pré-IPO, Asie) pour leur logo. */
+const DOMAIN: Record<string, string> = {
+  SPCX: "spacex.com", OAI: "openai.com", ANTH: "anthropic.com", SHEIN: "shein.com", MINIMAX: "minimax.io", ZHIPU: "zhipuai.cn",
+  UNITREE: "unitree.com", CXMT: "cxmt.com", OURA: "ouraring.com", KIOXIA: "kioxia.com", SKHX: "skhynix.com", SKHY: "skhynix.com",
+  SMSN: "samsung.com", SOFTBANK: "softbank.jp", HYUNDAI: "hyundai.com", TCNT: "tencent.com", GIGADEV: "gigadevice.com",
+  PURRDAT: "hyperliquid.xyz", ANSEM: "x.com", TREAD: "x.com",
+};
+function logoOf(symbol: string, category: Category): { imageUrl: string | null; emoji: string | null } {
+  if (EMOJI[symbol]) return { imageUrl: null, emoji: EMOJI[symbol] };
+  if (DOMAIN[symbol]) return { imageUrl: `https://www.google.com/s2/favicons?domain=${DOMAIN[symbol]}&sz=128`, emoji: null };
+  if (category === "actions") return { imageUrl: `https://assets.parqet.com/logos/symbol/${encodeURIComponent(symbol)}?format=png`, emoji: null };
+  return { imageUrl: null, emoji: null };
+}
 
 /** Noms lisibles et catégories (le reste est classé « actions » avec son symbole). */
 const INFO: Record<string, [string, Category?]> = {
@@ -82,6 +107,7 @@ async function marketsOf(dex: string): Promise<PerpMarket[]> {
         openInterestUsd: Number(c.openInterest ?? 0) * (px || 0),
         maxLeverage: a.maxLeverage,
         fundingPct: c.funding ? Number(c.funding) * 100 : null,
+        ...logoOf(symbol, category ?? "actions"),
       },
     ];
   });

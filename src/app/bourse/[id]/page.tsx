@@ -5,6 +5,7 @@ import { hyperliquidMarket } from "@/lib/hyperliquid";
 import { pct, usd } from "@/lib/market-format";
 import { PerpPanel } from "@/components/market/PerpPanel";
 import { WatchStar } from "@/components/market/WatchStar";
+import { TokenLogo } from "@/components/market/TokenLogo";
 
 const CAT: Record<string, string> = { actions: "Action", indices: "Indice / ETF", matieres: "Matière première", devises: "Devise", "pre-ipo": "Pré-IPO", taux: "Taux d'intérêt" };
 
@@ -67,7 +68,7 @@ export default async function BoursePage({ params }: PageProps<"/bourse/[id]">) 
     <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
       <div className="min-w-0 space-y-5">
         <header className="flex items-start gap-4">
-          <span className="grid size-16 shrink-0 place-items-center rounded-3xl bg-white/[0.08] text-lg font-extrabold">{m.symbol.slice(0, 4)}</span>
+          <TokenLogo src={m.imageUrl} emoji={m.emoji} symbol={m.symbol} name={m.name} size={64} className="rounded-3xl" />
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-3xl font-extrabold">{m.name}</h1>
             <p className="text-sm text-muted-foreground">

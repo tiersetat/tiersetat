@@ -9,10 +9,11 @@ import { buildSendTransaction, cashTotal, CASH, getBalances, parseRecipient, SOL
 import { SlideToConfirm } from "@/components/token/SlideToConfirm";
 import { LoginCta, PRIVY_APP_ID } from "@/components/providers/PrivyBridge";
 import { PrivySecurity } from "./PrivySecurity";
+import { DepositOptions, SellOptions } from "./FundingOptions";
 import { DEMO_CASH_EUR, useDemo } from "@/lib/demo";
 
 type Display = "EUR" | "USD";
-type Sheet = null | "recevoir" | "envoyer" | "securite";
+type Sheet = null | "deposer" | "recevoir" | "envoyer" | "vendre" | "securite";
 const DEVNET = (CLUSTER as string) === "devnet";
 
 const money = (n: number, cur: Display) =>
@@ -112,11 +113,12 @@ export function CashWallet() {
             ))}
           </div>
         </div>
-        <div className="relative mt-6 grid grid-cols-3 gap-2">
+        <div className="relative mt-6 grid grid-cols-4 gap-2">
           {(
             [
-              ["recevoir", "Recevoir"],
+              ["deposer", "Déposer"],
               ["envoyer", "Envoyer"],
+              ["vendre", "Vendre"],
               ["securite", "Sécurité"],
             ] as const
           ).map(([k, label]) => (
@@ -133,7 +135,9 @@ export function CashWallet() {
         </div>
       </div>
 
+      {sheet === "deposer" && <DepositOptions address={publicKey.toBase58()} onReceive={() => setSheet("recevoir")} />}
       {sheet === "recevoir" && <Receive address={publicKey.toBase58()} />}
+      {sheet === "vendre" && <SellOptions onSend={() => setSheet("envoyer")} />}
       {sheet === "envoyer" && balances && <Send balances={balances} onSent={refresh} />}
       {sheet === "securite" && (
         <div className="surface space-y-3 p-5">

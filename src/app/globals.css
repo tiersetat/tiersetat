@@ -259,6 +259,17 @@
   background: rgb(255 255 255 / 0.06) !important;
 }
 
+/* Verre dépoli façon iOS (barre du bas uniquement : un seul flou, léger pour le téléphone) */
+.ios-glass {
+  background: rgb(20 22 52 / 0.42);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.22) inset, 0 12px 40px -12px rgb(0 0 0 / 0.7);
+}
+/* Appui fluide façon iOS : léger enfoncement avec ressort */
+.ios-press { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); -webkit-tap-highlight-color: transparent; }
+.ios-press:active { transform: scale(0.88); transition-duration: 0.12s; }
+
 /* Mode démo (vidéos) : les mentions de la bêta disparaissent */
 html.demo [data-beta] { display: none !important; }
 
