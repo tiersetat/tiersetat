@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BuzzImage } from "@/components/buzz/BuzzImage";
 import { HEAT_STYLE, TrendList } from "@/components/buzz/TrendList";
 import { getBuzz } from "@/lib/buzz";
-import { launchHref, timeAgo, trendLaunchHref } from "@/lib/buzz-links";
+import { timeAgo, trendLaunchHref } from "@/lib/buzz-links";
 import { computeTrends, itemHeat, keywords, type Trend } from "@/lib/buzz-trends";
 
 export const metadata: Metadata = { title: "Ça buzz en France — Tiers-État" };
@@ -47,7 +47,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Ça buzz en France</h1>
-          <p className="max-w-2xl text-muted-foreground">Les sujets que tout le monde reprend en même temps. Plus c&apos;est rouge, plus ça chauffe. Un clic pour en faire un token.</p>
+          <p className="max-w-2xl text-muted-foreground">Les sujets que tout le monde reprend en même temps. Plus c&apos;est rouge, plus ça chauffe.</p>
         </div>
         <div className="flex gap-4 text-xs text-muted-foreground">
           {(["brulant", "chaud", "tiede"] as const).map((h) => (
@@ -144,9 +144,6 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
                     <a href={item.url} target="_blank" rel="noreferrer" className="text-xs text-muted-foreground hover:text-foreground">
                       Lire l&apos;article ↗
                     </a>
-                    <Link href={launchHref(item)} className="btn-primary px-3.5 py-1.5 text-xs">
-                      En faire un token
-                    </Link>
                   </div>
                 </div>
               </li>

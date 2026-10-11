@@ -3,7 +3,7 @@ import { AutoScroller } from "@/components/buzz/AutoScroller";
 import { BuzzImage } from "@/components/buzz/BuzzImage";
 import { HEAT_STYLE } from "@/components/buzz/TrendList";
 import { getBuzz } from "@/lib/buzz";
-import { launchHref, timeAgo } from "@/lib/buzz-links";
+import { timeAgo } from "@/lib/buzz-links";
 import { suggestName, suggestTicker } from "@/lib/buzz-suggest";
 import { computeTrends, itemHeat, keywords } from "@/lib/buzz-trends";
 
@@ -34,24 +34,13 @@ export async function HomeBuzz() {
     .slice(1)
     .find((t) => topItems.filter((i) => keywords(i.title).some((k) => k.key === t.key)).length * 2 >= topItems.length);
   const title = [top, companion].filter(Boolean).map((t) => t!.label.charAt(0).toUpperCase() + t!.label.slice(1)).join(" · ");
-  const topArticle = hot.find(({ item }) => keywords(item.title).some((k) => k.key === top.key))?.item;
-  // Ticker : le mot-clé le plus court qui tient en entier (≤ 10 lettres), sinon le premier tronqué
-  const words = [companion, top].filter(Boolean).map((t) => t!.label);
-  const tickerWord = words.filter((w) => w.length <= 10).sort((a, b) => a.length - b.length)[0] ?? top.label;
-  const memeHref = `/lancer?${new URLSearchParams({
-    nom: suggestName(title.replace(" · ", " ")),
-    ticker: suggestTicker(tickerWord),
-    description: `À la une : ${title}, repris par ${top.sources} médias.`,
-    ...(topArticle ? { source: topArticle.url } : {}),
-  })}`;
-
   return (
     <section className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className={`flex items-center gap-2 text-xs font-medium uppercase tracking-widest ${style.text}`}>
             <span className={`h-2 w-2 rounded-full ${style.dot}`} />
-            À la une · l&apos;actu du jour, à transformer en mème
+            À la une · l&apos;actu du jour
           </p>
           <h2 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
             {title}
@@ -61,9 +50,6 @@ export async function HomeBuzz() {
           </h2>
         </div>
         <div className="flex gap-2">
-          <Link href={memeHref} className="btn-primary">
-            Créer le mème
-          </Link>
           <Link href="/ca-buzz" className="btn-ghost">
             Toute l&apos;actu
           </Link>
@@ -90,9 +76,6 @@ export async function HomeBuzz() {
                   <a href={item.url} target="_blank" rel="noreferrer" className="text-xs text-muted-foreground hover:text-foreground">
                     Lire ↗
                   </a>
-                  <Link href={launchHref(item)} className="btn-primary px-3 py-1.5 text-xs">
-                    En faire un token
-                  </Link>
                 </div>
               </div>
             </article>
