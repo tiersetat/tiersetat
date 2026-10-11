@@ -122,14 +122,14 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
       {/* La liste des tokens */}
       <section id="tokens" className="scroll-mt-20 space-y-3">
-        <nav className="no-scrollbar -mx-4 flex gap-1 overflow-x-auto border-b border-white/[0.08] px-4" aria-label="Listes de tokens">
+        <nav className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 py-1" aria-label="Listes de tokens">
           {TABS.map((t) => (
             <Link
               key={t.key}
               href={`/?tri=${t.key}`}
               scroll={false}
               aria-current={key === t.key ? "page" : undefined}
-              className={`shrink-0 border-b-2 px-3 pb-2.5 pt-1 text-[15px] font-bold transition ${key === t.key ? "border-soleil text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+              className={`chip shrink-0 ${key === t.key ? "chip-active" : ""}`}
             >
               {t.label}
             </Link>

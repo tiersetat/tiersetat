@@ -138,15 +138,14 @@
   .btn-primary:hover:not(:disabled) {
     filter: brightness(1.08);
   }
-  /* Bouton fête : jaune soleil, pour les gros appels à l'action */
+  /* Bouton principal « Frapper » : verre transparent, liseré bleu-blanc-rouge, lueur tricolore */
   .btn-fete {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-extrabold tracking-tight disabled:opacity-50;
-    color: var(--nuit);
-    background: linear-gradient(180deg, #ffe17a 0%, #ffd23f 60%, #ffc21a 100%);
-    box-shadow: 0 1px 0 0 rgb(255 255 255 / 0.6) inset, 0 6px 0 -1px #c79400, 0 14px 30px -10px rgb(255 210 63 / 0.8);
+    @apply relative inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-extrabold tracking-tight text-white disabled:opacity-50;
+    background: rgb(255 255 255 / 0.08);
+    box-shadow: -8px 6px 24px -10px rgb(61 90 254 / 0.8), 8px 6px 24px -10px rgb(255 61 104 / 0.8), inset 0 1px 0 rgb(255 255 255 / 0.18);
   }
   .btn-fete:hover:not(:disabled) {
-    filter: brightness(1.05);
+    background: rgb(255 255 255 / 0.15);
   }
   /* Bouton secondaire : pilule claire */
   .btn-ghost {
@@ -163,13 +162,26 @@
     background: linear-gradient(180deg, #ff7a98 0%, #ff3d68 100%);
     box-shadow: 0 6px 0 -1px #c41d47, 0 14px 30px -12px rgb(255 61 104 / 0.8);
   }
+  /* Onglets et filtres : verre transparent ; l'onglet choisi prend le liseré bleu-blanc-rouge */
   .chip {
-    @apply inline-flex items-center rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[13px] font-bold text-muted-foreground hover:border-white/25 hover:text-foreground;
+    @apply relative inline-flex items-center rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[13px] font-bold text-white/75 hover:border-white/25 hover:text-white;
   }
   .chip-active {
-    @apply border-transparent text-nuit hover:text-nuit;
-    background: var(--soleil);
-    box-shadow: 0 6px 18px -8px rgb(255 210 63 / 0.9);
+    @apply border-transparent bg-white/[0.12] text-white hover:text-white;
+    box-shadow: -6px 4px 18px -10px rgb(61 90 254 / 0.9), 6px 4px 18px -10px rgb(255 61 104 / 0.9);
+  }
+  .chip-active::before,
+  .btn-fete::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #3d5afe, #ffffff, #ff3d68);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
   .field {
     @apply w-full rounded-2xl border border-white/15 bg-black/30 px-4 py-3 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-electrique focus:ring-4 focus:ring-electrique/25;
