@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { LiveActivity } from "./LiveActivity";
+import { ResizableHeight } from "@/components/layout/Resizable";
 
 const QUERY = "(min-width: 1024px)";
 const subscribe = (cb: () => void) => {
@@ -17,7 +18,13 @@ export function HomeSocial({ placement }: { placement: "gauche" | "liste" }) {
   return (
     <div className="space-y-2">
       <h2 className="px-1 text-lg font-extrabold">Social</h2>
-      <LiveActivity limit={placement === "gauche" ? 10 : 4} />
+      {placement === "gauche" ? (
+        <LiveActivity limit={20} />
+      ) : (
+        <ResizableHeight id="social" initial={300}>
+          <LiveActivity limit={20} />
+        </ResizableHeight>
+      )}
     </div>
   );
 }

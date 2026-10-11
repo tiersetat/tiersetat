@@ -65,3 +65,46 @@ export async function itemsFor(addresses: string[]): Promise<MarketItem[]> {
   for (const t of external) byAddr.set(t.address, fromRadar(t));
   return all.flatMap((a) => (byAddr.has(a) ? [byAddr.get(a)!] : perpItems.has(a) ? [perpItems.get(a)!] : []));
 }
+
+type MemeRow = { mint: string; name: string; ticker: string; image_url: string; market_cap_sol: number; curve_progress: number; migrated: boolean };
+
+/** Mème Tiers-État → ligne de marché (capitalisation en $, progression vers la Bastille si encore sur la courbe). */
+function memeItem(t: MemeRow, sol: number | null): MarketItem {
+  const mcapUsd = sol === null ? null : Number(t.market_cap_sol) * sol;
+  return {
+    address: t.mint,
+    name: t.name,
+    symbol: t.ticker,
+    imageUrl: t.image_url,
+    priceUsd: mcapUsd === null ? null : mcapUsd / 1e9,
+    mcapUsd,
+    change24: null,
+    progress: t.migrated ? undefined : Number(t.curve_progress),
+    href: `/token/${t.mint}`,
+  };
+}
+
+/** Nos mèmes : « migrés » (Bastille prise), « bonding » (encore sur la courbe) ou « détenus » (le plus de détenteurs). */
+export async function memesBy(kind: "migre" | "bonding" | "detenus"): Promise<MarketItem[]> {
+  const db = supabasePublic();
+  const sol = await solUsd();
+  const cols = "mint, name, ticker, image_url, market_cap_sol, curve_progress, migrated";
+  if (kind === "migre" || kind === "bonding") {
+    const { data } = await db.from("tokens").select(cols).eq("hidden", false).eq("migrated", kind === "migre").order(kind === "migre" ? "market_cap_sol" : "curve_progress", { ascending: false }).limit(50);
+    return ((data ?? []) as MemeRow[]).map((t) => memeItem(t, sol));
+  }
+  // Détenteurs : portefeuilles dont le solde (achats − ventes) est positif
+  const { data: trades } = await db.from("trades").select("mint, trader_wallet, side, token_amount").limit(20000);
+  const bal = new Map<string, number>();
+  for (const t of trades ?? []) {
+    const k = `${t.mint}|${t.trader_wallet}`;
+    bal.set(k, (bal.get(k) ?? 0) + (t.side === "buy" ? 1 : -1) * Number(t.token_amount));
+  }
+  const holders = new Map<string, number>();
+  for (const [k, v] of bal) if (v > 0) holders.set(k.split("|")[0], (holders.get(k.split("|")[0]) ?? 0) + 1);
+  const top = [...holders.entries()].sort((a, b) => b[1] - a[1]).slice(0, 50);
+  if (!top.length) return [];
+  const { data } = await db.from("tokens").select(cols).eq("hidden", false).in("mint", top.map(([m]) => m));
+  const byMint = new Map(((data ?? []) as MemeRow[]).map((t) => [t.mint, t]));
+  return top.flatMap(([m, n]) => (byMint.has(m) ? [{ ...memeItem(byMint.get(m)!, sol), name: `${byMint.get(m)!.name} · ${n} détenteur${n > 1 ? "s" : ""}` }] : []));
+}

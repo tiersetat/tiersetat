@@ -2,11 +2,13 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CashBar } from "@/components/market/CashBar";
 import { HomeSocial } from "@/components/social/HomeSocial";
+import { ResizableColumns } from "@/components/layout/Resizable";
 import { MarketRow, type MarketItem } from "@/components/market/MarketRow";
 import { WatchlistView } from "@/components/market/WatchlistView";
 import { GuestOnly } from "@/components/layout/GuestOnly";
 import { TopTradersBand } from "@/components/rank/TopTradersBand";
 import { CHAINS, dexPaidTrending, isChain, topCryptos, type ChainId } from "@/lib/market-feeds";
+import { memesBy } from "@/lib/market-data";
 import { NewTokensLive } from "@/components/market/NewTokensLive";
 import { hyperliquidMarkets, type Category } from "@/lib/hyperliquid";
 import { HomeBuzz } from "@/components/buzz/HomeBuzz";
@@ -16,10 +18,13 @@ import { TOTAL_SUPPLY } from "@/lib/traders";
 
 /** Onglets de la liste : tout le marché (multi-blockchains), puis nos mèmes (launchpad). */
 const TABS = [
-  { key: "liste", label: "Ma liste" },
-  { key: "tendances", label: "Tendances" },
-  { key: "nouveaux", label: "Nouveaux" },
+  { key: "liste", label: "Favoris" },
   { key: "cryptos", label: "Cryptos" },
+  { key: "tendances", label: "Tendances" },
+  { key: "detenus", label: "Plus détenus" },
+  { key: "migre", label: "Migré" },
+  { key: "bonding", label: "Bonding" },
+  { key: "nouveaux", label: "Nouveaux" },
   { key: "tiers-etat", label: "Tiers-État" },
   { key: "bourse", label: "Actions ×10" },
 ] as const;
@@ -52,6 +57,13 @@ function fromMeme(t: TokenCard, sol: number | null): MarketItem {
 
 async function loadList(key: Key, chain: ChainId | null, cat: Category | null): Promise<MarketItem[] | null> {
   if (key === "liste" || key === "nouveaux") return null;
+  if (key === "detenus") return memesBy("detenus");
+  if (key === "migre" || key === "bonding") {
+    // Nos mèmes d'abord, puis les tokens du marché (DEX payé) selon leur plateforme
+    const [ours, market] = await Promise.all([memesBy(key), dexPaidTrending().catch(() => [])]);
+    const ext = market.filter((t) => (key === "bonding" ? t.bonding : !t.bonding) && (!chain || t.chain === chain));
+    return [...ours, ...ext];
+  }
   if (key === "bourse") {
     const all = await hyperliquidMarkets();
     return all
@@ -83,13 +95,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const memeTab = key === "tiers-etat";
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)] xl:grid-cols-[22rem_minmax(0,1fr)]">
-      {/* Widget Social, à gauche (ordinateur) */}
-      <aside className="hidden lg:block">
-        <div className="sticky top-6">
-          <HomeSocial placement="gauche" />
-        </div>
-      </aside>
+    <ResizableColumns left={<HomeSocial placement="gauche" />}>
       <div className="min-w-0 space-y-6">
       {/* Solde et dépôt (connecté) ; bienvenue (visiteur) */}
       <div className="empty:hidden">
@@ -155,13 +161,13 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           ))}
         </nav>
 
-        {key === "tendances" && (
+        {(key === "tendances" || key === "migre" || key === "bonding") && (
           <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
-            <Link href="/?tri=tendances" scroll={false} className={`chip shrink-0 py-1.5 ${!chain ? "chip-active" : ""}`}>
+            <Link href={`/?tri=${key}`} scroll={false} className={`chip shrink-0 py-1.5 ${!chain ? "chip-active" : ""}`}>
               Toutes
             </Link>
             {(Object.keys(CHAINS) as ChainId[]).map((c) => (
-              <Link key={c} href={`/?tri=tendances&chaine=${c}`} scroll={false} className={`chip shrink-0 gap-1.5 py-1.5 ${chain === c ? "chip-active" : ""}`}>
+              <Link key={c} href={`/?tri=${key}&chaine=${c}`} scroll={false} className={`chip shrink-0 gap-1.5 py-1.5 ${chain === c ? "chip-active" : ""}`}>
                 <span className="size-2 rounded-full" style={{ background: CHAINS[c].color }} />
                 {CHAINS[c].label}
               </Link>
@@ -220,6 +226,6 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         {key === "cryptos" && <p className="px-1 text-xs text-muted-foreground">Les plus grandes cryptos du monde (CoinGecko), hors stablecoins. Pour information.</p>}
       </section>
       </div>
-    </div>
+    </ResizableColumns>
   );
 }

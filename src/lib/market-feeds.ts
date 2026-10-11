@@ -15,6 +15,7 @@ export const isChain = (v: unknown): v is ChainId => typeof v === "string" && v 
 
 type DexPair = {
   chainId: string;
+  dexId: string;
   pairAddress: string;
   baseToken: { address: string; name: string; symbol: string };
   priceUsd?: string;
@@ -53,7 +54,10 @@ async function bestPairs(byChain: Map<ChainId, string[]>): Promise<DexPair[]> {
   return [...best.values()];
 }
 
-export type TrendItem = MarketItem & { chain: ChainId; paid: boolean; volume6h: number; createdAt: number | null };
+export type TrendItem = MarketItem & { chain: ChainId; paid: boolean; volume6h: number; createdAt: number | null; dexId: string; bonding: boolean };
+
+/** Plateformes où un token est encore sur sa courbe de lancement (pas encore migré vers un vrai marché). */
+const BONDING_DEX = new Set(["pumpfun", "launchlab", "moonshot", "meteoradbc", "boop", "believe", "bonkfun", "letsbonk", "fourmeme", "clanker", "zora"]);
 
 /**
  * Tendances : les tokens « DEX payé » (profil payant DexScreener) et boostés, sur toutes nos blockchains,
@@ -91,6 +95,8 @@ export function dexPaidTrending(): Promise<TrendItem[]> {
           paid: true,
           volume6h: p.volume?.h6 ?? 0,
           createdAt: num(p.pairCreatedAt),
+          dexId: p.dexId,
+          bonding: BONDING_DEX.has(p.dexId),
           href: `/marche/${p.baseToken.address}?c=${p.chainId}`,
         };
       })
