@@ -4,7 +4,6 @@ import { BuzzImage } from "@/components/buzz/BuzzImage";
 import { HEAT_STYLE } from "@/components/buzz/TrendList";
 import { getBuzz } from "@/lib/buzz";
 import { timeAgo } from "@/lib/buzz-links";
-import { suggestName, suggestTicker } from "@/lib/buzz-suggest";
 import { computeTrends, itemHeat, keywords } from "@/lib/buzz-trends";
 
 const HEAT_RANK = { brulant: 0, chaud: 1, tiede: 2 } as const;
