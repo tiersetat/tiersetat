@@ -16,6 +16,7 @@ import { Workspace } from "@/components/layout/Workspace";
 import { Starfield } from "@/components/layout/Starfield";
 import { DemoMode } from "@/components/app/DemoMode";
 import { InstallSheet } from "@/components/app/InstallSheet";
+import { DemoAccount } from "@/components/app/DemoAccount";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <InstallSheet />
         <WalletProviders>
           <InviteCapture />
+          <DemoAccount />
           <RegisterSW />
           <AuthGate>
           <Header />

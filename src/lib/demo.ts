@@ -37,3 +37,15 @@ export function syncDemoFromUrl() {
     /* stockage indisponible : pas de mode démo */
   }
 }
+
+/** Active le mode démo sur cet appareil (compte de démonstration reconnu). */
+export function enableDemo() {
+  try {
+    if (localStorage.getItem(KEY) === "1") return;
+    localStorage.setItem(KEY, "1");
+    document.documentElement.classList.add("demo");
+    window.dispatchEvent(new Event("te-demo"));
+  } catch {
+    /* stockage indisponible */
+  }
+}

@@ -15,7 +15,7 @@ function withTimeout(p: Promise<unknown> | undefined, ms = 2500) {
 function clearLocalSession() {
   try {
     for (const k of Object.keys(localStorage)) {
-      if (k === "walletName" || k.startsWith("privy:") || k.startsWith("privy-")) localStorage.removeItem(k);
+      if (k === "walletName" || k === "te_demo" || k.startsWith("privy:") || k.startsWith("privy-")) localStorage.removeItem(k);
     }
     for (const k of Object.keys(sessionStorage)) if (k.startsWith("privy")) sessionStorage.removeItem(k);
   } catch {
