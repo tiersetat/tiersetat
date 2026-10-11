@@ -261,9 +261,9 @@
 
 /* Verre dépoli façon iOS (barre du bas uniquement : un seul flou, léger pour le téléphone) */
 .ios-glass {
-  background: rgb(20 22 52 / 0.42);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  backdrop-filter: blur(22px) saturate(180%);
+  background: rgb(20 22 52 / 0.2);
+  -webkit-backdrop-filter: blur(18px) saturate(190%);
+  backdrop-filter: blur(18px) saturate(190%);
   box-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.22) inset, 0 12px 40px -12px rgb(0 0 0 / 0.7);
 }
 /* Appui fluide façon iOS : léger enfoncement avec ressort */
