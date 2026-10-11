@@ -12,6 +12,7 @@ import { LiveTrades } from "@/components/social/LiveTrades";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { RegisterSW } from "@/components/app/RegisterSW";
 import { AuthGate } from "@/components/layout/AuthGate";
+import { Workspace } from "@/components/layout/Workspace";
 import { Starfield } from "@/components/layout/Starfield";
 import { DemoMode } from "@/components/app/DemoMode";
 import { InstallSheet } from "@/components/app/InstallSheet";
@@ -69,9 +70,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <AuthGate>
           <Header />
           <div className="flex flex-1 flex-col lg:pl-64">
-            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
+            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 xl:max-w-none xl:px-6">
               {/* Fondu enchaîné entre les pages (API View Transitions du navigateur) */}
-              <ViewTransition>{children}</ViewTransition>
+              <Workspace>
+                <ViewTransition>{children}</ViewTransition>
+              </Workspace>
             </main>
             <Footer />
           </div>

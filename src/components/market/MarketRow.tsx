@@ -44,7 +44,7 @@ export function MarketRow({ t, rank }: { t: MarketItem; rank?: number }) {
         <TokenLogo src={t.imageUrl} emoji={t.emoji} symbol={t.symbol} name={t.name} />
         <div className="min-w-0 flex-1">
           <p className="truncate font-bold">{t.symbol}</p>
-          <p className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+          <p className="flex min-w-0 items-center gap-1.5 overflow-hidden text-xs text-muted-foreground">
             {t.chain && CHAIN_DOT[t.chain] && (
               <span className="inline-flex shrink-0 items-center gap-1 font-bold">
                 <span className="size-1.5 rounded-full" style={{ background: CHAIN_DOT[t.chain].color }} />

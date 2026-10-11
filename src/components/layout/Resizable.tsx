@@ -69,7 +69,7 @@ export function ResizableColumns({ left, children }: { left: ReactNode; children
     cur.current = w;
   }, [w]);
   return (
-    <div className="lg:flex lg:items-start">
+    <div className="mx-auto max-w-[1500px] lg:flex lg:items-start">
       <aside className="hidden shrink-0 lg:sticky lg:top-6 lg:block" style={{ width: w }}>
         {left}
       </aside>

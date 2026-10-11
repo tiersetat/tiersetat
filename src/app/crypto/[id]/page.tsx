@@ -84,7 +84,7 @@ export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) 
     ["Record historique", usd(m.ath.usd)],
   ];
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+    <div className="grid gap-6 lg:grid-cols-[1fr_22rem] xl:grid-cols-1 min-[1800px]:grid-cols-[1fr_22rem]">
       <div className="min-w-0 space-y-5">
         <header className="flex items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element -- logo CoinGecko */}
@@ -114,7 +114,7 @@ export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) 
       </div>
       <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
         <BuyPanel symbol={coin.symbol.toUpperCase()} />
-        <div className="space-y-2">
+        <div className="space-y-2 xl:hidden">
           <h2 className="px-1 text-lg font-extrabold">Ce que le monde achète</h2>
           <LiveActivity limit={6} />
         </div>
