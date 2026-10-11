@@ -10,7 +10,7 @@ const securityHeaders = [
 ];
 
 /** Version 2 : l'appli se concentre sur le launchpad et le trading. Les anciennes pages renvoient vers l'essentiel. */
-const RETIRED = ["/semaine", "/clans", "/cahiers", "/dette", "/assemblee", "/vision", "/manifeste", "/radar"];
+const RETIRED = ["/clans", "/cahiers", "/dette", "/assemblee", "/vision", "/manifeste", "/radar"];
 
 const nextConfig: NextConfig = {
   async redirects() {

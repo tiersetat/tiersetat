@@ -6,7 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 const ITEMS = [
   { href: "/classements?tab=traders", label: "Traders", is: (p: string, t: string | null) => p === "/classements" && t === "traders" },
   { href: "/classements", label: "Créateurs", is: (p: string, t: string | null) => p === "/classements" && (t === null || t === "createurs") },
-  { href: "/semaine", label: "🏆 Mème de la semaine", is: (p: string) => p.startsWith("/semaine") },
+  { href: "/semaine", label: "Mème de la semaine", is: (p: string) => p.startsWith("/semaine") },
   { href: "/clans", label: "Clans", is: (p: string, t: string | null) => p.startsWith("/clans") || (p === "/classements" && t === "clans") },
   { href: "/cahiers", label: "Points", is: (p: string) => p.startsWith("/cahiers") },
 ];

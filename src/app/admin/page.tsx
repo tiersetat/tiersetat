@@ -43,7 +43,7 @@ export default async function AdminPage() {
   const lastWeek = await getWeek(1).catch(() => null);
   // Annonce sans emoji, factuelle, < 280 caractères (le lien compte pour 23)
   const weeklyPost = lastWeek?.winner
-    ? `Le Mème de la semaine sur Tiers-État : ${lastWeek.winner.name} ($${lastWeek.winner.ticker}).\n\n${lastWeek.winner.traders} traders, ${lastWeek.winner.volumeSol.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} SOL échangés par la communauté.\n\nUne nouvelle semaine commence.\ntiersetat.vercel.app/semaine`
+    ? `Le Mème de la semaine sur Tiers-État : ${lastWeek.winner.name} ($${lastWeek.winner.ticker}).\n\n${lastWeek.winner.holders} détenteurs, ${lastWeek.winner.marketCapSol.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} SOL de capitalisation.\n\nUne nouvelle semaine commence.\ntiersetat.vercel.app/semaine`
     : null;
   const [{ data: reports }, { data: hidden }, { data: words }, { data: allTokens }] = await Promise.all([
     db

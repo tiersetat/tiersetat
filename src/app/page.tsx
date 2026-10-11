@@ -13,6 +13,7 @@ import { CATS, parseKey, TABS } from "@/lib/market-tabs";
 import { NewTokensLive } from "@/components/market/NewTokensLive";
 import type { Category } from "@/lib/hyperliquid";
 import { HomeBuzz } from "@/components/buzz/HomeBuzz";
+import { HomeWeekly } from "@/components/weekly/HomeWeekly";
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;
@@ -58,6 +59,11 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           </div>
         </section>
       </GuestOnly>
+
+      {/* La Une du concours : le Mème de la semaine (plus grosse capitalisation) */}
+      <Suspense fallback={<div className="h-28 animate-pulse rounded-3xl bg-surface" />}>
+        <HomeWeekly />
+      </Suspense>
 
       {/* La petite bande : les plus gros gains du moment */}
       <Suspense fallback={null}>

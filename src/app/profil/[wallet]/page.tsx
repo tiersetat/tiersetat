@@ -16,6 +16,7 @@ import { getCreatorTrust } from "@/lib/creator-trust-data";
 import { getFounders } from "@/lib/founders-data";
 import { FounderBadge } from "@/components/trust/FounderBadge";
 import { solanaAddress } from "@/lib/validators";
+import { winsByCreator } from "@/lib/weekly-data";
 
 type Profile = { wallet: string; pseudo: string | null; avatar_url: string | null; bio: string | null; clan?: string | null };
 type CreatedToken = { mint: string; pool: string; name: string; ticker: string; image_url: string; market_cap_sol: number; curve_progress: number };
@@ -56,7 +57,8 @@ export default async function ProfilePage({ params }: PageProps<"/profil/[wallet
   ]);
 
   const profile: Profile = profileRes.data ?? { wallet, pseudo: null, avatar_url: null, bio: null };
-  const [trust, founders] = await Promise.all([getCreatorTrust(wallet).catch(() => null), getFounders().catch(() => null)]);
+  const [trust, founders, wins] = await Promise.all([getCreatorTrust(wallet).catch(() => null), getFounders().catch(() => null), winsByCreator().catch(() => new Map<string, number>())]);
+  const weeklyWins = wins.get(wallet) ?? 0;
   const founderN = founders?.byWallet.get(wallet) ?? null;
   const tokens = (tokensRes.data ?? []) as CreatedToken[];
   const trades = (tradesRes.data ?? []) as unknown as TradeWithToken[];
@@ -91,6 +93,14 @@ export default async function ProfilePage({ params }: PageProps<"/profil/[wallet
             {wallet} ↗
           </a>
           {founderN && <FounderBadge n={founderN} />}
+          {weeklyWins > 0 && (
+            <Link href="/semaine" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-1 text-sm font-bold shadow-[-6px_4px_18px_-10px_rgb(127_155_255/0.9),6px_4px_18px_-10px_rgb(233_163_201/0.9)]">
+              <svg viewBox="0 0 24 24" className="size-4 text-pervenche" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4" />
+              </svg>
+              Mème de la semaine{weeklyWins > 1 ? ` ×${weeklyWins}` : ""}
+            </Link>
+          )}
           {profile.bio && <p className="max-w-2xl text-muted-foreground">{profile.bio}</p>}
           {trust && trust.niveau !== "nouveau" && (
             <div className="flex flex-wrap items-center gap-3 text-sm">
