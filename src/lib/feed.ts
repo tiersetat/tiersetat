@@ -7,7 +7,7 @@ import { aggregateTraders, TOTAL_SUPPLY } from "@/lib/traders";
 /** Fil social : les échanges et les thèses de la communauté, du plus récent au plus ancien. */
 
 export type FeedToken = { mint: string; name: string; ticker: string; image_url: string };
-export type FeedAuthor = { wallet: string; pseudo: string | null; avatar_url: string | null };
+export type FeedAuthor = { wallet: string; pseudo: string | null; avatar_url: string | null; clan?: string | null };
 
 export type FeedItem =
   | { kind: "trade"; id: string; at: string; author: FeedAuthor; token: FeedToken; side: "buy" | "sell"; usd: number | null; mcapUsd: number | null }
@@ -34,7 +34,7 @@ type TradeRow = {
   price_sol: number;
   block_time: string;
   tokens: (FeedToken & { market_cap_sol: number; hidden: boolean }) | null;
-  profiles: { pseudo: string | null; avatar_url: string | null } | null;
+  profiles: { pseudo: string | null; avatar_url: string | null; clan?: string | null } | null;
 };
 type CommentRow = {
   id: number;
@@ -54,10 +54,11 @@ export function solUsd(): Promise<number | null> {
   });
 }
 
-const author = (wallet: string, p: { pseudo: string | null; avatar_url: string | null } | null): FeedAuthor => ({
+const author = (wallet: string, p: { pseudo: string | null; avatar_url: string | null; clan?: string | null } | null): FeedAuthor => ({
   wallet,
   pseudo: p?.pseudo ?? null,
   avatar_url: p?.avatar_url ?? null,
+  clan: p?.clan ?? null,
 });
 const token = (t: FeedToken): FeedToken => ({ mint: t.mint, name: t.name, ticker: t.ticker, image_url: t.image_url });
 
@@ -70,7 +71,7 @@ export async function getFeed(filter: FeedFilter): Promise<FeedItem[]> {
   const wantTheses = filter.type !== "echanges";
   const tradesQ = db
     .from("trades")
-    .select("signature, mint, trader_wallet, side, sol_amount, token_amount, price_sol, block_time, tokens(mint, name, ticker, image_url, market_cap_sol, hidden), profiles(pseudo, avatar_url)")
+    .select("signature, mint, trader_wallet, side, sol_amount, token_amount, price_sol, block_time, tokens(mint, name, ticker, image_url, market_cap_sol, hidden), profiles(pseudo, avatar_url, clan)")
     .order("block_time", { ascending: false })
     .limit(150);
   const commentsQ = db

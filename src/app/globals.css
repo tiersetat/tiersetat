@@ -395,3 +395,23 @@ html,
 body {
   overflow-x: clip;
 }
+
+/* « La France qui trade » : villes qui scintillent et ondes des vrais échanges sur la carte */
+.city-glow {
+  background: #dfe7ff;
+  box-shadow: 0 0 10px 3px rgb(157 176 255 / 0.75), 0 0 28px 8px rgb(127 155 255 / 0.35);
+  animation: city-glow 6s ease-in-out infinite;
+}
+@keyframes city-glow {
+  0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) scale(0.7); }
+  50% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.25); }
+}
+.map-pulse { animation: map-pulse 3s cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
+.map-pulse-buy { background: rgb(157 176 255 / 0.9); box-shadow: 0 0 0 2px rgb(157 176 255 / 0.9), 0 0 24px 6px rgb(127 155 255 / 0.8); }
+.map-pulse-sell { background: rgb(233 163 201 / 0.9); box-shadow: 0 0 0 2px rgb(233 163 201 / 0.9), 0 0 24px 6px rgb(233 163 201 / 0.7); }
+@keyframes map-pulse {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(7); }
+}
+@media (prefers-reduced-motion: reduce) { .city-glow, .map-pulse { animation: none; } }
