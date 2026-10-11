@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { formatEur } from "@/lib/eur";
 import { CLUSTER } from "@/lib/solana/config";
+import { useDemo } from "@/lib/demo";
 
 let shared: Promise<number | null> | null = null;
 let sharedAt = 0;
@@ -34,10 +35,11 @@ export function useSolEur(): number | null {
 /** Équivalent en euros d'un montant en SOL (mention « fictifs » sur le devnet). */
 export function Eur({ sol, className = "text-xs text-muted-foreground" }: { sol: number; className?: string }) {
   const solEur = useSolEur();
+  const demo = useDemo();
   if (solEur === null || !Number.isFinite(sol)) return null;
   return (
     <span className={className} title={CLUSTER === "devnet" ? "Au cours réel du SOL. Sur le devnet, les tokens n'ont aucune valeur." : "Au cours actuel du SOL"}>
-      {formatEur(sol, solEur, CLUSTER === "devnet")}
+      {formatEur(sol, solEur, CLUSTER === "devnet" && !demo)}
     </span>
   );
 }

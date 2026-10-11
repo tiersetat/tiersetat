@@ -187,7 +187,7 @@ export default async function VerifierPage() {
         </p>
       </section>
 
-      <p className="text-xs text-muted-foreground">
+      <p data-beta className="text-xs text-muted-foreground">
         Bêta sur le réseau de test de Solana (devnet) : les adresses et les montants concernent ce réseau. Les programmes de la courbe et du
         marché sont développés et opérés par Meteora.
       </p>

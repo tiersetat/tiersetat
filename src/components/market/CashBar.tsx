@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { getBalances, type Balances } from "@/lib/solana/cash";
 import { CLUSTER } from "@/lib/solana/config";
+import { DEMO_CASH_EUR, useDemo } from "@/lib/demo";
 
 /** Barre « liquidités » en haut de l'accueil : le cash disponible pour trader, et le bouton Déposer. */
 export function CashBar() {
@@ -31,15 +32,20 @@ export function CashBar() {
     };
   }, [connection, publicKey]);
 
+  const demo = useDemo();
   if (!publicKey) return null;
   const cash = b ? b.USDC + (usdEur ? b.EURC / usdEur : 0) : null;
   return (
     <div className="flex items-center justify-between gap-3">
       <div>
         <p className="font-[family-name:var(--font-display)] text-[2.6rem] leading-none font-extrabold tracking-tight">
-          {cash === null ? "…" : cash.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+          {demo
+            ? DEMO_CASH_EUR.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })
+            : cash === null
+              ? "…"
+              : cash.toLocaleString("en-US", { style: "currency", currency: "USD" })}
         </p>
-        <p className="mt-1.5 text-sm text-muted-foreground">liquidités{(CLUSTER as string) === "devnet" ? " · bêta, argent fictif" : ""}</p>
+        <p className="mt-1.5 text-sm text-muted-foreground">liquidités{(CLUSTER as string) === "devnet" && !demo ? " · bêta, argent fictif" : ""}</p>
       </div>
       <Link href="/portefeuille" className="btn-primary min-h-11 px-6">
         Déposer

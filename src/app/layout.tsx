@@ -13,6 +13,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { RegisterSW } from "@/components/app/RegisterSW";
 import { AuthGate } from "@/components/layout/AuthGate";
 import { Starfield } from "@/components/layout/Starfield";
+import { DemoMode } from "@/components/app/DemoMode";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         {/* Fond d'écran : ciel vivant d'étoiles bleu-blanc-rouge */}
         <Starfield />
+        <DemoMode />
         <WalletProviders>
           <InviteCapture />
           <RegisterSW />

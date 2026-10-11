@@ -57,7 +57,7 @@ export function MyAddress() {
       </div>
       <p className="text-sm text-muted-foreground">
         Solde : <span className="font-mono text-foreground">{balance === null ? "…" : `${balance.toLocaleString("fr-FR", { maximumFractionDigits: 4 })} SOL`}</span>
-        {CLUSTER === "devnet" && " (fictifs)"}
+        {CLUSTER === "devnet" && <span data-beta> (fictifs)</span>}
       </p>
     </div>
   );

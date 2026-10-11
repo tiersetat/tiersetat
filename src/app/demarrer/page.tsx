@@ -26,7 +26,7 @@ export default function DemarrerPage() {
         <p className="text-lg text-muted-foreground">Trois minutes pour créer ton compte, obtenir des SOL et lancer ton premier token.</p>
         <InstallApp />
         {devnet && (
-          <p className="rounded-xl border border-pervenche/30 bg-pervenche/10 p-4 text-sm">
+          <p data-beta className="rounded-xl border border-pervenche/30 bg-pervenche/10 p-4 text-sm">
             Tiers-État tourne sur le <strong>réseau de test de Solana (devnet)</strong> : tout fonctionne comme en vrai, mais les SOL et les tokens
             sont <strong>fictifs</strong> et gratuits. Tu peux tout essayer sans risquer un centime.
           </p>

@@ -44,7 +44,7 @@ export function BuyPanel({ symbol }: { symbol: string }) {
       <button type="button" disabled className={`${side === "buy" ? "btn-buy" : "btn-sell"} w-full`}>
         {side === "buy" ? `Acheter ${symbol}` : `Vendre ${symbol}`}
       </button>
-      <p className="text-center text-xs text-muted-foreground">
+      <p data-beta className="text-center text-xs text-muted-foreground">
         {DEVNET
           ? "Pendant la bêta, seuls les mèmes Tiers-État s'échangent (argent fictif). L'achat de tous les tokens Solana avec ton cash arrive au lancement réel."
           : "Bientôt disponible."}

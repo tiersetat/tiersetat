@@ -13,7 +13,7 @@ export function Footer() {
           <InstallApp />
           <p className="max-w-xl text-xs text-muted-foreground/70">
             Les tokens créés sur Tiers-État sont des memecoins spéculatifs, pas une monnaie ayant cours légal. Vous pouvez tout perdre. Pas un conseil financier.
-            {CLUSTER === "devnet" && " Réseau de test Solana (devnet) : les tokens n'ont aucune valeur réelle."}
+            {CLUSTER === "devnet" && <span data-beta> Réseau de test Solana (devnet) : les tokens n&apos;ont aucune valeur réelle.</span>}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted-foreground sm:grid-cols-4 sm:self-end">

@@ -18,7 +18,7 @@ export default async function RejoindrePage() {
       <p className="font-mono text-xs uppercase tracking-[0.3em] text-pervenche">Lancement officiel</p>
       <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Le peuple frappe sa monnaie. Bientôt pour de vrai.</h1>
       <p className="text-muted-foreground">
-        Laisse ton e-mail : le jour du lancement, on te prévient de l&apos;heure exacte. En attendant, la bêta est ouverte et gratuite.
+        Laisse ton e-mail : le jour du lancement, on te prévient de l&apos;heure exacte. <span data-beta>En attendant, la bêta est ouverte et gratuite.</span>
       </p>
       <JoinWaitlist initialCount={count} source="rejoindre" />
     </div>

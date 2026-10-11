@@ -9,6 +9,7 @@ import { buildSendTransaction, cashTotal, CASH, getBalances, parseRecipient, SOL
 import { SlideToConfirm } from "@/components/token/SlideToConfirm";
 import { LoginCta, PRIVY_APP_ID } from "@/components/providers/PrivyBridge";
 import { PrivySecurity } from "./PrivySecurity";
+import { DEMO_CASH_EUR, useDemo } from "@/lib/demo";
 
 type Display = "EUR" | "USD";
 type Sheet = null | "recevoir" | "envoyer" | "securite";
@@ -35,6 +36,7 @@ export function CashWallet() {
   const [usdEur, setUsdEur] = useState<number | null>(null);
   const [display, setDisplay] = useState<Display>("EUR");
   const [sheet, setSheet] = useState<Sheet>(null);
+  const demo = useDemo();
 
   useEffect(() => {
     Promise.resolve().then(() => setDisplay(readDisplay()));
@@ -85,7 +87,9 @@ export function CashWallet() {
     );
   }
 
-  const total = balances ? cashTotal(balances, display, usdEur) : null;
+  // Mode démo (vidéos) : solde de démonstration en euros
+  const shown: Balances | null = demo ? { SOL: balances?.SOL ?? 0, USDC: 0, EURC: DEMO_CASH_EUR } : balances;
+  const total = shown ? cashTotal(shown, display, usdEur) : null;
   const isPrivy = Boolean(PRIVY_APP_ID) && wallet?.adapter.name === "Privy";
 
   return (
@@ -95,9 +99,9 @@ export function CashWallet() {
         <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[radial-gradient(closest-side,rgb(255_210_63/0.45),transparent)]" />
         <div className="relative flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-white/80">Cash{DEVNET ? " · bêta, argent fictif" : ""}</p>
+            <p className="text-sm font-semibold text-white/80">Cash{DEVNET && !demo ? " · bêta, argent fictif" : ""}</p>
             <p className="mt-1 font-[family-name:var(--font-display)] text-5xl font-extrabold tracking-tight sm:text-6xl">
-              {balances === null ? "…" : total === null ? "—" : money(total, display)}
+              {shown === null ? "…" : total === null ? "—" : money(total, display)}
             </p>
           </div>
           <div className="flex rounded-full bg-black/20 p-1 text-sm font-bold" role="group" aria-label="Monnaie d'affichage">
@@ -161,7 +165,7 @@ export function CashWallet() {
                 <p className="truncate text-xs text-muted-foreground">{a.sub}</p>
               </div>
             </div>
-            <p className="shrink-0 font-mono font-bold">{balances ? `${qty(balances[a.s], a.s === "SOL" ? 4 : 2)} ${a.s}` : "…"}</p>
+            <p className="shrink-0 font-mono font-bold">{shown ? `${qty(shown[a.s], a.s === "SOL" ? 4 : 2)} ${a.s}` : "…"}</p>
           </li>
         ))}
       </ul>
@@ -184,6 +188,7 @@ export function CashWallet() {
 }
 
 function Receive({ address }: { address: string }) {
+  const demo = useDemo();
   const [qr, setQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   useEffect(() => {
@@ -208,7 +213,7 @@ function Receive({ address }: { address: string }) {
         <h3 className="text-lg font-extrabold">Recevoir</h3>
         <p className="text-sm text-muted-foreground">
           Envoie sur cette adresse des SOL, des USDC ou des EURC, <strong className="text-foreground">uniquement sur le réseau Solana</strong>
-          {DEVNET ? " (réseau de test pendant la bêta)" : ""}.
+          {DEVNET && !demo ? " (réseau de test pendant la bêta)" : ""}.
         </p>
         <p className="select-all break-all rounded-xl bg-white/[0.06] p-3 font-mono text-xs">{address}</p>
         <button type="button" onClick={copy} className="btn-ghost min-h-10 px-4 py-2 text-sm">

@@ -259,6 +259,9 @@
   background: rgb(255 255 255 / 0.06) !important;
 }
 
+/* Mode démo (vidéos) : les mentions de la bêta disparaissent */
+html.demo [data-beta] { display: none !important; }
+
 /* Ciel vivant : dérive très lente de la nébuleuse, scintillement des étoiles */
 @keyframes sky-drift {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
