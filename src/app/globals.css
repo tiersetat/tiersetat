@@ -297,7 +297,11 @@ html.demo [data-beta] { display: none !important; }
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
   50% { transform: translate3d(-2.5%, 1.5%, 0) scale(1.04); }
 }
-.sky-drift { animation: sky-drift 90s ease-in-out infinite; will-change: transform; }
+.sky-drift { animation: none; }
+/* La dérive du grand fond ne tourne que sur ordinateur : sur téléphone, elle coûterait en fluidité */
+@media (min-width: 1024px) and (hover: hover) {
+  .sky-drift { animation: sky-drift 90s ease-in-out infinite; will-change: transform; }
+}
 @keyframes twinkle {
   0%, 100% { opacity: 0.15; transform: scale(0.7); }
   50% { opacity: 1; transform: scale(1.2); }

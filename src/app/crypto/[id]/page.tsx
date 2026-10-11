@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { memo } from "@/lib/memo";
 import { pct, usd } from "@/lib/market-format";
 import { BuyPanel } from "@/components/market/BuyPanel";
-import { LiveChart } from "@/components/market/LiveChart";
+import { ChartPanel } from "@/components/market/ChartPanel";
+import { tvForCrypto } from "@/lib/tradingview";
 
 /** Cryptos qui ont un marché sur Hyperliquid : on peut alors afficher leurs bougies en direct. */
 function hyperliquidCoins(): Promise<Set<string>> {
@@ -99,7 +100,7 @@ export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) 
           <p className="font-[family-name:var(--font-display)] text-5xl font-extrabold">{usd(m.current_price.usd)}</p>
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(m.price_change_percentage_24h)} 24 h</p>
         </div>
-        <LiveChart source={hlCoin ? { kind: "hyperliquid", coin: hlCoin } : { kind: "coingecko", id: coin.id }} />
+        <ChartPanel source={hlCoin ? { kind: "hyperliquid", coin: hlCoin } : { kind: "coingecko", id: coin.id }} tvSymbol={tvForCrypto(coin.symbol)} />
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {stats.map(([k, v]) => (
             <div key={k} className="rounded-2xl bg-surface px-4 py-3 ring-1 ring-white/[0.08]">

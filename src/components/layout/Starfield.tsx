@@ -12,7 +12,7 @@ const TWINKLES = Array.from({ length: 14 }, (_, i) => {
 export function Starfield({ dim = true }: { dim?: boolean }) {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-nuit">
-      <div className="sky-drift absolute -inset-[6%] bg-[url(/images/etoiles-tricolores-mobile.webp)] bg-cover bg-center sm:bg-[url(/images/etoiles-tricolores.webp)]" />
+      <div className="sky-drift absolute inset-0 lg:-inset-[6%] bg-[url(/images/etoiles-tricolores-mobile.webp)] bg-cover bg-center sm:bg-[url(/images/etoiles-tricolores.webp)]" />
       {TWINKLES.map((t, i) => (
         <span
           key={i}

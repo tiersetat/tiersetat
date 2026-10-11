@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { searchRadar, tokenOnChain } from "@/lib/radar";
 import { CHAINS, isChain } from "@/lib/market-feeds";
-import { LiveChart } from "@/components/market/LiveChart";
+import { ChartPanel } from "@/components/market/ChartPanel";
 import { geckoNetwork } from "@/lib/chart-feeds";
 import { age, alertes, isSolanaAddress } from "@/lib/radar-utils";
 import { pct, usd } from "@/lib/market-format";
@@ -93,7 +93,7 @@ export default async function MarchePage({ params, searchParams }: PageProps<"/m
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(t.change.h24)} 24 h</p>
         </div>
 
-        {pair && <LiveChart source={{ kind: "gecko", network: geckoNetwork(chain), pool: pair }} />}
+        {pair && <ChartPanel source={{ kind: "gecko", network: geckoNetwork(chain), pool: pair }} />}
 
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {stats.map(([k, v]) => (
