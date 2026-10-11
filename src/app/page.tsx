@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { CashBar } from "@/components/market/CashBar";
+import { HomeSocial } from "@/components/social/HomeSocial";
 import { MarketRow, type MarketItem } from "@/components/market/MarketRow";
 import { WatchlistView } from "@/components/market/WatchlistView";
 import { GuestOnly } from "@/components/layout/GuestOnly";
@@ -82,7 +83,14 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const memeTab = key === "tiers-etat";
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)] xl:grid-cols-[22rem_minmax(0,1fr)]">
+      {/* Widget Social, à gauche (ordinateur) */}
+      <aside className="hidden lg:block">
+        <div className="sticky top-6">
+          <HomeSocial placement="gauche" />
+        </div>
+      </aside>
+      <div className="min-w-0 space-y-6">
       {/* Solde et dépôt (connecté) ; bienvenue (visiteur) */}
       <div className="empty:hidden">
         <CashBar />
@@ -119,6 +127,11 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       <Suspense fallback={<div className="h-[26rem] animate-pulse rounded-3xl bg-surface" />}>
         <HomeBuzz />
       </Suspense>
+
+      {/* Widget Social, compact (téléphone et tablette) */}
+      <section className="lg:hidden">
+        <HomeSocial placement="liste" />
+      </section>
 
       {/* La liste des tokens */}
       <section id="tokens" className="scroll-mt-20 space-y-3">
@@ -206,6 +219,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         )}
         {key === "cryptos" && <p className="px-1 text-xs text-muted-foreground">Les plus grandes cryptos du monde (CoinGecko), hors stablecoins. Pour information.</p>}
       </section>
+      </div>
     </div>
   );
 }
