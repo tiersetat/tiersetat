@@ -17,24 +17,13 @@ import {
   type UTCTimestamp,
 } from "lightweight-charts";
 
-/** Durées de bougie proposées, et la période chargée pour chacune. */
-const INTERVALS = [
-  { key: "1m", label: "1m", lookback: 6 * 3600_000 },
-  { key: "5m", label: "5m", lookback: 2 * 86_400_000 },
-  { key: "15m", label: "15m", lookback: 5 * 86_400_000 },
-  { key: "1h", label: "1h", lookback: 20 * 86_400_000 },
-  { key: "4h", label: "4h", lookback: 80 * 86_400_000 },
-  { key: "1d", label: "1j", lookback: 400 * 86_400_000 },
-] as const;
-type Interval = (typeof INTERVALS)[number]["key"];
+import { intervalsOf, LABELS, loadBars, pollMs, subscribeBars, type Bar, type ChartSource, type Interval } from "@/lib/chart-feeds";
+
 type Kind = "bougies" | "ligne" | "aire";
 type Tool = null | "horizontale" | "tendance";
-type Raw = { t: number; o: string; h: string; l: string; c: string; v: string };
-type Bar = { time: UTCTimestamp; open: number; high: number; low: number; close: number; volume: number };
 
 const UP = "#3dffb0";
 const DOWN = "#ff3d68";
-const toBar = (c: Raw): Bar => ({ time: Math.floor(c.t / 1000) as UTCTimestamp, open: +c.o, high: +c.h, low: +c.l, close: +c.c, volume: +c.v });
 
 /** Indicateurs (calculs purs) */
 function sma(bars: Bar[], n: number) {
@@ -73,10 +62,11 @@ const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: n 
 /**
  * Graphique en temps réel avec ses outils : type (bougies, ligne, aire), indicateurs (volume, moyennes mobiles,
  * Bollinger), dessin (ligne horizontale, ligne de tendance), plein écran et capture.
- * `coin` : identifiant Hyperliquid, ex. « xyz:TSLA » (actions) ou « BTC » (cryptos).
+ * `source` : Hyperliquid (actions, cryptos), GeckoTerminal (memecoins), CoinGecko (autres cryptos) ou nos échanges (mèmes Tiers-État).
  */
-export function LiveChart({ coin }: { coin: string }) {
-  const [interval, setIntervalKey] = useState<Interval>("15m");
+export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartSource; unit?: string; height?: number }) {
+  const intervals = intervalsOf(source);
+  const [interval, setIntervalKey] = useState<Interval>(intervals.includes("15m") ? "15m" : intervals[0]);
   const [kind, setKind] = useState<Kind>("bougies");
   const [indics, setIndics] = useState<Set<Indic>>(new Set(["volume"]));
   const [tool, setTool] = useState<Tool>(null);
@@ -199,53 +189,54 @@ export function LiveChart({ coin }: { coin: string }) {
     render();
   }, [render]);
 
-  // Historique puis temps réel
+  // Historique, puis temps réel (flux en direct ou actualisation régulière)
+  const sourceKey = source.kind === "local" ? `local:${source.trades.length}:${source.trades[source.trades.length - 1]?.signature ?? ""}` : JSON.stringify(source);
+  const kindRef = useRef(kind);
+  const indicsRef = useRef(indics);
+  useEffect(() => {
+    kindRef.current = kind;
+    indicsRef.current = indics;
+  }, [kind, indics]);
   useEffect(() => {
     let stop = false;
-    let ws: WebSocket | null = null;
-    const lookback = INTERVALS.find((i) => i.key === interval)!.lookback;
+    let first = true;
+    const apply = (b: Bar) => {
+      const list = bars.current;
+      if (list.length && list[list.length - 1].time === b.time) list[list.length - 1] = b;
+      else if (!list.length || b.time > list[list.length - 1].time) list.push(b);
+      else return;
+      if (!main.current) return;
+      if (kindRef.current === "bougies") (main.current as ISeriesApi<"Candlestick">).update(b);
+      else (main.current as ISeriesApi<"Line">).update({ time: b.time, value: b.close });
+      const vol = indicsRef.current.has("volume") ? (extras.current[0] as ISeriesApi<"Histogram"> | undefined) : undefined;
+      vol?.update({ time: b.time, value: b.volume, color: b.close >= b.open ? "rgba(61,255,176,0.35)" : "rgba(255,61,104,0.35)" });
+      setLegend(b);
+    };
+    const load = () =>
+      loadBars(source, interval)
+        .then((list) => {
+          if (stop) return;
+          bars.current = list;
+          render();
+          if (first) chartRef.current?.timeScale().fitContent();
+          first = false;
+          setLegend(list[list.length - 1] ?? null);
+          if (source.kind !== "hyperliquid") setLive(list.length > 0);
+        })
+        .catch(() => undefined);
     Promise.resolve().then(() => !stop && setLive(false));
-    fetch("https://api.hyperliquid.xyz/info", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ type: "candleSnapshot", req: { coin, interval, startTime: Date.now() - lookback } }),
-    })
-      .then((r) => r.json())
-      .then((list: Raw[]) => {
-        if (stop) return;
-        bars.current = list.map(toBar);
-        render();
-        chartRef.current?.timeScale().fitContent();
-        setLegend(bars.current[bars.current.length - 1] ?? null);
-        ws = new WebSocket("wss://api.hyperliquid.xyz/ws");
-        ws.onopen = () => {
-          ws?.send(JSON.stringify({ method: "subscribe", subscription: { type: "candle", coin, interval } }));
-          setLive(true);
-        };
-        ws.onmessage = (e) => {
-          const m = JSON.parse(e.data as string) as { channel?: string; data?: Raw };
-          if (m.channel !== "candle" || !m.data || !main.current) return;
-          const bar = toBar(m.data);
-          const list = bars.current;
-          if (list.length && list[list.length - 1].time === bar.time) list[list.length - 1] = bar;
-          else if (!list.length || bar.time > list[list.length - 1].time) list.push(bar);
-          else return;
-          if (kind === "bougies") (main.current as ISeriesApi<"Candlestick">).update(bar);
-          else (main.current as ISeriesApi<"Line">).update({ time: bar.time, value: bar.close });
-          const vol = indics.has("volume") ? (extras.current[0] as ISeriesApi<"Histogram"> | undefined) : undefined;
-          vol?.update({ time: bar.time, value: bar.volume, color: bar.close >= bar.open ? "rgba(61,255,176,0.35)" : "rgba(255,61,104,0.35)" });
-          setLegend(bar);
-        };
-        ws.onclose = () => !stop && setLive(false);
-      })
-      .catch(() => undefined);
+    void load();
+    const unsub = subscribeBars(source, interval, apply, (on) => !stop && setLive(on));
+    const every = pollMs(source);
+    const timer = every ? setInterval(load, every) : null;
     return () => {
       stop = true;
-      ws?.close();
+      unsub();
+      if (timer) clearInterval(timer);
     };
-    // le rendu suit kind/indics via render ; ici on recharge seulement si la source change
+    // la source est suivie par sa clé (sourceKey) ; le rendu suit kind/indics via render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coin, interval]);
+  }, [sourceKey, interval]);
 
   const clearDrawings = () => {
     const chart = chartRef.current;
@@ -277,7 +268,7 @@ export function LiveChart({ coin }: { coin: string }) {
     if (!canvas) return;
     const a = document.createElement("a");
     a.href = canvas.toDataURL("image/png");
-    a.download = `tiers-etat-${coin.replace(":", "-")}.png`;
+    a.download = `tiers-etat-graphique.png`;
     a.click();
   };
 
@@ -288,9 +279,9 @@ export function LiveChart({ coin }: { coin: string }) {
     <div ref={wrap} className={`surface flex flex-col p-3 sm:p-4 ${full ? "fixed inset-0 z-[70] rounded-none bg-nuit" : ""}`}>
       {/* Barre d'outils */}
       <div className="no-scrollbar -mx-1 flex items-center gap-1 overflow-x-auto px-1 pb-2">
-        {INTERVALS.map((i) => (
-          <button key={i.key} type="button" onClick={() => setIntervalKey(i.key)} className={btn(interval === i.key)}>
-            {i.label}
+        {intervals.map((i) => (
+          <button key={i} type="button" onClick={() => setIntervalKey(i)} className={btn(interval === i)}>
+            {LABELS[i]}
           </button>
         ))}
         <span className="mx-1 h-4 w-px shrink-0 bg-white/15" />
@@ -336,17 +327,17 @@ export function LiveChart({ coin }: { coin: string }) {
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-1 pb-2 font-mono text-[11px]">
         <span className="flex items-center gap-1.5 font-bold text-muted-foreground">
           <span className={`size-2 rounded-full ${live ? "animate-pulse bg-achat" : "bg-muted-foreground"}`} />
-          {live ? "En direct" : "Connexion…"}
+          {live ? (source.kind === "hyperliquid" ? "En direct" : "À jour") : "Connexion…"}
         </span>
         {legend && (
           <span className={up ? "text-achat" : "text-vente"}>
-            O {fmt(legend.open)} · H {fmt(legend.high)} · B {fmt(legend.low)} · C {fmt(legend.close)}
+            O {fmt(legend.open)} · H {fmt(legend.high)} · B {fmt(legend.low)} · C {fmt(legend.close)} {unit}
           </span>
         )}
         {tool && <span className="font-sans font-bold text-soleil">{tool === "horizontale" ? "Touche le graphique pour placer la ligne" : step === 2 ? "Touche le 2e point" : "Touche le 1er point"}</span>}
       </div>
 
-      <div ref={box} className={`w-full ${full ? "flex-1" : "h-[360px]"} ${tool ? "cursor-crosshair" : ""}`} />
+      <div ref={box} style={full ? undefined : { height }} className={`w-full ${full ? "flex-1" : ""} ${tool ? "cursor-crosshair" : ""}`} />
     </div>
   );
 }

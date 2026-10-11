@@ -12,7 +12,7 @@ import { MigrationPanel } from "./MigrationPanel";
 import { TradePanel } from "./TradePanel";
 
 // Le graphique manipule le DOM : rendu côté navigateur uniquement.
-const PriceChart = dynamic(() => import("./PriceChart").then((m) => m.PriceChart), {
+const LiveChart = dynamic(() => import("@/components/market/LiveChart").then((m) => m.LiveChart), {
   ssr: false,
   loading: () => <div className="surface h-[380px]" />,
 });
@@ -97,7 +97,7 @@ export function TokenLive(props: {
           ))}
         </dl>
 
-        <PriceChart trades={trades} createdAt={createdAt} />
+        <LiveChart source={{ kind: "local", trades, createdAt }} unit="SOL" height={320} />
 
         <section className="surface space-y-3 p-5">
           <div className="flex items-baseline justify-between">

@@ -53,31 +53,6 @@ export async function generateMetadata({ params }: PageProps<"/crypto/[id]">): P
   return { title: c ? `${c.symbol.toUpperCase()} — ${usd(c.market_data.current_price.usd)} — Tiers-État` : "Crypto — Tiers-État" };
 }
 
-/** Courbe des 7 derniers jours, dessinée en SVG (aucune bibliothèque). */
-function Sparkline({ prices, up }: { prices: number[]; up: boolean }) {
-  if (prices.length < 2) return null;
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const W = 600;
-  const H = 220;
-  const pts = prices.map((p, i) => [(i / (prices.length - 1)) * W, H - 10 - ((p - min) / (max - min || 1)) * (H - 20)] as const);
-  const line = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
-  const color = up ? "#3dffb0" : "#ff3d68";
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-56 w-full" preserveAspectRatio="none" role="img" aria-label="Évolution du cours sur 7 jours">
-      <defs>
-        <linearGradient id="spark" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.35" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={`${line} L${W} ${H} L0 ${H} Z`} fill="url(#spark)" />
-      <path d={line} fill="none" stroke={color} strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
-      <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r="5" fill={color} />
-    </svg>
-  );
-}
-
 export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) {
   const { id } = await params;
   let coin: Coin | null = null;
@@ -124,14 +99,7 @@ export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) 
           <p className="font-[family-name:var(--font-display)] text-5xl font-extrabold">{usd(m.current_price.usd)}</p>
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(m.price_change_percentage_24h)} 24 h</p>
         </div>
-        {hlCoin ? (
-          <LiveChart coin={hlCoin} />
-        ) : (
-          <div className="surface p-3">
-            <Sparkline prices={m.sparkline_7d?.price ?? []} up={(m.price_change_percentage_7d ?? 0) >= 0} />
-            <p className="px-2 text-xs text-muted-foreground">7 derniers jours</p>
-          </div>
-        )}
+        <LiveChart source={hlCoin ? { kind: "hyperliquid", coin: hlCoin } : { kind: "coingecko", id: coin.id }} />
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {stats.map(([k, v]) => (
             <div key={k} className="rounded-2xl bg-surface px-4 py-3 ring-1 ring-white/[0.08]">

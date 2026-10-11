@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { searchRadar, tokenOnChain } from "@/lib/radar";
 import { CHAINS, isChain } from "@/lib/market-feeds";
+import { LiveChart } from "@/components/market/LiveChart";
+import { geckoNetwork } from "@/lib/chart-feeds";
 import { age, alertes, isSolanaAddress } from "@/lib/radar-utils";
 import { pct, usd } from "@/lib/market-format";
 import { supabasePublic } from "@/lib/supabase/public";
@@ -91,16 +93,7 @@ export default async function MarchePage({ params, searchParams }: PageProps<"/m
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(t.change.h24)} 24 h</p>
         </div>
 
-        {pair && (
-          <div className="surface overflow-hidden p-0">
-            <iframe
-              title={`Graphique ${t.symbol}`}
-              src={`https://dexscreener.com/${chain}/${pair}?embed=1&loadChartSettings=0&trades=0&info=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=marketCap&interval=15`}
-              className="h-[26rem] w-full border-0 sm:h-[30rem]"
-              loading="lazy"
-            />
-          </div>
-        )}
+        {pair && <LiveChart source={{ kind: "gecko", network: geckoNetwork(chain), pool: pair }} />}
 
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {stats.map(([k, v]) => (
