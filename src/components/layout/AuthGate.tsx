@@ -58,20 +58,18 @@ function WalletGate({ children, privy }: { children: ReactNode; privy: { ready: 
   return (
     <div className="fixed inset-0 z-[60] overflow-y-auto">
       <Starfield dim={false} />
-      <main className="relative mx-auto flex min-h-full max-w-md flex-col items-center justify-center gap-7 px-6 py-10 text-center">
+      <main className="relative mx-auto flex min-h-full max-w-md flex-col items-center justify-start gap-6 px-6 pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-10 text-center">
         {/* Le Tiers-État de 1789, perdu dans l'espace */}
         {/* eslint-disable-next-line @next/next/no-img-element -- image locale, animée en CSS */}
         <img
           src="/images/tiers-etat-1789.webp"
           alt="Le Tiers-État portant le clergé et la noblesse, caricature de 1789, flottant dans l'espace"
-          className="adrift w-60 drop-shadow-[0_20px_40px_rgba(0,0,0,0.6)] sm:w-72"
+          className="adrift w-56 drop-shadow-[0_20px_40px_rgba(0,0,0,0.6)] sm:w-64"
         />
-        <div className="space-y-3">
-          <h1 className="flex items-center justify-center gap-3 font-[family-name:var(--font-display)] text-5xl font-extrabold">
-            <LogoMark size={44} />
-            Tiers-État
-          </h1>
-          <p className="text-lg text-muted-foreground">Crée ton mème. Trade toutes les cryptos. Suis ce que tes amis achètent.</p>
+        {/* Halo sombre derrière le texte : lisible même devant les lumières de Paris */}
+        <div className="space-y-3 rounded-[2.5rem] bg-[radial-gradient(closest-side,rgb(3_3_12/0.82),rgb(3_3_12/0.55)_60%,transparent)] px-6 py-6">
+          <h1 className="font-[family-name:var(--font-display)] text-5xl font-extrabold [text-shadow:0_2px_18px_rgb(0_0_0/0.9)]">Tiers-État</h1>
+          <p className="text-lg font-semibold text-white/90 [text-shadow:0_1px_10px_rgb(0_0_0/0.95)]">Crée ton mème. Trade toutes les cryptos. Suis ce que tes amis achètent.</p>
         </div>
         <div className="w-full space-y-3">
           {privy && (
