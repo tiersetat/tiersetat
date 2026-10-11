@@ -18,7 +18,7 @@ function Icon({ d, className = "" }: { d: string; className?: string }) {
 export function Sidebar() {
   const path = usePathname();
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/[0.07] bg-[#0d1033] px-3 py-5 lg:flex">
+    <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/[0.1] bg-black/25 px-3 py-5 lg:flex">
       <Link href="/" aria-label="Tiers-État, marché" className="px-3">
         <Wordmark />
       </Link>

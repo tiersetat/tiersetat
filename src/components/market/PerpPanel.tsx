@@ -21,7 +21,7 @@ export function PerpPanel({ symbol, maxLeverage }: { symbol: string; maxLeverage
           Short ▼
         </button>
       </div>
-      <div className="flex items-center rounded-2xl border border-white/12 bg-[#0e1136] px-4">
+      <div className="flex items-center rounded-2xl border border-white/12 bg-black/30 px-4">
         <span className="font-[family-name:var(--font-display)] text-3xl font-extrabold text-muted-foreground">$</span>
         <input
           id="perp-amount"

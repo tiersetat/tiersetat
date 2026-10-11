@@ -4,6 +4,16 @@ import { notFound } from "next/navigation";
 import { memo } from "@/lib/memo";
 import { pct, usd } from "@/lib/market-format";
 import { BuyPanel } from "@/components/market/BuyPanel";
+import { LiveChart } from "@/components/market/LiveChart";
+
+/** Cryptos qui ont un marché sur Hyperliquid : on peut alors afficher leurs bougies en direct. */
+function hyperliquidCoins(): Promise<Set<string>> {
+  return memo("hl:coins", 3_600_000, async () => {
+    const res = await fetch("https://api.hyperliquid.xyz/info", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ type: "meta" }), signal: AbortSignal.timeout(7000) });
+    const meta = (await res.json()) as { universe: { name: string; isDelisted?: boolean }[] };
+    return new Set(meta.universe.filter((u) => !u.isDelisted).map((u) => u.name));
+  });
+}
 
 type Coin = {
   id: string;
@@ -85,6 +95,8 @@ export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) 
   }
   if (!coin) notFound();
   const m = coin.market_data;
+  const hl = await hyperliquidCoins().catch(() => new Set<string>());
+  const hlCoin = hl.has(coin.symbol.toUpperCase()) ? coin.symbol.toUpperCase() : null;
   const up = (m.price_change_percentage_24h ?? 0) >= 0;
   const stats: [string, string][] = [
     ["Capitalisation", usd(m.market_cap.usd)],
@@ -112,10 +124,14 @@ export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) 
           <p className="font-[family-name:var(--font-display)] text-5xl font-extrabold">{usd(m.current_price.usd)}</p>
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(m.price_change_percentage_24h)} 24 h</p>
         </div>
-        <div className="rounded-3xl bg-surface p-3 ring-1 ring-white/[0.08]">
-          <Sparkline prices={m.sparkline_7d?.price ?? []} up={(m.price_change_percentage_7d ?? 0) >= 0} />
-          <p className="px-2 text-xs text-muted-foreground">7 derniers jours</p>
-        </div>
+        {hlCoin ? (
+          <LiveChart coin={hlCoin} />
+        ) : (
+          <div className="surface p-3">
+            <Sparkline prices={m.sparkline_7d?.price ?? []} up={(m.price_change_percentage_7d ?? 0) >= 0} />
+            <p className="px-2 text-xs text-muted-foreground">7 derniers jours</p>
+          </div>
+        )}
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {stats.map(([k, v]) => (
             <div key={k} className="rounded-2xl bg-surface px-4 py-3 ring-1 ring-white/[0.08]">

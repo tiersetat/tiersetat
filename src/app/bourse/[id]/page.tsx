@@ -6,45 +6,9 @@ import { pct, usd } from "@/lib/market-format";
 import { PerpPanel } from "@/components/market/PerpPanel";
 import { WatchStar } from "@/components/market/WatchStar";
 import { TokenLogo } from "@/components/market/TokenLogo";
+import { LiveChart } from "@/components/market/LiveChart";
 
 const CAT: Record<string, string> = { actions: "Action", indices: "Indice / ETF", matieres: "Matière première", devises: "Devise", "pre-ipo": "Pré-IPO", taux: "Taux d'intérêt" };
-
-async function candles(id: string): Promise<number[]> {
-  try {
-    const res = await fetch("https://api.hyperliquid.xyz/info", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ type: "candleSnapshot", req: { coin: id, interval: "1h", startTime: Date.now() - 7 * 86_400_000, endTime: Date.now() } }),
-      next: { revalidate: 300 },
-      signal: AbortSignal.timeout(7000),
-    });
-    const list = (await res.json()) as { c: string }[];
-    return list.map((c) => Number(c.c)).filter((n) => n > 0);
-  } catch {
-    return [];
-  }
-}
-
-function Sparkline({ prices }: { prices: number[] }) {
-  if (prices.length < 2) return <p className="p-6 text-center text-sm text-muted-foreground">Graphique indisponible.</p>;
-  const min = Math.min(...prices), max = Math.max(...prices), W = 600, H = 220;
-  const pts = prices.map((p, i) => [(i / (prices.length - 1)) * W, H - 10 - ((p - min) / (max - min || 1)) * (H - 20)] as const);
-  const line = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
-  const up = prices[prices.length - 1] >= prices[0];
-  const color = up ? "#3dffb0" : "#ff3d68";
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-56 w-full" preserveAspectRatio="none" role="img" aria-label="Évolution du cours sur 7 jours">
-      <defs>
-        <linearGradient id="perp" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.35" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={`${line} L${W} ${H} L0 ${H} Z`} fill="url(#perp)" />
-      <path d={line} fill="none" stroke={color} strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
-    </svg>
-  );
-}
 
 export async function generateMetadata({ params }: PageProps<"/bourse/[id]">): Promise<Metadata> {
   const m = await hyperliquidMarket(decodeURIComponent((await params).id)).catch(() => null);
@@ -56,7 +20,6 @@ export default async function BoursePage({ params }: PageProps<"/bourse/[id]">) 
   const id = decodeURIComponent((await params).id);
   const m = await hyperliquidMarket(id).catch(() => null);
   if (!m) notFound();
-  const prices = await candles(m.id);
   const up = (m.change24 ?? 0) >= 0;
   const stats: [string, string][] = [
     ["Vol. 24 h", usd(m.volume24Usd)],
@@ -81,10 +44,7 @@ export default async function BoursePage({ params }: PageProps<"/bourse/[id]">) 
           <p className="font-[family-name:var(--font-display)] text-5xl font-extrabold">{usd(m.priceUsd)}</p>
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(m.change24)} 24 h</p>
         </div>
-        <div className="rounded-3xl bg-surface p-3 ring-1 ring-white/[0.08]">
-          <Sparkline prices={prices} />
-          <p className="px-2 text-xs text-muted-foreground">7 derniers jours</p>
-        </div>
+        <LiveChart coin={m.id} />
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {stats.map(([k, v]) => (
             <div key={k} className="rounded-2xl bg-surface px-4 py-3 ring-1 ring-white/[0.08]">
