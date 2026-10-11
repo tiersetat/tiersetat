@@ -83,7 +83,7 @@ function EmailLoginInner() {
     <button
       type="button"
       onClick={() => login()}
-      className="inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-white/[0.08] px-4 text-sm font-extrabold text-white transition active:scale-95 xl:px-5"
+      className="btn-login inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-white/[0.08] px-4 text-sm font-extrabold text-white transition active:scale-95 xl:px-5"
     >
       {/* Logo Google (couleurs officielles) */}
       <svg viewBox="0 0 24 24" className="size-4 shrink-0" aria-hidden>
