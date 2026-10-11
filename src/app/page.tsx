@@ -15,7 +15,7 @@ import { TOTAL_SUPPLY } from "@/lib/traders";
 
 /** Onglets de la liste : tout le marché (multi-blockchains), puis nos mèmes (launchpad). */
 const TABS = [
-  { key: "liste", label: "⭐" },
+  { key: "liste", label: "Ma liste" },
   { key: "tendances", label: "Tendances" },
   { key: "nouveaux", label: "Nouveaux" },
   { key: "cryptos", label: "Cryptos" },
@@ -131,7 +131,13 @@ export default async function Home({ searchParams }: PageProps<"/">) {
               aria-current={key === t.key ? "page" : undefined}
               className={`chip shrink-0 ${key === t.key ? "chip-active" : ""}`}
             >
-              {t.label}
+              {t.key === "liste" ? (
+                <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" aria-label="Ma liste">
+                  <path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z" />
+                </svg>
+              ) : (
+                t.label
+              )}
             </Link>
           ))}
         </nav>

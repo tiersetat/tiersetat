@@ -30,9 +30,9 @@ export function WatchlistView() {
   if (!key) {
     return (
       <div className="surface space-y-3 p-8 text-center">
-        <p className="text-4xl" aria-hidden>
-          ⭐
-        </p>
+        <svg viewBox="0 0 24 24" className="mx-auto size-10 text-white/70" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinejoin="round" aria-hidden>
+          <path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z" />
+        </svg>
         <p className="font-bold">Ta liste est vide</p>
         <p className="mx-auto max-w-sm text-sm text-muted-foreground">Touche l&apos;étoile sur la fiche d&apos;un token pour le suivre ici, avec son cours en direct.</p>
         <Link href="/?tri=solana#explorer" scroll={false} className="btn-ghost">
