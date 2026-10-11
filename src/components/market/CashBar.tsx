@@ -45,7 +45,7 @@ export function CashBar() {
               ? "…"
               : cash.toLocaleString("en-US", { style: "currency", currency: "USD" })}
         </p>
-        <p className="mt-1.5 text-sm text-muted-foreground">liquidités{(CLUSTER as string) === "devnet" && !demo ? " · bêta, argent fictif" : ""}</p>
+        <p className="mt-1.5 text-sm text-muted-foreground">liquidités</p>
       </div>
       <Link href="/portefeuille" className="btn-primary min-h-11 px-6">
         Déposer

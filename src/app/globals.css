@@ -290,7 +290,8 @@
 .ios-press:active { transform: scale(0.88); transition-duration: 0.12s; }
 
 /* Mode démo (vidéos) : les mentions de la bêta disparaissent */
-html.demo [data-beta] { display: none !important; }
+/* Mentions de la bêta masquées : l'appli se présente comme la version réelle */
+[data-beta] { display: none !important; }
 
 /* Ciel vivant : dérive très lente de la nébuleuse, scintillement des étoiles */
 @keyframes sky-drift {

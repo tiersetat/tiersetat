@@ -75,8 +75,8 @@ export function DepositOptions({ address, onReceive }: { address: string; onRece
       <p className="px-3 pt-2 pb-1 text-lg font-extrabold">Déposer des fonds</p>
       <CardRow address={address} />
       <Row icon="📲" title="Depuis un portefeuille crypto" sub="Reçois des USDC ou des SOL (Phantom, Solflare…)" onClick={onReceive} />
-      <Row icon="🏦" title="Depuis une plateforme d'échange" sub="OKX, Coinbase, Binance, Kraken…" onClick={() => setExchanges((v) => !v)} />
-      {exchanges && (
+      <Row icon="🏦" title="Depuis une plateforme d'échange" sub="OKX, Coinbase, Binance, Kraken…" badge={DEVNET ? "Bientôt" : undefined} onClick={DEVNET ? undefined : () => setExchanges((v) => !v)} />
+      {exchanges && !DEVNET && (
         <div className="space-y-3 rounded-2xl bg-white/[0.04] p-4">
           <p className="text-sm text-muted-foreground">
             Sur ta plateforme, choisis <strong className="text-foreground">Retrait</strong>, la monnaie <strong className="text-foreground">USDC ou SOL</strong>, le réseau{" "}

@@ -129,7 +129,7 @@ export function CashWallet() {
         <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[radial-gradient(closest-side,rgb(217_204_255/0.35),transparent)]" />
         <div className="relative flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-white/80">Cash{DEVNET && !demo ? " · bêta, argent fictif" : ""}</p>
+            <p className="text-sm font-semibold text-white/80">Cash</p>
             <p className="mt-1 font-[family-name:var(--font-display)] text-5xl font-extrabold tracking-tight sm:text-6xl">
               {shown === null ? "…" : total === null ? "—" : money(total, display)}
             </p>
@@ -252,8 +252,7 @@ function Receive({ address }: { address: string }) {
       <div className="min-w-0 space-y-2">
         <h3 className="text-lg font-extrabold">Recevoir</h3>
         <p className="text-sm text-muted-foreground">
-          Envoie sur cette adresse des SOL, des USDC ou des EURC, <strong className="text-foreground">uniquement sur le réseau Solana</strong>
-          {DEVNET && !demo ? " (réseau de test pendant la bêta)" : ""}.
+          Envoie sur cette adresse des SOL, des USDC ou des EURC, <strong className="text-foreground">uniquement sur le réseau Solana</strong>.
         </p>
         <p className="select-all break-all rounded-xl bg-white/[0.06] p-3 font-mono text-xs">{address}</p>
         <button type="button" onClick={copy} className="btn-ghost min-h-10 px-4 py-2 text-sm">

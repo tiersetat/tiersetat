@@ -44,8 +44,7 @@ export default function DemarrerPage() {
               est créé pour toi, sans phrase secrète à retenir.
             </li>
             <li>
-              <strong>Avec un wallet Solana</strong> (Phantom ou Solflare) : clique sur « Connecter un wallet »
-              {devnet && ", après avoir réglé ton wallet sur le réseau Devnet (Paramètres → Paramètres du développeur → mode Testnet → Devnet)"}.
+              <strong>Avec un wallet Solana</strong> (Phantom ou Solflare) : clique sur « Connecter un wallet ».
             </li>
           </ul>
           <p className="text-sm text-muted-foreground">Clique ensuite sur « Se connecter » : une signature gratuite ouvre ta session.</p>
@@ -53,22 +52,9 @@ export default function DemarrerPage() {
 
         <li className="surface space-y-3 p-6">
           <p className="font-mono text-sm text-pervenche">02</p>
-          <h2 className="text-xl font-semibold">{devnet ? "Obtiens des SOL de test (gratuits)" : "Alimente ton wallet"}</h2>
-          {devnet ? (
-            <>
-              <p className="text-sm text-muted-foreground">Copie ton adresse ci-dessous, puis colle-la sur le faucet officiel de Solana en choisissant « Devnet ».</p>
-              <MyAddress />
-              <a href="https://faucet.solana.com" target="_blank" rel="noreferrer" className="btn-primary inline-flex">
-                Ouvrir le faucet Solana ↗
-              </a>
-              <p className="text-xs text-muted-foreground">Le faucet peut demander une connexion GitHub et limite le nombre de demandes : 1 à 2 SOL suffisent largement pour tester.</p>
-            </>
-          ) : (
-            <>
-              <p className="text-sm text-muted-foreground">Envoie des SOL vers ton adresse depuis une plateforme d&apos;échange ou un autre wallet.</p>
-              <MyAddress />
-            </>
-          )}
+          <h2 className="text-xl font-semibold">Alimente ton wallet</h2>
+          <p className="text-sm text-muted-foreground">Envoie des SOL vers ton adresse depuis une plateforme d&apos;échange ou un autre wallet.</p>
+          <MyAddress />
         </li>
 
         <li className="surface space-y-3 p-6">
@@ -111,7 +97,7 @@ export default function DemarrerPage() {
         <h2 className="text-xl font-semibold">Questions fréquentes</h2>
         {[
           ["C'est quoi une bonding curve ?", "Le prix d'un token suit une courbe publique : il monte quand on achète, descend quand on vend. Tout le monde achète au même prix, sans prévente. Quand la courbe est remplie, le token migre sur un DEX avec une liquidité verrouillée."],
-          ["Est-ce que je peux perdre de l'argent ?", devnet ? "Pas ici : sur le réseau de test, les SOL sont fictifs. Mais en conditions réelles, un memecoin est très spéculatif : son prix peut tomber à zéro." : "Oui. Un memecoin est très spéculatif : son prix peut tomber à zéro. N'engage que ce que tu es prêt à perdre."],
+          ["Est-ce que je peux perdre de l'argent ?", "Oui. Un memecoin est très spéculatif : son prix peut tomber à zéro. N'engage que ce que tu es prêt à perdre."],
           ["Qui peut retirer la liquidité ?", "Personne. Pendant la courbe, les SOL sont dans le pool, puis la liquidité est verrouillée à vie sur le DEX. Le panneau « Transparence » de chaque token le vérifie sur la blockchain."],
           ["Combien gagne un créateur ?", "Le créateur touche 70 % des frais de trading de son token (après la part du protocole Meteora), qu'il encaisse depuis son profil."],
         ].map(([q, a]) => (
