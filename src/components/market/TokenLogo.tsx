@@ -9,7 +9,7 @@ export function TokenLogo({ src, emoji, symbol, name, size = 44, className = "ro
   const style = { width: size, height: size };
   if (src && !broken) {
     // eslint-disable-next-line @next/next/no-img-element -- logos de domaines variables
-    return <img src={src} alt="" loading="lazy" decoding="async" onError={() => setBroken(true)} style={style} className={`shrink-0 bg-white object-contain p-1 ${className}`} />;
+    return <img src={src} alt="" loading="lazy" decoding="async" onError={() => setBroken(true)} style={style} className={`shrink-0 bg-white object-cover ${className}`} />;
   }
   if (emoji) {
     return (
