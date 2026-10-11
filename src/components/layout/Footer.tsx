@@ -20,7 +20,11 @@ export function Footer() {
             <a href="https://earthobservatory.nasa.gov/features/NightLights" target="_blank" rel="noreferrer" className="underline underline-offset-2">
               NASA Earth Observatory (Black Marble, Suomi NPP VIIRS)
             </a>{" "}
-            (domaine public), couleurs retouchées. Estampe : musée Carnavalet (domaine public).
+            (domaine public), couleurs retouchées. Écran de démarrage : Voie lactée,{" "}
+            <a href="https://www.eso.org/public/images/eso0932a/" target="_blank" rel="noreferrer" className="underline underline-offset-2">
+              ESO/S. Brunier
+            </a>{" "}
+            (CC BY 4.0). Estampe : musée Carnavalet (domaine public).
           </p>
         </div>
         <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-muted-foreground sm:grid-cols-4 sm:self-end">
