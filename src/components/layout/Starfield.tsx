@@ -2,7 +2,7 @@
  * Ciel vivant : la nébuleuse tricolore dérive très lentement et des étoiles scintillent devant.
  * CSS uniquement (transform et opacity), coupé si l'utilisateur réduit les animations.
  */
-const TWINKLES = Array.from({ length: 28 }, (_, i) => {
+const TWINKLES = Array.from({ length: 14 }, (_, i) => {
   const x = (i * 37) % 100;
   const y = (i * 61 + 13) % 100;
   const color = x < 38 ? "#8ca5ff" : x < 62 ? "#ffffff" : "#ff7390";
@@ -29,7 +29,7 @@ export function Starfield({ dim = true }: { dim?: boolean }) {
           }}
         />
       ))}
-      {dim && <div className="absolute inset-0 bg-nuit/60" />}
+      {dim && <div className="absolute inset-0 bg-nuit/45" />}
     </div>
   );
 }

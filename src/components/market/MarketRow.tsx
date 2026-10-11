@@ -23,6 +23,8 @@ export type MarketItem = {
   /** Blockchain (pastille de couleur) et badge « DEX payé » pour les listes multi-chaînes */
   chain?: string;
   paid?: boolean;
+  /** Effet de levier maximal (contrats perpétuels Hyperliquid) */
+  leverage?: number;
   /** Mème lancé sur Tiers-État : lien vers sa page complète */
   href?: string;
 };
@@ -55,6 +57,7 @@ export function MarketRow({ t, rank }: { t: MarketItem; rank?: number }) {
                 {CHAIN_DOT[t.chain].label}
               </span>
             )}
+            {t.leverage && <span className="shrink-0 rounded bg-soleil/20 px-1 font-bold text-soleil">×{t.leverage}</span>}
             {t.paid && <span className="shrink-0 rounded bg-electrique/20 px-1 font-bold text-[#8fa2ff]">DEX payé</span>}
             <span className="truncate">{t.name}</span>
           </p>

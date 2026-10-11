@@ -7,6 +7,7 @@ import { GuestOnly } from "@/components/layout/GuestOnly";
 import { TopTradersBand } from "@/components/rank/TopTradersBand";
 import { CHAINS, dexPaidTrending, isChain, topCryptos, type ChainId } from "@/lib/market-feeds";
 import { NewTokensLive } from "@/components/market/NewTokensLive";
+import { hyperliquidMarkets, type Category } from "@/lib/hyperliquid";
 import { HomeBuzz } from "@/components/buzz/HomeBuzz";
 import { solUsd } from "@/lib/feed";
 import { listTokens, type Tab, type TokenCard } from "@/lib/tokens";
@@ -19,9 +20,18 @@ const TABS = [
   { key: "nouveaux", label: "Nouveaux" },
   { key: "cryptos", label: "Cryptos" },
   { key: "tiers-etat", label: "Tiers-État" },
-  { key: "bourse", label: "Actions · Forex" },
+  { key: "bourse", label: "Actions ×10" },
 ] as const;
 type Key = (typeof TABS)[number]["key"];
+/** Catégories des marchés Hyperliquid */
+const CATS: { key: Category; label: string }[] = [
+  { key: "actions", label: "Actions" },
+  { key: "indices", label: "Indices · ETF" },
+  { key: "matieres", label: "Matières premières" },
+  { key: "pre-ipo", label: "Pré-IPO" },
+  { key: "devises", label: "Forex" },
+  { key: "taux", label: "Taux" },
+];
 const parseKey = (v: unknown): Key => (TABS.some((t) => t.key === v) ? (v as Key) : "tendances");
 
 function fromMeme(t: TokenCard, sol: number | null): MarketItem {
@@ -39,8 +49,14 @@ function fromMeme(t: TokenCard, sol: number | null): MarketItem {
   };
 }
 
-async function loadList(key: Key, chain: ChainId | null): Promise<MarketItem[] | null> {
-  if (key === "liste" || key === "bourse" || key === "nouveaux") return null;
+async function loadList(key: Key, chain: ChainId | null, cat: Category | null): Promise<MarketItem[] | null> {
+  if (key === "liste" || key === "nouveaux") return null;
+  if (key === "bourse") {
+    const all = await hyperliquidMarkets();
+    return all
+      .filter((m) => !cat || m.category === cat)
+      .map((m) => ({ address: m.id, name: m.name, symbol: m.symbol, imageUrl: null, priceUsd: m.priceUsd, mcapUsd: null, change24: m.change24, leverage: m.maxLeverage, href: `/bourse/${encodeURIComponent(m.id)}` }));
+  }
   if (key === "cryptos") return topCryptos();
   if (key === "tendances") {
     const all = await dexPaidTrending();
@@ -54,10 +70,11 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;
   const key = parseKey(sp.tri);
   const chain = isChain(sp.chaine) ? sp.chaine : null;
+  const cat = (CATS.some((c) => c.key === sp.cat) ? sp.cat : null) as Category | null;
   let items: MarketItem[] | null = null;
   let failed = false;
   try {
-    items = await loadList(key, chain);
+    items = await loadList(key, chain, cat);
   } catch (err) {
     console.error("accueil", err);
     failed = true;
@@ -133,20 +150,23 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           </div>
         )}
 
+        {key === "bourse" && (
+          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
+            <Link href="/?tri=bourse" scroll={false} className={`chip shrink-0 py-1.5 ${!cat ? "chip-active" : ""}`}>
+              Tout
+            </Link>
+            {CATS.map((c) => (
+              <Link key={c.key} href={`/?tri=bourse&cat=${c.key}`} scroll={false} className={`chip shrink-0 py-1.5 ${cat === c.key ? "chip-active" : ""}`}>
+                {c.label}
+              </Link>
+            ))}
+          </div>
+        )}
+
         {key === "liste" ? (
           <WatchlistView />
         ) : key === "nouveaux" ? (
           <NewTokensLive />
-        ) : key === "bourse" ? (
-          <div className="rounded-3xl bg-surface p-6 text-center ring-1 ring-white/[0.08]">
-            <p className="text-3xl" aria-hidden>
-              📈
-            </p>
-            <p className="mt-2 text-lg font-extrabold">Actions, indices, forex, matières premières et pré-IPO</p>
-            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-              Bientôt sur Tiers-État : Tesla, l&apos;or, l&apos;euro-dollar, le Nasdaq ou les futures introductions en bourse, depuis le même solde que tes mèmes.
-            </p>
-          </div>
         ) : failed || !items ? (
           <p className="rounded-3xl bg-surface p-8 text-center text-sm text-muted-foreground">Liste momentanément indisponible. Réessaie dans une minute.</p>
         ) : items.length === 0 ? (
@@ -171,6 +191,11 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         {key === "tendances" && (
           <p className="px-1 text-xs text-muted-foreground">
             Tokens « DEX payé » et boostés sur DexScreener, avec de l&apos;activité, classés par volume des 6 dernières heures. Ni vérifiés ni recommandés par Tiers-État.
+          </p>
+        )}
+        {key === "bourse" && (
+          <p className="px-1 text-xs text-muted-foreground">
+            Contrats perpétuels avec effet de levier, alimentés par Hyperliquid : actions, indices, matières premières, devises et pré-IPO. Très risqué : les pertes sont multipliées par le levier.
           </p>
         )}
         {key === "cryptos" && <p className="px-1 text-xs text-muted-foreground">Les plus grandes cryptos du monde (CoinGecko), hors stablecoins. Pour information.</p>}

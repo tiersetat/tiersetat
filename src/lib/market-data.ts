@@ -2,6 +2,7 @@ import "server-only";
 import { majorsRadar, tokensByAddresses, trendingWithImages, type RadarToken } from "@/lib/radar";
 import { supabasePublic } from "@/lib/supabase/public";
 import type { MarketItem } from "@/components/market/MarketRow";
+import { hyperliquidMarkets } from "@/lib/hyperliquid";
 
 const fromRadar = (t: RadarToken): MarketItem => ({
   address: t.address,
@@ -29,8 +30,17 @@ export async function cryptos(): Promise<MarketItem[]> {
 
 /** Fiches pour « Ma liste » : mèmes Tiers-État (lus en base) et tokens Solana externes (DexScreener). */
 export async function itemsFor(addresses: string[]): Promise<MarketItem[]> {
-  const list = addresses.slice(0, 100);
-  if (list.length === 0) return [];
+  const all = addresses.slice(0, 100);
+  if (all.length === 0) return [];
+  const perpIds = all.filter((a) => a.includes(":"));
+  const perps = perpIds.length ? await hyperliquidMarkets().catch(() => []) : [];
+  const perpItems = new Map(
+    perps
+      .filter((m) => perpIds.includes(m.id))
+      .map((m) => [m.id, { address: m.id, name: m.name, symbol: m.symbol, imageUrl: null, priceUsd: m.priceUsd, mcapUsd: null, change24: m.change24, leverage: m.maxLeverage, href: `/bourse/${encodeURIComponent(m.id)}` } as MarketItem]),
+  );
+  const list = all.filter((a) => !a.includes(":"));
+  if (list.length === 0) return all.flatMap((a) => (perpItems.has(a) ? [perpItems.get(a)!] : []));
   const { data: ours } = await supabasePublic()
     .from("tokens")
     .select("mint, name, ticker, image_url, market_cap_sol, total_supply:market_cap_sol")
@@ -53,5 +63,5 @@ export async function itemsFor(addresses: string[]): Promise<MarketItem[]> {
     });
   }
   for (const t of external) byAddr.set(t.address, fromRadar(t));
-  return list.flatMap((a) => (byAddr.has(a) ? [byAddr.get(a)!] : []));
+  return all.flatMap((a) => (byAddr.has(a) ? [byAddr.get(a)!] : perpItems.has(a) ? [perpItems.get(a)!] : []));
 }
