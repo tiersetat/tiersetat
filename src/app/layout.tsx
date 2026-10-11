@@ -12,6 +12,7 @@ import { LiveTrades } from "@/components/social/LiveTrades";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { RegisterSW } from "@/components/app/RegisterSW";
 import { AuthGate } from "@/components/layout/AuthGate";
+import { Starfield } from "@/components/layout/Starfield";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -33,10 +34,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="fr" className={`${geist.variable} ${geistMono.variable} ${display.variable} h-full`}>
       <body className="flex min-h-full flex-col">
-        {/* Fond d'écran : ciel d'étoiles bleu-blanc-rouge (calque fixe, assombri pour la lisibilité) */}
-        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-[url(/images/etoiles-tricolores.webp)] bg-cover bg-center">
-          <div className="absolute inset-0 bg-nuit/70" />
-        </div>
+        {/* Fond d'écran : ciel vivant d'étoiles bleu-blanc-rouge */}
+        <Starfield />
         <WalletProviders>
           <InviteCapture />
           <RegisterSW />

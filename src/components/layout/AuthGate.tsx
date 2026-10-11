@@ -7,6 +7,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { LogoMark } from "@/components/brand/Logo";
+import { Starfield } from "./Starfield";
 import { PRIVY_APP_ID } from "@/components/providers/PrivyBridge";
 
 /** Pages lisibles sans compte (obligations légales). */
@@ -49,14 +50,15 @@ function WalletGate({ children, privy }: { children: ReactNode; privy: { ready: 
     );
   }
   return (
-    <div className="fixed inset-0 z-[60] overflow-y-auto bg-nuit bg-[url(/images/etoiles-tricolores.webp)] bg-cover bg-center">
+    <div className="fixed inset-0 z-[60] overflow-y-auto">
+      <Starfield dim={false} />
       <main className="relative mx-auto flex min-h-full max-w-md flex-col items-center justify-center gap-7 px-6 py-10 text-center">
         {/* Le Tiers-État de 1789, perdu dans l'espace */}
         {/* eslint-disable-next-line @next/next/no-img-element -- image locale, animée en CSS */}
         <img
           src="/images/tiers-etat-1789.webp"
           alt="Le Tiers-État portant le clergé et la noblesse, caricature de 1789, flottant dans l'espace"
-          className="adrift w-56 drop-shadow-[0_20px_40px_rgba(0,0,0,0.6)] sm:w-64"
+          className="adrift w-60 drop-shadow-[0_20px_40px_rgba(0,0,0,0.6)] sm:w-72"
         />
         <div className="space-y-3">
           <h1 className="flex items-center justify-center gap-3 font-[family-name:var(--font-display)] text-5xl font-extrabold">

@@ -259,6 +259,19 @@
   background: rgb(255 255 255 / 0.06) !important;
 }
 
+/* Ciel vivant : dérive très lente de la nébuleuse, scintillement des étoiles */
+@keyframes sky-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-2.5%, 1.5%, 0) scale(1.04); }
+}
+.sky-drift { animation: sky-drift 90s ease-in-out infinite; will-change: transform; }
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.twinkle { animation: twinkle 4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .sky-drift, .twinkle { animation: none; } }
+
 /* Le Tiers-État perdu dans l'espace : flottement lent (transform uniquement) */
 @keyframes adrift {
   0%, 100% { transform: translateY(0) rotate(-12deg); }
