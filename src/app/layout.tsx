@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     capable: true,
     title: "Tiers-État",
     statusBarStyle: "black-translucent",
-    // Écran de lancement de l'appli installée : la nébuleuse tricolore et le logo
+    // Écran de lancement de l'appli installée : la Terre la nuit vue de l'espace (lumières en or) et le logo
     startupImage: [
     { url: "/splash/1320x2868.jpg", media: "(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" },
     { url: "/splash/1290x2796.jpg", media: "(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" },
