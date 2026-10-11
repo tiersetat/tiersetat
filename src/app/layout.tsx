@@ -15,7 +15,6 @@ import { AuthGate } from "@/components/layout/AuthGate";
 import { Workspace } from "@/components/layout/Workspace";
 import { Starfield } from "@/components/layout/Starfield";
 import { DemoMode } from "@/components/app/DemoMode";
-import { THEME_BOOT } from "@/lib/theme";
 import { InstallSheet } from "@/components/app/InstallSheet";
 import { DemoAccount } from "@/components/app/DemoAccount";
 
@@ -62,7 +61,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="fr" className={`${geist.variable} ${geistMono.variable} ${display.variable} h-full`}>
       <body className="flex min-h-full flex-col">
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
         {/* Fond d'écran : ciel vivant d'étoiles bleu-blanc-rouge */}
         <Starfield />
         <DemoMode />

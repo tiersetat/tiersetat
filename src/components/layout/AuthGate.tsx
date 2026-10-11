@@ -75,7 +75,7 @@ function WalletGate({ children, privy }: { children: ReactNode; privy: { ready: 
         </div>
         <div className="w-full space-y-3">
           {privy && (
-            <button type="button" onClick={() => privy.login()} className="btn-login inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-full bg-white text-[17px] font-extrabold text-nuit shadow-[0_10px_30px_-10px_rgb(255_255_255/0.6)] transition active:scale-[0.98]">
+            <button type="button" onClick={() => privy.login()} className="inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-full bg-white text-[17px] font-extrabold text-nuit shadow-[0_10px_30px_-10px_rgb(255_255_255/0.6)] transition active:scale-[0.98]">
               <svg viewBox="0 0 24 24" className="size-5" aria-hidden>
                 <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z" />
                 <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z" />
