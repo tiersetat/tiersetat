@@ -8,14 +8,28 @@ type Env = "installed" | "android" | "ios-safari" | "ios-inapp" | "android-inapp
 const KEY = "te_install_dismissed";
 const noop = () => () => {};
 
+/** Appli d'où vient le lien (navigateur intégré), pour expliquer le bon geste. */
+function sourceApp(ua: string): string | null {
+  if (/instagram/i.test(ua)) return "Instagram";
+  if (/fban|fbav|fb_iab/i.test(ua)) return "Facebook";
+  if (/tiktok|bytedance|musical_ly/i.test(ua)) return "TikTok";
+  if (/twitter/i.test(ua)) return "X";
+  if (/snapchat/i.test(ua)) return "Snapchat";
+  if (/linkedin/i.test(ua)) return "LinkedIn";
+  if (/telegram/i.test(ua)) return "Telegram";
+  if (/whatsapp/i.test(ua)) return "WhatsApp";
+  return null;
+}
+
 function detect(): Env {
   const ua = navigator.userAgent;
   const standalone = window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
   if (standalone) return "installed";
   const ios = /iphone|ipad|ipod/i.test(ua);
   const android = /android/i.test(ua);
-  // Navigateurs intégrés des applis (Instagram, X, TikTok, Facebook, Snapchat, LinkedIn…) : impossible d'y installer
-  const inapp = /instagram|fban|fbav|twitter|tiktok|bytedance|snapchat|linkedin|line\/|telegram|; wv\)/i.test(ua) || (ios && !/safari/i.test(ua));
+  // Navigateurs intégrés des applis : impossible d'y installer. Chrome, Firefox et Edge sur iPhone, eux, le permettent.
+  const iosBrowser = /crios|fxios|edgios/i.test(ua);
+  const inapp = sourceApp(ua) !== null || /; wv\)/i.test(ua) || (ios && !iosBrowser && !/safari/i.test(ua));
   if (ios) return inapp ? "ios-inapp" : "ios-safari";
   if (android) return inapp ? "android-inapp" : "android";
   return "desktop";
@@ -105,7 +119,7 @@ export function InstallSheet() {
             <li className="flex items-center gap-3 rounded-2xl bg-white/[0.08] p-3">
               <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-sm font-extrabold text-nuit">1</span>
               <span>
-                Touche <ShareIcon /> <strong>Partager</strong> en bas de Safari
+                Touche <ShareIcon /> <strong>Partager</strong> {typeof navigator !== "undefined" && /crios|fxios|edgios/i.test(navigator.userAgent) ? "en haut à droite" : "en bas de l'écran"}
               </span>
             </li>
             <li className="flex items-center gap-3 rounded-2xl bg-white/[0.08] p-3">
@@ -117,15 +131,7 @@ export function InstallSheet() {
           </ol>
         )}
 
-        {env === "ios-inapp" && (
-          <div className="space-y-3">
-            <p className="text-sm text-white/80">Tu es dans le navigateur d&apos;une appli. Ouvre Tiers-État dans Safari pour l&apos;installer.</p>
-            <a href={`x-safari-${url}`} className="btn-fete w-full">
-              Ouvrir dans Safari
-            </a>
-            <p className="text-xs text-white/60">Si rien ne se passe : touche ••• en haut, puis « Ouvrir dans le navigateur ».</p>
-          </div>
-        )}
+        {env === "ios-inapp" && <InAppHelp url={url} />}
 
         {env === "android-inapp" && (
           <div className="space-y-3">
@@ -141,6 +147,52 @@ export function InstallSheet() {
         </button>
         {env === "ios-safari" && <div aria-hidden className="mx-auto -mb-2 size-0 animate-bounce border-x-[10px] border-t-[12px] border-x-transparent border-t-white/70" />}
       </div>
+    </div>
+  );
+}
+
+/** Dans le navigateur d'une appli (Instagram, X, TikTok…) : il faut d'abord ouvrir le lien dans Safari. */
+function InAppHelp({ url }: { url: string }) {
+  const [copied, setCopied] = useState(false);
+  const app = typeof navigator !== "undefined" ? sourceApp(navigator.userAgent) : null;
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {
+      window.prompt("Copie ce lien puis colle-le dans Safari :", url);
+    }
+  };
+  const gesture =
+    app === "Instagram" || app === "Facebook"
+      ? "Touche ••• en haut à droite, puis « Ouvrir dans le navigateur externe »."
+      : app === "TikTok"
+        ? "Touche ••• en haut à droite, puis « Ouvrir dans le navigateur »."
+        : app === "X"
+          ? "Touche l'icône Partager en bas, puis « Ouvrir dans Safari »."
+          : "Touche le menu (••• ou la boussole), puis « Ouvrir dans Safari ».";
+  return (
+    <div className="space-y-3 text-left">
+      <p className="text-sm text-white/80">
+        {app ? `Tu es dans ${app}.` : "Tu es dans le navigateur d'une appli."} Apple ne permet d&apos;installer Tiers-État que depuis Safari.
+      </p>
+      <div className="flex items-center gap-3 rounded-2xl bg-white/[0.08] p-3 text-[15px]">
+        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-sm font-extrabold text-nuit">1</span>
+        <span>{gesture}</span>
+      </div>
+      <div className="flex items-center gap-3 rounded-2xl bg-white/[0.08] p-3 text-[15px]">
+        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-sm font-extrabold text-nuit">2</span>
+        <span>
+          Dans Safari, touche <ShareIcon /> puis <strong>« Sur l&apos;écran d&apos;accueil »</strong>.
+        </span>
+      </div>
+      <p className="text-center text-xs text-white/60">Ça ne marche pas ? Copie le lien et colle-le dans Safari :</p>
+      <button type="button" onClick={copy} className="btn-fete w-full">
+        {copied ? "Lien copié, colle-le dans Safari" : "Copier le lien"}
+      </button>
+      <a href={`x-safari-${url}`} className="block text-center text-sm font-semibold text-white/70 underline underline-offset-2">
+        Essayer d&apos;ouvrir Safari directement
+      </a>
     </div>
   );
 }
