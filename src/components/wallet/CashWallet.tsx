@@ -268,6 +268,9 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
   const { publicKey, sendTransaction } = useWallet();
   const [asset, setAsset] = useState<AssetSymbol>("USDC");
   const [to, setTo] = useState("");
+  const [mode, setMode] = useState<"adresse" | "email">("adresse");
+  const [email, setEmail] = useState("");
+  const [lookup, setLookup] = useState<{ state: "idle" | "busy" | "ok" | "error"; text?: string; created?: boolean }>({ state: "idle" });
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; text: string; sig?: string } | null>(null);
@@ -275,8 +278,25 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
   const max = asset === "SOL" ? Math.max(0, balances.SOL - SOL_FEE_RESERVE) : balances[asset];
   const value = Number(amount.replace(",", "."));
   const recipient = parseRecipient(to);
+  // Envoi par e-mail : on retrouve (ou prépare) le wallet du destinataire, puis l'envoi part directement vers lui
+  const findByEmail = async () => {
+    setLookup({ state: "busy" });
+    setTo("");
+    try {
+      const res = await fetch("/api/envoi/email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+      const j = (await res.json()) as { address?: string; created?: boolean; error?: string };
+      if (!res.ok || !j.address) throw new Error(j.error ?? "Destinataire introuvable.");
+      setTo(j.address);
+      setLookup({ state: "ok", created: j.created });
+    } catch (err) {
+      setLookup({ state: "error", text: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
   const problem = !to
-    ? "Colle l'adresse du destinataire."
+    ? mode === "email"
+      ? "Indique l'e-mail du destinataire, puis touche « Trouver »."
+      : "Colle l'adresse du destinataire."
     : !recipient
       ? "Cette adresse Solana n'est pas valide."
       : recipient.equals(publicKey!)
@@ -297,7 +317,14 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
       const tx = buildSendTransaction(publicKey, recipient, asset, value);
       const sig = await sendTransaction(tx, connection);
       await connection.confirmTransaction(sig, "confirmed");
-      setResult({ ok: true, text: `${qty(value, 6)} ${asset} envoyés.`, sig });
+      setResult({
+        ok: true,
+        text:
+          mode === "email"
+            ? `${qty(value, 6)} ${asset} envoyés à ${email}. Préviens cette personne : elle les retrouve en se connectant sur tiersetat.vercel.app avec cet e-mail.`
+            : `${qty(value, 6)} ${asset} envoyés.`,
+        sig,
+      });
       setAmount("");
       onSent();
     } catch {
@@ -317,10 +344,69 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
           </button>
         ))}
       </div>
-      <label className="block space-y-1.5">
-        <span className="label">Adresse du destinataire (réseau Solana)</span>
-        <input id="send-to" value={to} onChange={(e) => setTo(e.target.value)} placeholder="Ex. 7xKX…" className="field font-mono text-sm" autoComplete="off" spellCheck={false} />
-      </label>
+      <div className="flex rounded-full bg-black/20 p-1 text-sm font-bold" role="group" aria-label="Envoyer à">
+        {(
+          [
+            ["adresse", "Adresse Solana"],
+            ["email", "E-mail"],
+          ] as const
+        ).map(([k, label]) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => {
+              setMode(k);
+              setTo("");
+              setLookup({ state: "idle" });
+            }}
+            aria-pressed={mode === k}
+            className={`flex-1 rounded-full px-3 py-1.5 ${mode === k ? "bg-white text-nuit" : "text-white/80"}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {mode === "adresse" ? (
+        <label className="block space-y-1.5">
+          <span className="label">Adresse du destinataire (réseau Solana)</span>
+          <input id="send-to" value={to} onChange={(e) => setTo(e.target.value)} placeholder="Ex. 7xKX…" className="field font-mono text-sm" autoComplete="off" spellCheck={false} />
+        </label>
+      ) : (
+        <div className="space-y-1.5">
+          <label htmlFor="send-email" className="label block">
+            E-mail du destinataire
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="send-email"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setTo("");
+                setLookup({ state: "idle" });
+              }}
+              placeholder="prenom@exemple.fr"
+              className="field text-sm"
+              autoComplete="off"
+            />
+            <button type="button" onClick={() => void findByEmail()} disabled={!email.includes("@") || lookup.state === "busy"} className="btn-ghost min-h-0 shrink-0 px-4 py-2 text-sm">
+              {lookup.state === "busy" ? "…" : "Trouver"}
+            </button>
+          </div>
+          {lookup.state === "ok" && (
+            <p className="text-xs text-muted-foreground">
+              {lookup.created
+                ? "Cette personne n'a pas encore de compte : un portefeuille lui est réservé. Elle récupère l'argent en se connectant avec cet e-mail."
+                : "Portefeuille Tiers-État trouvé."}{" "}
+              <span className="font-mono">
+                {to.slice(0, 4)}…{to.slice(-4)}
+              </span>
+            </p>
+          )}
+          {lookup.state === "error" && <p className="text-xs text-vente">{lookup.text}</p>}
+        </div>
+      )}
       <label className="block space-y-1.5">
         <span className="label flex justify-between">
           <span>Montant</span>
@@ -330,7 +416,7 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
         </span>
         <input id="send-amount" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="0,00" className="field font-mono" />
       </label>
-      {to || amount ? <p className={`text-sm ${problem ? "text-muted-foreground" : "text-achat"}`}>{problem ?? "Vérifie bien l'adresse : un envoi sur la blockchain ne peut pas être annulé."}</p> : null}
+      {to || amount ? <p className={`text-sm ${problem ? "text-muted-foreground" : "text-achat"}`}>{problem ?? (mode === "email" ? "Vérifie bien l'e-mail : un envoi sur la blockchain ne peut pas être annulé." : "Vérifie bien l'adresse : un envoi sur la blockchain ne peut pas être annulé.")}</p> : null}
       <SlideToConfirm label={`Glisser pour envoyer ${asset}`} tone="buy" disabled={Boolean(problem)} busy={busy} onConfirm={send} />
       {result && (
         <p className={`text-sm ${result.ok ? "text-achat" : "text-vente"}`}>
