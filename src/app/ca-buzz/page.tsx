@@ -47,15 +47,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Ça buzz en France</h1>
-          <p className="max-w-2xl text-muted-foreground">Les sujets que tout le monde reprend en même temps. Plus c&apos;est rouge, plus ça chauffe.</p>
-        </div>
-        <div className="flex gap-4 text-xs text-muted-foreground">
-          {(["brulant", "chaud", "tiede"] as const).map((h) => (
-            <span key={h} className="flex items-center gap-1.5">
-              <span className={`h-2 w-2 rounded-full ${HEAT_STYLE[h].dot}`} />
-              {HEAT_STYLE[h].label}
-            </span>
-          ))}
+          <p className="max-w-2xl text-muted-foreground">Les sujets que tout le monde reprend en même temps.</p>
         </div>
       </header>
 
@@ -64,7 +56,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
       {activeTrend && (
         <section className="surface flex flex-wrap items-center justify-between gap-4 p-5">
           <div>
-            <p className={`text-xs font-medium uppercase tracking-widest ${HEAT_STYLE[activeTrend.heat].text}`}>Sujet {HEAT_STYLE[activeTrend.heat].label.toLowerCase()}</p>
+            <p className={`text-xs font-medium uppercase tracking-widest ${HEAT_STYLE[activeTrend.heat].text}`}>Sujet du moment</p>
             <p className="mt-1 text-2xl font-semibold">{activeTrend.label}</p>
             <p className="text-sm text-muted-foreground">
               Repris par {activeTrend.sources} sources, {activeTrend.articles} articles.{" "}
@@ -122,7 +114,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
                   {trend && heat && (
                     <span className={`absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium ${heat.text}`}>
                       <span className={`h-1.5 w-1.5 rounded-full ${heat.dot}`} />
-                      {heat.label} · {trend.sources} sources
+                      {trend.sources} sources
                     </span>
                   )}
                 </a>

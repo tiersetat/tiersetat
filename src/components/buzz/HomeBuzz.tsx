@@ -56,17 +56,12 @@ export async function HomeBuzz() {
       </div>
 
       <AutoScroller className="-mx-4 snap-x px-4">
-        {hot.map(({ item, trend }, index) => {
-          const heat = HEAT_STYLE[trend!.heat];
+        {hot.map(({ item }, index) => {
           return (
             <article key={item.id} className="surface group flex w-72 shrink-0 snap-start flex-col overflow-hidden sm:w-80">
               <a href={item.url} target="_blank" rel="noreferrer" tabIndex={-1} aria-hidden className="relative block">
                 <BuzzImage src={item.image} source={item.source} priority={index < 2} />
                 <span className="absolute left-3 top-3 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium text-lueur">{item.source}</span>
-                <span className={`absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium ${heat.text}`}>
-                  <span className={`h-1.5 w-1.5 rounded-full ${heat.dot}`} />
-                  {heat.label}
-                </span>
               </a>
               <div className="flex flex-1 flex-col p-4">
                 <p className="text-xs text-muted-foreground">{timeAgo(item.publishedAt)}</p>
