@@ -40,7 +40,7 @@ export async function HomeWeekly() {
           Classement
         </Link>
       </div>
-      <div className="relative mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="relative mt-4 grid gap-4 sm:grid-cols-2 min-[1400px]:grid-cols-1">
         {last?.winner && <Meme m={last.winner} label="Gagnant de la semaine dernière" rate={rate} big />}
         {current.winner ? (
           <Meme m={current.winner} label="En tête cette semaine" rate={rate} big={!last?.winner} />
