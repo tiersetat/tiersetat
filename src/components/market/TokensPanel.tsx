@@ -9,6 +9,7 @@ const TABS = [
   { key: "liste", label: "Favoris" },
   { key: "cryptos", label: "Cryptos" },
   { key: "tendances", label: "Tendances" },
+  { key: "dexpaye", label: "DEX payé" },
   { key: "detenus", label: "Plus détenus" },
   { key: "migre", label: "Migré" },
   { key: "bonding", label: "Bonding" },

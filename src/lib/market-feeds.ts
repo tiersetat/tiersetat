@@ -105,6 +105,63 @@ export function dexPaidTrending(): Promise<TrendItem[]> {
   });
 }
 
+/** `paidAt` = moment où Tiers-État a vu le « DEX payé » ; `early` = déjà présent au démarrage du serveur (heure exacte inconnue). */
+export type PaidItem = MarketItem & { chain: ChainId; paidAt: number; early: boolean; dexId: string | null; bonding: boolean; liquidityUsd: number | null };
+
+/** Mémoire des derniers « DEX payé » vus (le flux public ne renvoie que les 30 derniers). */
+const paidSeen = new Map<string, { chain: ChainId; address: string; paidAt: number; early: boolean; order: number; icon: string | null; description: string | null }>();
+let paidSeq = 0;
+
+/**
+ * Les tokens qui viennent de payer leur profil DexScreener (« DEX payé »), du plus récent au plus ancien,
+ * sur nos blockchains. Le flux ne donne pas l'heure du paiement : on note le moment où on le voit apparaître.
+ * Prix et capitalisation de leur meilleure paire. Cache 10 s.
+ */
+export function dexPaidLatest(): Promise<PaidItem[]> {
+  return memo("feeds:dexpaid-latest", 10_000, async () => {
+    type Profile = { chainId: string; tokenAddress: string; icon?: string; openGraph?: string; description?: string };
+    const latest = await getJson<Profile[]>("https://api.dexscreener.com/token-profiles/latest/v1");
+    const now = Date.now();
+    const firstRun = paidSeen.size === 0;
+    // Le flux va du plus récent au plus ancien : on numérote pour garder cet ordre
+    [...latest].reverse().forEach((p) => {
+      if (!isChain(p.chainId)) return;
+      const key = `${p.chainId}:${p.tokenAddress.toLowerCase()}`;
+      if (paidSeen.has(key)) return;
+      paidSeen.set(key, { chain: p.chainId, address: p.tokenAddress, paidAt: now, early: firstRun, order: ++paidSeq, icon: p.icon ?? null, description: p.description ?? null });
+    });
+    // On garde les 120 derniers
+    const kept = [...paidSeen.entries()].sort((a, b) => b[1].order - a[1].order).slice(0, 120);
+    paidSeen.clear();
+    kept.forEach(([k, v]) => paidSeen.set(k, v));
+
+    const byChain = new Map<ChainId, string[]>();
+    for (const [, v] of kept) byChain.set(v.chain, [...(byChain.get(v.chain) ?? []), v.address]);
+    const pairs = await bestPairs(byChain).catch(() => [] as DexPair[]);
+    const pairOf = new Map(pairs.map((p) => [`${p.chainId}:${p.baseToken.address.toLowerCase()}`, p]));
+    return kept.map(([key, v]): PaidItem => {
+      const p = pairOf.get(key);
+      return {
+        address: v.address,
+        name: p?.baseToken.name ?? v.description?.slice(0, 32) ?? "Token",
+        symbol: p?.baseToken.symbol ?? "?",
+        imageUrl: p?.info?.imageUrl ?? v.icon,
+        priceUsd: num(p?.priceUsd),
+        mcapUsd: num(p?.marketCap ?? p?.fdv),
+        change24: num(p?.priceChange?.h24),
+        chain: v.chain,
+        paid: true,
+        paidAt: v.paidAt,
+        early: v.early,
+        dexId: p?.dexId ?? null,
+        bonding: p ? BONDING_DEX.has(p.dexId) : false,
+        liquidityUsd: num(p?.liquidity?.usd),
+        href: `/marche/${v.address}?c=${v.chain}`,
+      };
+    });
+  });
+}
+
 /** Stablecoins exclus de la liste des cryptos (leur cours ne bouge pas). */
 const STABLES = new Set(["usdt", "usdc", "dai", "fdusd", "usde", "usds", "pyusd", "tusd", "usd1", "rlusd", "usdd", "gusd", "usdp", "frax", "lusd", "susd", "usdy", "usd0", "bfusd", "usdtb", "susde", "eurc"]);
 

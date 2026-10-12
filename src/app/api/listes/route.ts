@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   const cat = (CATS.some((c) => c.key === q.get("cat")) ? q.get("cat") : null) as Category | null;
   try {
     const items = await loadList(key, chain, cat);
-    return NextResponse.json({ items: items ?? [] }, { headers: { "Cache-Control": "public, s-maxage=20, stale-while-revalidate=60" } });
+    return NextResponse.json({ items: items ?? [] }, { headers: { "Cache-Control": key === "dexpaye" ? "public, s-maxage=8, stale-while-revalidate=20" : "public, s-maxage=20, stale-while-revalidate=60" } });
   } catch {
     return NextResponse.json({ items: [] }, { status: 502 });
   }

@@ -9,6 +9,8 @@ import { CHAINS, isChain, topCryptos, type ChainId } from "@/lib/market-feeds";
 import { loadList } from "@/lib/market-lists";
 import { CATS, parseKey, TABS } from "@/lib/market-tabs";
 import { NewTokensLive } from "@/components/market/NewTokensLive";
+import { DexPaidLive } from "@/components/market/DexPaidLive";
+import type { PaidItem } from "@/lib/market-feeds";
 import type { Category } from "@/lib/hyperliquid";
 import { HomeBuzz } from "@/components/buzz/HomeBuzz";
 import { HomeWeekly } from "@/components/weekly/HomeWeekly";
@@ -144,7 +146,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             ))}
           </nav>
 
-          {(key === "tendances" || key === "migre" || key === "bonding") && (
+          {(key === "tendances" || key === "dexpaye" || key === "migre" || key === "bonding") && (
             <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
               <Link
                 href={`/?tri=${key}`}
@@ -196,6 +198,8 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             <WatchlistView />
           ) : key === "nouveaux" ? (
             <NewTokensLive />
+        ) : key === "dexpaye" ? (
+          <DexPaidLive key={chain ?? "toutes"} chain={chain} initial={(items ?? []) as PaidItem[]} />
           ) : failed || !items ? (
             <p className="rounded-3xl bg-surface p-8 text-center text-sm text-muted-foreground">
               Liste momentanément indisponible. Réessaie dans une minute.

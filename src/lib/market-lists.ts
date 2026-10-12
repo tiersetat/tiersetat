@@ -1,6 +1,6 @@
 import "server-only";
 import type { MarketItem } from "@/components/market/MarketRow";
-import { dexPaidTrending, topCryptos, type ChainId } from "@/lib/market-feeds";
+import { dexPaidLatest, dexPaidTrending, topCryptos, type ChainId } from "@/lib/market-feeds";
 import { memesBy } from "@/lib/market-data";
 import { hyperliquidMarkets, type Category } from "@/lib/hyperliquid";
 import { solUsd } from "@/lib/feed";
@@ -39,6 +39,10 @@ export async function loadList(key: Key, chain: ChainId | null, cat: Category | 
       .map((m) => ({ address: m.id, name: m.name, symbol: m.symbol, imageUrl: m.imageUrl, emoji: m.emoji, priceUsd: m.priceUsd, mcapUsd: null, change24: m.change24, leverage: m.maxLeverage, href: `/bourse/${encodeURIComponent(m.id)}` }));
   }
   if (key === "cryptos") return topCryptos();
+  if (key === "dexpaye") {
+    const all = await dexPaidLatest();
+    return chain ? all.filter((t) => t.chain === chain) : all;
+  }
   if (key === "tendances") {
     const all = await dexPaidTrending();
     return chain ? all.filter((t) => t.chain === chain) : all;
