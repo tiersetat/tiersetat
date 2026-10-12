@@ -7,7 +7,7 @@ import { TradersPanel } from "@/components/token/TradersPanel";
 import { aggregateTraders, TOTAL_SUPPLY } from "@/lib/traders";
 import { solUsd } from "@/lib/feed";
 import { getHolders } from "@/lib/holders";
-import { Comments } from "@/components/token/Comments";
+import { CommunityTeaser } from "@/components/community/CommunityTeaser";
 import { ShareButton } from "@/components/token/ShareButton";
 import { WatchStar } from "@/components/market/WatchStar";
 import { TrustBadge } from "@/components/trust/TrustBadge";
@@ -162,7 +162,7 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
         below={
           <div className="space-y-10">
             <TradersPanel rows={traders} profiles={profilesByWallet} theses={theses} solUsd={sol} creator={token.creator_wallet} />
-            <Comments mint={token.mint} ticker={token.ticker} creator={token.creator_wallet} />
+            <CommunityTeaser mint={token.mint} ticker={token.ticker} />
           </div>
         }
         sidebar={

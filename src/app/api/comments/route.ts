@@ -8,6 +8,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { solanaAddress } from "@/lib/validators";
 import { rateLimit, tooMany } from "@/lib/rate-limit";
 import { checkQgMessage } from "@/lib/qg";
+import { GIF_PREFIX, gifOf } from "@/lib/gif";
 import { holdsToken } from "@/lib/qg-data";
 
 const postSchema = z.object({ mint: solanaAddress, body: z.string().trim().min(1, "Message vide").max(500, "500 caractères max") });
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
     if (!rateLimit(`comment:${profile.wallet}`, 30, 60 * 60_000)) return tooMany(60);
     const { mint, body } = postSchema.parse(await req.json());
 
+    if (body.startsWith(GIF_PREFIX) && !gifOf(body)) return jsonError(422, "GIF non reconnu : utilise un GIF de Giphy ou Tenor.");
     const verdict = moderate([body], await getBlockedWords());
     if (!verdict.ok) return jsonError(422, verdict.reason);
     const qg = checkQgMessage(body);
