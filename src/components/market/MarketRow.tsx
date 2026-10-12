@@ -29,6 +29,8 @@ export type MarketItem = {
   leverage?: number;
   /** Mème lancé sur Tiers-État : lien vers sa page complète */
   href?: string;
+  /** Prix des 7 derniers jours (mini-courbe), quand la source le fournit */
+  sparkline?: number[];
 };
 
 /** Ligne compacte d'une liste de tokens : image, nom, prix, capitalisation, variation 24 h. */

@@ -1,19 +1,24 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { CashBar } from "@/components/market/CashBar";
-import { HomeSocial } from "@/components/social/HomeSocial";
-import { ResizableColumns } from "@/components/layout/Resizable";
 import { MarketRow, type MarketItem } from "@/components/market/MarketRow";
 import { WatchlistView } from "@/components/market/WatchlistView";
 import { GuestOnly } from "@/components/layout/GuestOnly";
 import { TopTradersBand } from "@/components/rank/TopTradersBand";
-import { CHAINS, isChain, type ChainId } from "@/lib/market-feeds";
+import { CHAINS, isChain, topCryptos, type ChainId } from "@/lib/market-feeds";
 import { loadList } from "@/lib/market-lists";
 import { CATS, parseKey, TABS } from "@/lib/market-tabs";
 import { NewTokensLive } from "@/components/market/NewTokensLive";
 import type { Category } from "@/lib/hyperliquid";
 import { HomeBuzz } from "@/components/buzz/HomeBuzz";
 import { HomeWeekly } from "@/components/weekly/HomeWeekly";
+import { LiveActivity } from "@/components/social/LiveActivity";
+import { Panel } from "@/components/dashboard/Panel";
+import { TickerCards } from "@/components/dashboard/TickerCards";
+import { MoversPanel } from "@/components/dashboard/Movers";
+import { WatchlistPanel } from "@/components/dashboard/WatchlistPanel";
+import { BtcHistory } from "@/components/dashboard/BtcHistory";
+import { majors, movers } from "@/lib/dashboard-data";
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;
@@ -32,86 +37,82 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   }
   const memeTab = key === "tiers-etat";
 
-  return (
-    <ResizableColumns left={<HomeSocial placement="gauche" />}>
-      {/* Grand écran (1400 px et plus) : trois colonnes côte à côte, Social à gauche, l'actu du jour au centre, les tokens à droite */}
-      <div className="min-w-0 space-y-6 min-[1400px]:grid min-[1400px]:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] min-[1400px]:items-start min-[1400px]:gap-6 min-[1400px]:space-y-0">
-        <div className="flex min-w-0 flex-col gap-6">
-          {/* Solde et dépôt (connecté) ; bienvenue (visiteur) */}
-          <div className="empty:hidden">
-            <CashBar />
-          </div>
-          <GuestOnly>
-            <section className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-electrique/35 via-[#4a49f0]/25 to-[#7b3fe0]/30 shadow-[inset_0_1px_0_rgb(255_255_255/0.15)] p-5 text-white sm:p-7">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -right-10 -top-10 size-44 rounded-full bg-[radial-gradient(closest-side,rgb(255_210_63/0.5),transparent)]"
-              />
-              <h1 className="relative font-[family-name:var(--font-display)] text-3xl leading-tight font-extrabold sm:text-4xl">
-                Crée. Trade.{" "}
-                <span className="sticker text-nuit">Gagne ensemble.</span>
-              </h1>
-              <p className="relative mt-3 max-w-md text-[15px] text-white/85">
-                Le launchpad et l&apos;appli de trading du peuple : lance ton
-                mème en une minute, trade toutes les cryptos et suis ce que tes
-                amis achètent.
-              </p>
-              <Link
-                href="/verifier"
-                className="relative mt-3 inline-flex items-center gap-1.5 rounded-full bg-black/20 px-3 py-1 text-xs font-bold"
-              >
-                🛡 Règles 100 % vérifiables sur la blockchain →
-              </Link>
-              <div className="relative mt-5 flex flex-wrap gap-2">
-                <Link href="/portefeuille" className="btn-fete min-h-11 px-6">
-                  Commencer
-                </Link>
-                <Link
-                  href="/lancer"
-                  className="inline-flex min-h-11 items-center rounded-full bg-white/15 px-6 font-bold"
-                >
-                  Créer un mème
-                </Link>
-              </div>
-            </section>
-          </GuestOnly>
+  const [majorList, move, market] = await Promise.all([
+    majors().catch(() => []),
+    movers().catch(() => ({ gainers: [], losers: [] })),
+    topCryptos().catch(() => []),
+  ]);
 
-          {/* La Une du concours : le Mème de la semaine (plus grosse capitalisation) */}
-          <Suspense
-            fallback={
-              <div className="h-28 animate-pulse rounded-3xl bg-surface" />
-            }
-          >
+  return (
+    // Tableau de bord : une grille qui s'adapte à la largeur (téléphone empilé, ordinateur en 2 colonnes, grand écran et ultrawide en 3 colonnes)
+    <div className="dash">
+      {/* Social : liquidités et qui achète en ce moment */}
+      <div className="dash-social space-y-4">
+        <div className="empty:hidden">
+          <CashBar />
+        </div>
+        <Panel title="Social" className="dash-social-feed">
+          <LiveActivity limit={20} />
+        </Panel>
+      </div>
+
+      {/* Les grandes cryptos, en cartes avec leur courbe 7 jours */}
+      <div className="dash-tickers">
+        <TickerCards items={majorList} />
+      </div>
+
+      {/* Bienvenue (visiteur), Mème de la semaine, plus fortes hausses et baisses */}
+      <div className="dash-mid">
+        <GuestOnly>
+          <section className="dash-panel dash-hero relative overflow-hidden p-5 sm:p-6">
+            <div aria-hidden className="pointer-events-none absolute -right-12 -top-12 size-48 rounded-full bg-[radial-gradient(closest-side,rgb(127_155_255/0.35),transparent)]" />
+            <h1 className="relative font-[family-name:var(--font-display)] text-3xl leading-tight font-extrabold">
+              Crée. Trade. <span className="text-lueur-gradient">Gagne ensemble.</span>
+            </h1>
+            <p className="relative mt-2 max-w-md text-[15px] text-white/80">
+              Le launchpad et l&apos;appli de trading du peuple : lance ton mème en une minute, trade toutes les cryptos et suis ce que tes amis achètent.
+            </p>
+            <div className="relative mt-4 flex flex-wrap gap-2">
+              <Link href="/portefeuille" className="btn-fete min-h-11 px-6">
+                Commencer
+              </Link>
+              <Link href="/verifier" className="inline-flex min-h-11 items-center rounded-full bg-white/10 px-5 text-sm font-bold">
+                Règles vérifiables sur la blockchain
+              </Link>
+            </div>
+          </section>
+        </GuestOnly>
+        <div className="dash-weekly">
+          <Suspense fallback={<div className="dash-panel h-28 animate-pulse" />}>
             <HomeWeekly />
           </Suspense>
-
-          {/* La petite bande : les plus gros gains du moment */}
-          <Suspense fallback={null}>
-            <TopTradersBand />
-          </Suspense>
-
-          {/* La une des journaux : l'actu du jour (en haut de la colonne du centre sur grand écran) */}
-          <div className="min-[1400px]:order-first">
-            <Suspense
-              fallback={
-                <div className="h-[26rem] animate-pulse rounded-3xl bg-surface" />
-              }
-            >
-              <HomeBuzz />
-            </Suspense>
-          </div>
-
-          {/* Widget Social, compact (téléphone et tablette) */}
-          <section className="lg:hidden">
-            <HomeSocial placement="liste" />
-          </section>
         </div>
+        <MoversPanel title="Plus fortes hausses (24 h)" items={move.gainers} />
+        <MoversPanel title="Plus fortes baisses (24 h)" items={move.losers} />
+      </div>
 
-        {/* La liste des tokens (colonne de droite sur grand écran, qui reste à l'écran et défile seule) */}
-        <section
-          id="tokens"
-          className="scroll-mt-20 space-y-3 min-[1400px]:no-scrollbar min-[1400px]:sticky min-[1400px]:top-6 min-[1400px]:max-h-[calc(100vh-3rem)] min-[1400px]:overflow-y-auto"
-        >
+      {/* L'actu du jour et les plus gros gains des traders */}
+      <div className="dash-news space-y-4">
+        <Suspense fallback={<div className="dash-panel h-[26rem] animate-pulse" />}>
+          <HomeBuzz />
+        </Suspense>
+        <Suspense fallback={null}>
+          <TopTradersBand />
+        </Suspense>
+      </div>
+
+      {/* Ma watchlist (favoris) et le Bitcoin heure par heure */}
+      <div className="dash-watch">
+        <WatchlistPanel top={market} />
+      </div>
+      <div className="dash-hist">
+        <Suspense fallback={<div className="dash-panel h-64 animate-pulse" />}>
+          <BtcHistory />
+        </Suspense>
+      </div>
+
+      {/* Tous les marchés : onglets, filtres et liste des tokens */}
+      <section id="tokens" className="dash-tokens scroll-mt-20 space-y-3">
           <nav
             className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 py-1"
             aria-label="Listes de tokens"
@@ -243,8 +244,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
               Pour information.
             </p>
           )}
-        </section>
-      </div>
-    </ResizableColumns>
+      </section>
+    </div>
   );
 }

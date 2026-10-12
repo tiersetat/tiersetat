@@ -108,12 +108,30 @@ export function dexPaidTrending(): Promise<TrendItem[]> {
 /** Stablecoins exclus de la liste des cryptos (leur cours ne bouge pas). */
 const STABLES = new Set(["usdt", "usdc", "dai", "fdusd", "usde", "usds", "pyusd", "tusd", "usd1", "rlusd", "usdd", "gusd", "usdp", "frax", "lusd", "susd", "usdy", "usd0", "bfusd", "usdtb", "susde", "eurc"]);
 
-type CgCoin = { id: string; symbol: string; name: string; image: string; current_price: number | null; market_cap: number | null; price_change_percentage_24h: number | null };
+type CgCoin = {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number | null;
+  market_cap: number | null;
+  price_change_percentage_24h: number | null;
+  sparkline_in_7d?: { price?: number[] };
+};
+
+/** Courbe 7 jours réduite à ~28 points (assez pour une mini-courbe, léger à transmettre). */
+function thin(prices: number[] | undefined): number[] | undefined {
+  if (!prices?.length) return undefined;
+  const step = Math.max(1, Math.floor(prices.length / 28));
+  const out = prices.filter((_, i) => i % step === 0);
+  if (out.at(-1) !== prices.at(-1)) out.push(prices.at(-1)!);
+  return out;
+}
 
 /** Les grandes cryptos du monde (classement CoinGecko par capitalisation), sans les stablecoins. */
 export function topCryptos(): Promise<MarketItem[]> {
   return memo("feeds:cryptos", 300_000, async () => {
-    const coins = await getJson<CgCoin[]>("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&price_change_percentage=24h");
+    const coins = await getJson<CgCoin[]>("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&price_change_percentage=24h&sparkline=true");
     return coins
       .filter((c) => !STABLES.has(c.symbol.toLowerCase()))
       .map((c) => ({
@@ -124,6 +142,7 @@ export function topCryptos(): Promise<MarketItem[]> {
         priceUsd: c.current_price,
         mcapUsd: c.market_cap,
         change24: c.price_change_percentage_24h,
+        sparkline: thin(c.sparkline_in_7d?.price),
         href: `/crypto/${c.id}`,
       }));
   });

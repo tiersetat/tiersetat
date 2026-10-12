@@ -418,3 +418,65 @@ body {
 /* Changement de carte : fondu doux */
 .map-fade { animation: map-fade 0.9s ease-out; }
 @keyframes map-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Tableau de bord (accueil) ----------
+   Panneaux bleu marine translucides, liseré fin, lueur bleue discrète.
+   La grille suit la largeur : empilée (téléphone), 2 colonnes (ordinateur), 3 colonnes (grand écran, ultrawide). */
+.dash-panel {
+  border-radius: 1.25rem;
+  background: linear-gradient(180deg, rgb(16 22 58 / 0.78), rgb(9 12 36 / 0.78));
+  border: 1px solid rgb(120 150 255 / 0.14);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 18px 40px -28px rgb(0 0 0 / 0.9);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.dash-hover { transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; }
+@media (hover: hover) {
+  .dash-hover:hover { border-color: rgb(127 155 255 / 0.4); box-shadow: 0 0 0 1px rgb(127 155 255 / 0.15), 0 16px 40px -20px rgb(61 90 254 / 0.6); transform: translateY(-2px); }
+}
+.dash { display: flex; flex-direction: column; gap: 1rem; }
+/* Téléphone : les cours d'abord, puis le marché, la liste des tokens, et le Social plus bas */
+.dash-tickers { order: 1; } .dash-mid { order: 2; } .dash-news { order: 3; } .dash-tokens { order: 4; } .dash-social { order: 5; } .dash-watch { order: 6; } .dash-hist { order: 7; }
+.dash-mid { display: grid; gap: 1rem; }
+@media (min-width: 640px) { .dash-mid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dash-mid > .dash-hero, .dash-mid > .dash-weekly { grid-column: 1 / -1; } }
+@media (min-width: 1024px) {
+  .dash {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "tickers tickers"
+      "mid mid"
+      "news news"
+      "social tokens"
+      "watch hist";
+  }
+}
+/* Grand écran : Social à gauche, le marché au centre, la watchlist à droite */
+@media (min-width: 1400px) {
+  .dash {
+    grid-template-columns: minmax(270px, 0.8fr) minmax(0, 2.3fr) minmax(320px, 0.95fr);
+    grid-template-areas:
+      "social tickers watch"
+      "social mid watch"
+      "social news hist"
+      "social tokens hist";
+  }
+  .dash-social { position: sticky; top: 1rem; }
+  .dash-social-feed { max-height: calc(100vh - 14rem); overflow-y: auto; scrollbar-width: none; }
+  .dash-mid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* Ultrawide : plus de place au marché, le Mème de la semaine et les classements côte à côte */
+@media (min-width: 2200px) {
+  .dash { grid-template-columns: minmax(320px, 0.8fr) minmax(0, 3fr) minmax(340px, 0.85fr); gap: 1.25rem; }
+  .dash-mid { grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)); }
+  .dash-mid > .dash-weekly { grid-column: auto; }
+}
+.dash-social { grid-area: social; min-width: 0; }
+.dash-tickers { grid-area: tickers; min-width: 0; }
+.dash-mid { grid-area: mid; min-width: 0; }
+.dash-news { grid-area: news; min-width: 0; }
+.dash-tokens { grid-area: tokens; min-width: 0; }
+.dash-watch { grid-area: watch; min-width: 0; }
+.dash-hist { grid-area: hist; min-width: 0; }

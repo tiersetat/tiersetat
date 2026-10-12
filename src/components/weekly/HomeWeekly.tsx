@@ -27,7 +27,7 @@ export async function HomeWeekly() {
   const [current, last, rate] = await Promise.all([getWeek(0).catch(() => null), getWeek(1).catch(() => null), solUsd().catch(() => null)]);
   if (!current) return null;
   return (
-    <section className="surface relative overflow-hidden p-4 sm:p-5">
+    <section className="dash-panel relative h-full overflow-hidden p-4 sm:p-5">
       <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 size-60 rounded-full bg-[radial-gradient(closest-side,rgb(127_155_255/0.25),transparent)]" />
       <div className="relative flex items-center justify-between gap-3">
         <div>
@@ -40,12 +40,12 @@ export async function HomeWeekly() {
           Classement
         </Link>
       </div>
-      <div className="relative mt-4 grid gap-4 sm:grid-cols-2 min-[1400px]:grid-cols-1">
+      <div className="relative mt-4 grid gap-4 sm:grid-cols-2">
         {last?.winner && <Meme m={last.winner} label="Gagnant de la semaine dernière" rate={rate} big />}
         {current.winner ? (
           <Meme m={current.winner} label="En tête cette semaine" rate={rate} big={!last?.winner} />
         ) : (
-          <Link href="/lancer" className="ios-press flex items-center justify-between gap-3 rounded-2xl border border-dashed border-white/15 p-3 text-sm">
+          <Link href="/lancer" className={`ios-press flex items-center justify-between gap-3 rounded-2xl border border-dashed border-white/15 p-3 text-sm ${last?.winner ? "" : "sm:col-span-2"}`}>
             <span className="text-muted-foreground">Personne en tête cette semaine. Ton mème peut prendre la Une.</span>
             <span className="btn-fete min-h-9 shrink-0 px-4 py-1.5 text-sm">Créer un mème</span>
           </Link>
