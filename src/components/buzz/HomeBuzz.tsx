@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AutoScroller } from "@/components/buzz/AutoScroller";
 import { BuzzImage } from "@/components/buzz/BuzzImage";
 import { HEAT_STYLE } from "@/components/buzz/TrendList";
 import { getBuzz } from "@/lib/buzz";
@@ -7,7 +8,7 @@ import { computeTrends, itemHeat, keywords } from "@/lib/buzz-trends";
 
 const HEAT_RANK = { brulant: 0, chaud: 1, tiede: 2 } as const;
 
-/** Accueil, « À la une » : le sujet le plus chaud du moment et les actus chaudes, en liste verticale. */
+/** Accueil, « À la une » : le sujet le plus chaud du moment et les actus chaudes, en cartes qui défilent. */
 export async function HomeBuzz() {
   const items = await getBuzz().then((b) => b.items, () => []);
   const trends = computeTrends(items, 16);
@@ -54,35 +55,27 @@ export async function HomeBuzz() {
         </div>
       </div>
 
-      {/* Liste verticale : l'article phare en grand, puis les suivants en lignes compactes */}
-      <div className="surface divide-y divide-ligne overflow-hidden">
-        {hot.slice(0, 6).map(({ item }, index) =>
-          index === 0 ? (
-            <a key={item.id} href={item.url} target="_blank" rel="noreferrer" className="group block">
-              <div className="relative">
-                <BuzzImage src={item.image} source={item.source} priority />
+      <AutoScroller className="-mx-4 snap-x px-4">
+        {hot.map(({ item }, index) => {
+          return (
+            <article key={item.id} className="surface group flex w-72 shrink-0 snap-start flex-col overflow-hidden sm:w-80">
+              <a href={item.url} target="_blank" rel="noreferrer" tabIndex={-1} aria-hidden className="relative block">
+                <BuzzImage src={item.image} source={item.source} priority={index < 2} />
                 <span className="absolute left-3 top-3 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium text-lueur">{item.source}</span>
-              </div>
-              <div className="space-y-1 p-4">
+              </a>
+              <div className="flex flex-1 flex-col p-4">
                 <p className="text-xs text-muted-foreground">{timeAgo(item.publishedAt)}</p>
-                <h3 className="text-lg font-bold leading-snug">{item.title}</h3>
+                <h3 className="mt-1 line-clamp-3 text-sm font-medium leading-snug">{item.title}</h3>
+                <div className="mt-auto flex items-center justify-between gap-3 pt-3">
+                  <a href={item.url} target="_blank" rel="noreferrer" className="text-xs text-muted-foreground hover:text-foreground">
+                    Lire ↗
+                  </a>
+                </div>
               </div>
-            </a>
-          ) : (
-            <a key={item.id} href={item.url} target="_blank" rel="noreferrer" className="group flex items-center gap-3 p-3 hover:bg-white/[0.04]">
-              <div className="w-28 shrink-0 overflow-hidden rounded-xl sm:w-36">
-                <BuzzImage src={item.image} source={item.source} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">
-                  {item.source} · {timeAgo(item.publishedAt)}
-                </p>
-                <h3 className="mt-0.5 line-clamp-3 text-sm font-semibold leading-snug">{item.title}</h3>
-              </div>
-            </a>
-          ),
-        )}
-      </div>
+            </article>
+          );
+        })}
+      </AutoScroller>
     </section>
   );
 }
