@@ -7,6 +7,8 @@ import { moderate } from "@/lib/moderation";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { solanaAddress } from "@/lib/validators";
 import { rateLimit, tooMany } from "@/lib/rate-limit";
+import { checkQgMessage } from "@/lib/qg";
+import { holdsToken } from "@/lib/qg-data";
 
 const postSchema = z.object({ mint: solanaAddress, body: z.string().trim().min(1, "Message vide").max(500, "500 caractères max") });
 const hideSchema = z.object({ id: z.number().int().positive() });
@@ -14,7 +16,7 @@ const hideSchema = z.object({ id: z.number().int().positive() });
 /** Délai minimal entre deux messages d'un même compte (anti-spam). */
 const COOLDOWN_MS = 10_000;
 
-/** Publier un commentaire sous un token (session requise, modéré comme les tokens). */
+/** Écrire dans le QG d'un mème : réservé à son créateur et à ses détenteurs, modéré (mots interdits, promesses de gains, achats coordonnés). */
 export async function POST(req: NextRequest) {
   try {
     const profile = await getSessionProfile();
@@ -24,10 +26,15 @@ export async function POST(req: NextRequest) {
 
     const verdict = moderate([body], await getBlockedWords());
     if (!verdict.ok) return jsonError(422, verdict.reason);
+    const qg = checkQgMessage(body);
+    if (!qg.ok) return jsonError(422, qg.reason);
 
     const db = supabaseAdmin();
-    const { data: token } = await db.from("tokens").select("hidden").eq("mint", mint).maybeSingle();
+    const { data: token } = await db.from("tokens").select("hidden, creator_wallet").eq("mint", mint).maybeSingle();
     if (!token || token.hidden) return jsonError(404, "Token introuvable.");
+    if (token.creator_wallet !== profile.wallet && !(await holdsToken(profile.wallet, mint).catch(() => false))) {
+      return jsonError(403, "Le QG est réservé aux détenteurs : achète un peu de ce mème pour y écrire.");
+    }
 
     const { data: last } = await db
       .from("comments")

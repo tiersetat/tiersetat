@@ -162,7 +162,7 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
         below={
           <div className="space-y-10">
             <TradersPanel rows={traders} profiles={profilesByWallet} theses={theses} solUsd={sol} creator={token.creator_wallet} />
-            <Comments mint={token.mint} />
+            <Comments mint={token.mint} ticker={token.ticker} creator={token.creator_wallet} />
           </div>
         }
         sidebar={
