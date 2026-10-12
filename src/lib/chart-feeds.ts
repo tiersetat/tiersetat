@@ -4,7 +4,7 @@ import { buildCandles, type TradeRow } from "@/lib/candles";
 /** D'où viennent les bougies d'un graphique (données sérialisables, passées par les pages). */
 export type ChartSource =
   | { kind: "hyperliquid"; coin: string }
-  | { kind: "gecko"; network: string; pool: string; /** blockchain DexScreener, pour le prix en direct */ chain?: string }
+  | { kind: "gecko"; network: string; pool: string; /** blockchain DexScreener et adresse du token, pour le prix en direct */ chain?: string; token?: string }
   | { kind: "coingecko"; id: string }
   | { kind: "local"; trades: TradeRow[]; createdAt?: string };
 
@@ -102,7 +102,7 @@ async function fetchBars(s: ChartSource, i: Interval): Promise<Bar[]> {
  * `last` donne la dernière bougie affichée. Renvoie une fonction d'arrêt.
  */
 export function subscribeBars(s: ChartSource, i: Interval, onBar: (b: Bar) => void, onLive: (on: boolean) => void, last?: () => Bar | undefined): () => void {
-  if (s.kind === "gecko" && s.chain) return tickDex(s.chain, s.pool, i, onBar, onLive, last);
+  if (s.kind === "gecko" && s.chain) return tickDex(s.chain, s.pool, s.token, i, onBar, onLive, last);
   if (s.kind !== "hyperliquid") return () => undefined;
   let stop = false;
   const ws = new WebSocket("wss://api.hyperliquid.xyz/ws");
@@ -123,17 +123,26 @@ export function subscribeBars(s: ChartSource, i: Interval, onBar: (b: Bar) => vo
   };
 }
 
-/** Prix DexScreener toutes les 3 s : met à jour (ou ouvre) la bougie en cours. Pause quand l'onglet est caché. */
-function tickDex(chain: string, pair: string, i: Interval, onBar: (b: Bar) => void, onLive: (on: boolean) => void, last?: () => Bar | undefined): () => void {
+/** Prix en direct toutes les 3 s (Jupiter sur Solana, DexScreener ailleurs) : met à jour (ou ouvre) la bougie en cours. Pause quand l'onglet est caché. */
+function tickDex(chain: string, pair: string, token: string | undefined, i: Interval, onBar: (b: Bar) => void, onLive: (on: boolean) => void, last?: () => Bar | undefined): () => void {
   let stop = false;
   const sec = SECONDS[i];
   const tick = async () => {
     if (stop || document.hidden) return;
     try {
-      const res = await fetch(`https://api.dexscreener.com/latest/dex/pairs/${chain}/${pair}`);
-      if (!res.ok) return;
-      const j = (await res.json()) as { pairs?: { priceUsd?: string }[]; pair?: { priceUsd?: string } };
-      const price = Number((j.pairs?.[0] ?? j.pair)?.priceUsd);
+      let price: number;
+      if (chain === "solana" && token) {
+        // Solana : Jupiter, rafraîchi toutes les ~5 s
+        const res = await fetch(`https://lite-api.jup.ag/price/v3?ids=${token}`);
+        if (!res.ok) return;
+        const j = (await res.json()) as Record<string, { usdPrice?: number }>;
+        price = Number(j[token]?.usdPrice);
+      } else {
+        const res = await fetch(`https://api.dexscreener.com/latest/dex/pairs/${chain}/${pair}`);
+        if (!res.ok) return;
+        const j = (await res.json()) as { pairs?: { priceUsd?: string }[]; pair?: { priceUsd?: string } };
+        price = Number((j.pairs?.[0] ?? j.pair)?.priceUsd);
+      }
       const prev = last?.();
       if (stop || !Number.isFinite(price) || price <= 0) return;
       const bucket = (Math.floor(Date.now() / 1000 / sec) * sec) as UTCTimestamp;

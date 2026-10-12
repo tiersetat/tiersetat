@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { TokenLogo } from "./TokenLogo";
-import { pct, usd } from "@/lib/market-format";
+import { LiveRowValues } from "./LiveValues";
 
 const CHAIN_DOT: Record<string, { label: string; color: string }> = {
   solana: { label: "SOL", color: "#9945ff" },
@@ -35,7 +35,6 @@ export type MarketItem = {
 
 /** Ligne compacte d'une liste de tokens : image, nom, prix, capitalisation, variation 24 h. */
 export function MarketRow({ t, rank }: { t: MarketItem; rank?: number }) {
-  const up = (t.change24 ?? 0) >= 0;
   return (
     <li>
       <Link
@@ -58,21 +57,7 @@ export function MarketRow({ t, rank }: { t: MarketItem; rank?: number }) {
             <span className="truncate">{t.name}</span>
           </p>
         </div>
-        <div className="shrink-0 text-right">
-          <p className="font-mono text-sm font-bold">{usd(t.priceUsd)}</p>
-          {t.mcapUsd !== null && <p className="font-mono text-xs text-muted-foreground">{usd(t.mcapUsd)} cap.</p>}
-        </div>
-        {t.progress !== undefined ? (
-          <span className="w-[5.5rem] shrink-0 rounded-xl bg-soleil/15 px-2 py-1.5 text-center font-mono text-xs font-bold text-soleil" title="Progression vers la Bastille">
-            🏰 {Math.round(t.progress)} %
-          </span>
-        ) : (
-          <span
-            className={`w-[5.5rem] shrink-0 rounded-xl px-2 py-1.5 text-center font-mono text-xs font-bold ${t.change24 === null ? "bg-white/[0.06] text-muted-foreground" : up ? "bg-achat/15 text-achat" : "bg-vente/15 text-vente"}`}
-          >
-            {pct(t.change24)}
-          </span>
-        )}
+        <LiveRowValues t={t} />
       </Link>
     </li>
   );

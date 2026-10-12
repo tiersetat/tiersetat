@@ -94,7 +94,7 @@ export default async function MarchePage({ params, searchParams }: PageProps<"/m
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(t.change.h24)} 24 h</p>
         </div>
 
-        {pair && <ChartPanel source={{ kind: "gecko", network: geckoNetwork(chain), pool: pair, chain }} />}
+        {pair && <ChartPanel source={{ kind: "gecko", network: geckoNetwork(chain), pool: pair, chain, token: t.address }} />}
 
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {stats.map(([k, v]) => (

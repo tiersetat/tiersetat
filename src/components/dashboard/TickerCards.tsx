@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { TokenLogo } from "@/components/market/TokenLogo";
 import type { MarketItem } from "@/components/market/MarketRow";
-import { Change, fullPrice } from "./Panel";
+import { LiveQuote } from "./LiveQuote";
 import { Sparkline } from "./Sparkline";
 
 /** Les grandes cryptos en cartes : logo, nom, prix, variation 24 h et courbe 7 jours (CoinGecko). */
@@ -20,8 +20,7 @@ export function TickerCards({ items }: { items: MarketItem[] }) {
               <p className="font-mono text-[11px] text-muted-foreground">{c.symbol}</p>
             </div>
           </div>
-          <p className="mt-2.5 font-mono text-xl font-bold tabular-nums">{fullPrice(c.priceUsd)}</p>
-          <Change v={c.change24} className="text-xs" />
+          <LiveQuote item={c} priceClass="mt-2.5 font-mono text-xl font-bold tabular-nums" changeClass="text-xs" />
           {c.sparkline && <Sparkline points={c.sparkline} className="mt-1.5 h-9 w-full" />}
         </Link>
       ))}

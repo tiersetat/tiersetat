@@ -485,3 +485,10 @@ body {
 .dash-tokens { grid-area: tokens; min-width: 0; }
 .dash-watch { grid-area: watch; min-width: 0; }
 .dash-hist { grid-area: hist; min-width: 0; }
+
+/* Prix en direct : bref éclair vert (hausse) ou rouge (baisse) à chaque mouvement */
+@keyframes flash-up { from { color: var(--achat); text-shadow: 0 0 10px rgb(61 255 176 / 0.7); } }
+@keyframes flash-down { from { color: var(--vente); text-shadow: 0 0 10px rgb(255 61 104 / 0.7); } }
+.flash-up { animation: flash-up 0.9s ease-out; }
+.flash-down { animation: flash-down 0.9s ease-out; }
+@media (prefers-reduced-motion: reduce) { .flash-up, .flash-down { animation: none; } }

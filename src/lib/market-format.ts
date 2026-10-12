@@ -17,3 +17,13 @@ export function pct(n: number | null | undefined): string {
   const v = a >= 10_000 ? `${Math.round(n / 1000).toLocaleString("fr-FR")} k` : a >= 100 ? Math.round(n).toLocaleString("fr-FR") : n.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
   return `${n >= 0 ? "▲" : "▼"} ${v.replace("-", "")} %`;
 }
+
+/** Prix détaillé pour les valeurs en direct : $83,244.50, $2,541.82, $0.00144 (les petits mouvements restent visibles). */
+export function livePrice(n: number | null | undefined): string {
+  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
+  const abs = Math.abs(n);
+  if (abs >= 1e6) return usd(n);
+  if (abs >= 1) return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (abs === 0) return "$0";
+  return `$${n.toPrecision(4)}`;
+}

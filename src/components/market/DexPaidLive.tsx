@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { TokenLogo } from "./TokenLogo";
 import { pct, usd } from "@/lib/market-format";
+import { liveKeyOf, useLiveQuote } from "./livePrices";
 import type { PaidItem } from "@/lib/market-feeds";
 
 const CHAIN: Record<string, { label: string; color: string }> = {
@@ -78,7 +79,6 @@ export function DexPaidLive({ chain, initial }: { chain: string | null; initial:
       <ul className="overflow-hidden rounded-3xl bg-surface p-1.5 ring-1 ring-white/[0.08]">
         {items.map((t) => {
           const c = CHAIN[t.chain];
-          const up = (t.change24 ?? 0) >= 0;
           return (
             <li key={`${t.chain}:${t.address}`} className={`rounded-2xl transition-colors duration-1000 ${fresh.has(t.address) ? "bg-achat/15" : ""}`}>
               <Link href={t.href ?? `/marche/${t.address}`} className="flex items-center gap-3 rounded-2xl px-2.5 py-2.5 hover:bg-white/[0.04]">
@@ -99,10 +99,7 @@ export function DexPaidLive({ chain, initial }: { chain: string | null; initial:
                     {t.bonding && <span>· bonding</span>}
                   </p>
                 </div>
-                <div className="shrink-0 text-right">
-                  <p className="font-mono text-sm font-semibold tabular-nums">{t.mcapUsd !== null ? usd(t.mcapUsd) : "—"}</p>
-                  <p className={`font-mono text-[11px] tabular-nums ${t.change24 === null ? "text-muted-foreground" : up ? "text-achat" : "text-vente"}`}>{t.change24 === null ? "cap." : pct(t.change24)}</p>
-                </div>
+                <PaidValues t={t} />
               </Link>
             </li>
           );
@@ -112,6 +109,22 @@ export function DexPaidLive({ chain, initial }: { chain: string | null; initial:
         Tokens qui viennent de payer leur profil DexScreener (« DEX payé »), du plus récent au plus ancien ; l&apos;heure est celle où Tiers-État les a vus apparaître. Solana, Robinhood, Base, BNB et Ethereum. Payer un profil ne prouve rien : ni vérifiés ni recommandés
         par Tiers-État, très risqués.
       </p>
+    </div>
+  );
+}
+
+/** Capitalisation et variation 24 h en direct (Jupiter sur Solana, DexScreener ailleurs), avec éclair à chaque mouvement. */
+function PaidValues({ t }: { t: PaidItem }) {
+  const q = useLiveQuote(liveKeyOf(t));
+  const mcap = q?.mcap ?? (q && t.mcapUsd !== null && t.priceUsd ? (t.mcapUsd * q.price) / t.priceUsd : t.mcapUsd);
+  const change = q?.change24 ?? t.change24;
+  const up = (change ?? 0) >= 0;
+  return (
+    <div className="shrink-0 text-right">
+      <p key={q?.at} className={`font-mono text-sm font-semibold tabular-nums ${q?.dir === "up" ? "flash-up" : q?.dir === "down" ? "flash-down" : ""}`}>
+        {mcap !== null ? usd(mcap) : "—"}
+      </p>
+      <p className={`font-mono text-[11px] tabular-nums ${change === null ? "text-muted-foreground" : up ? "text-achat" : "text-vente"}`}>{change === null ? "cap." : pct(change)}</p>
     </div>
   );
 }

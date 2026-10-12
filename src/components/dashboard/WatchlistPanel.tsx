@@ -6,6 +6,7 @@ import { TokenLogo } from "@/components/market/TokenLogo";
 import { useWatchlist } from "@/components/market/useWatchlist";
 import type { MarketItem } from "@/components/market/MarketRow";
 import { Change, Panel, fullPrice } from "./Panel";
+import { useLiveItem } from "@/components/market/LiveValues";
 
 /**
  * Ma watchlist : les favoris (étoile) de cet appareil, avec leur prix en direct.
@@ -54,22 +55,32 @@ export function WatchlistPanel({ top }: { top: MarketItem[] }) {
         </thead>
         <tbody>
           {rows.map((c, i) => (
-            <tr key={c.address} className="border-t border-white/[0.06]">
-              <td className="py-1.5">
-                <Link href={c.href ?? `/marche/${c.address}`} className="flex min-w-0 items-center gap-2 hover:text-pervenche">
-                  <span className="hidden w-4 shrink-0 font-mono text-[11px] text-muted-foreground tabular-nums min-[1700px]:inline">{i + 1}</span>
-                  <TokenLogo src={c.imageUrl} emoji={c.emoji} symbol={c.symbol} name={c.name} size={22} className="rounded-full" />
-                  <span className="truncate font-bold">{c.symbol}</span>
-                </Link>
-              </td>
-              <td className="whitespace-nowrap py-1.5 pl-2 text-right font-mono tabular-nums">{fullPrice(c.priceUsd)}</td>
-              <td className="py-1.5 pl-2 text-right">
-                <Change v={c.change24} className="text-[11px]" />
-              </td>
-            </tr>
+            <WatchRow key={c.address} c={c} i={i} />
           ))}
         </tbody>
       </table>
     </Panel>
+  );
+}
+
+/** Une ligne de la watchlist, en direct. */
+function WatchRow({ c, i }: { c: MarketItem; i: number }) {
+  const v = useLiveItem(c);
+  return (
+    <tr className="border-t border-white/[0.06]">
+      <td className="py-1.5">
+        <Link href={c.href ?? `/marche/${c.address}`} className="flex min-w-0 items-center gap-2 hover:text-pervenche">
+          <span className="hidden w-4 shrink-0 font-mono text-[11px] text-muted-foreground tabular-nums min-[1700px]:inline">{i + 1}</span>
+          <TokenLogo src={c.imageUrl} emoji={c.emoji} symbol={c.symbol} name={c.name} size={22} className="rounded-full" />
+          <span className="truncate font-bold">{c.symbol}</span>
+        </Link>
+      </td>
+      <td key={v.at} className={`whitespace-nowrap py-1.5 pl-2 text-right font-mono tabular-nums ${v.dir === "up" ? "flash-up" : v.dir === "down" ? "flash-down" : ""}`}>
+        {fullPrice(v.price)}
+      </td>
+      <td className="py-1.5 pl-2 text-right">
+        <Change v={v.change24} className="text-[11px]" />
+      </td>
+    </tr>
   );
 }
