@@ -228,8 +228,12 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
           if (stop) return;
           attempt = 0;
           setLimited(false);
+          // Les bougies en direct plus récentes que l'historique rechargé (en retard) sont gardées : pas de retour en arrière
+          const lastLoaded = list[list.length - 1]?.time ?? 0;
+          const newer = bars.current.filter((b) => b.time > lastLoaded);
+          const merged = newer.length && list.length ? [...list, ...newer] : list;
           // Une réponse vide ne remplace jamais un graphique déjà affiché
-          if (list.length || !bars.current.length) show(list);
+          if (merged.length || !bars.current.length) show(merged);
           if (source.kind !== "hyperliquid") setLive(list.length > 0);
         })
         .catch(() => {
@@ -247,7 +251,7 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
     if (cached) show(cached);
     Promise.resolve().then(() => !stop && setLive(Boolean(cached) && source.kind !== "hyperliquid"));
     void load();
-    const unsub = subscribeBars(source, interval, apply, (on) => !stop && setLive(on));
+    const unsub = subscribeBars(source, interval, apply, (on) => !stop && setLive(on), () => bars.current[bars.current.length - 1]);
     const every = pollMs(source);
     const timer = every ? setInterval(load, every) : null;
     return () => {

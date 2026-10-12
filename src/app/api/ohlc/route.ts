@@ -25,10 +25,10 @@ export async function GET(req: Request) {
       const pool = q.get("pool") ?? "";
       const tf = GECKO_TF[i];
       if (!tf || !SAFE.test(network) || !/^[A-Za-z0-9]{20,80}$/.test(pool)) return NextResponse.json({ error: "paramètres" }, { status: 400 });
-      const data = await memo(`ohlc:g:${network}:${pool}:${i}`, 20_000, () =>
+      const data = await memo(`ohlc:g:${network}:${pool}:${i}`, 12_000, () =>
         upstream(`https://api.geckoterminal.com/api/v2/networks/${network}/pools/${pool}/ohlcv/${tf[0]}?aggregate=${tf[1]}&limit=1000&currency=usd`),
       );
-      return NextResponse.json(data, { headers: { "Cache-Control": "public, s-maxage=20, stale-while-revalidate=120" } });
+      return NextResponse.json(data, { headers: { "Cache-Control": "public, s-maxage=10, stale-while-revalidate=20" } });
     }
     if (src === "coingecko") {
       const id = q.get("id") ?? "";

@@ -4,7 +4,7 @@ import { buildCandles, type TradeRow } from "@/lib/candles";
 /** D'où viennent les bougies d'un graphique (données sérialisables, passées par les pages). */
 export type ChartSource =
   | { kind: "hyperliquid"; coin: string }
-  | { kind: "gecko"; network: string; pool: string }
+  | { kind: "gecko"; network: string; pool: string; /** blockchain DexScreener, pour le prix en direct */ chain?: string }
   | { kind: "coingecko"; id: string }
   | { kind: "local"; trades: TradeRow[]; createdAt?: string };
 
@@ -22,7 +22,7 @@ export function intervalsOf(s: ChartSource): Interval[] {
 
 /** Fréquence d'actualisation quand il n'y a pas de flux en direct (ms). */
 export function pollMs(s: ChartSource): number | null {
-  if (s.kind === "gecko") return 20_000;
+  if (s.kind === "gecko") return 15_000;
   if (s.kind === "coingecko") return 120_000;
   return null;
 }
@@ -96,8 +96,13 @@ async function fetchBars(s: ChartSource, i: Interval): Promise<Bar[]> {
   return buildCandles(s.trades, sec, launch).map((c) => ({ ...c, time: c.time as UTCTimestamp, volume: vol.get(c.time) ?? 0 }));
 }
 
-/** Flux en direct (Hyperliquid uniquement) : renvoie une fonction d'arrêt. */
-export function subscribeBars(s: ChartSource, i: Interval, onBar: (b: Bar) => void, onLive: (on: boolean) => void): () => void {
+/**
+ * Flux en direct : bougies Hyperliquid en continu ; pour les tokens des DEX (GeckoTerminal),
+ * le prix DexScreener toutes les 3 s fait vivre la dernière bougie entre deux rechargements de l'historique.
+ * `last` donne la dernière bougie affichée. Renvoie une fonction d'arrêt.
+ */
+export function subscribeBars(s: ChartSource, i: Interval, onBar: (b: Bar) => void, onLive: (on: boolean) => void, last?: () => Bar | undefined): () => void {
+  if (s.kind === "gecko" && s.chain) return tickDex(s.chain, s.pool, i, onBar, onLive, last);
   if (s.kind !== "hyperliquid") return () => undefined;
   let stop = false;
   const ws = new WebSocket("wss://api.hyperliquid.xyz/ws");
@@ -115,5 +120,36 @@ export function subscribeBars(s: ChartSource, i: Interval, onBar: (b: Bar) => vo
   return () => {
     stop = true;
     ws.close();
+  };
+}
+
+/** Prix DexScreener toutes les 3 s : met à jour (ou ouvre) la bougie en cours. Pause quand l'onglet est caché. */
+function tickDex(chain: string, pair: string, i: Interval, onBar: (b: Bar) => void, onLive: (on: boolean) => void, last?: () => Bar | undefined): () => void {
+  let stop = false;
+  const sec = SECONDS[i];
+  const tick = async () => {
+    if (stop || document.hidden) return;
+    try {
+      const res = await fetch(`https://api.dexscreener.com/latest/dex/pairs/${chain}/${pair}`);
+      if (!res.ok) return;
+      const j = (await res.json()) as { pairs?: { priceUsd?: string }[]; pair?: { priceUsd?: string } };
+      const price = Number((j.pairs?.[0] ?? j.pair)?.priceUsd);
+      const prev = last?.();
+      if (stop || !Number.isFinite(price) || price <= 0) return;
+      const bucket = (Math.floor(Date.now() / 1000 / sec) * sec) as UTCTimestamp;
+      // Historique pas encore disponible (service limité) : le graphique démarre avec le prix en direct
+      if (!prev) onBar({ time: bucket, open: price, high: price, low: price, close: price, volume: 0 });
+      else if (bucket === prev.time) onBar({ ...prev, high: Math.max(prev.high, price), low: Math.min(prev.low, price), close: price });
+      else if (bucket > prev.time) onBar({ time: bucket, open: prev.close, high: Math.max(prev.close, price), low: Math.min(prev.close, price), close: price, volume: 0 });
+      onLive(true);
+    } catch {
+      /* réseau indisponible : l'historique continue de se recharger */
+    }
+  };
+  void tick();
+  const id = setInterval(tick, 3_000);
+  return () => {
+    stop = true;
+    clearInterval(id);
   };
 }
