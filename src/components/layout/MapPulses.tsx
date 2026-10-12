@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { FeedItem } from "@/lib/feed";
 import { nightLevel, pulsePoint, type MapView, type Variant } from "@/lib/france-map";
+import { subscribeTrades } from "@/components/social/tradesFeed";
 
 type Pulse = { id: string; x: number; y: number; side: "buy" | "sell" };
 
-const POLL_MS = 12_000;
 
 function parisHour(): number {
   const parts = new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "numeric", minute: "numeric", hour12: false }).formatToParts(new Date());
@@ -39,41 +39,34 @@ export function MapPulses({ view, variant }: { view: MapView; variant: Variant }
     if (window.matchMedia("(min-width: 640px)").matches !== (variant === "d")) return;
     let stop = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
-    const load = async () => {
-      if (document.hidden) return;
-      try {
-        const j = (await (await fetch("/api/fil?type=echanges")).json()) as { items: FeedItem[] };
-        const trades = j.items.filter((i): i is Extract<FeedItem, { kind: "trade" }> => i.kind === "trade");
-        // Premier chargement : on retient l'historique sans l'animer (seuls les échanges qui arrivent ensuite font une onde)
-        if (!seen.current) {
-          seen.current = new Set(trades.map((t) => t.id));
-          return;
-        }
-        const fresh = trades.filter((t) => !seen.current!.has(t.id)).slice(0, 8);
-        fresh.forEach((t) => seen.current!.add(t.id));
-        fresh.forEach((t, k) => {
-          const p = pulsePoint(view, variant, t.author);
-          if (!p) return;
-          // Léger décalage pour que plusieurs achats d'une même région ne se superposent pas
-          const jitter = (n: number) => ((parseInt(t.id.slice(-n - 2, -n) || "0", 36) % 9) - 4) * 0.35;
-          timers.push(
-            setTimeout(() => {
-              if (stop) return;
-              const pulse: Pulse = { id: t.id, x: p[0] + jitter(1), y: p[1] + jitter(3), side: t.side };
-              setPulses((cur) => [...cur.slice(-11), pulse]);
-              timers.push(setTimeout(() => setPulses((cur) => cur.filter((q) => q.id !== pulse.id)), 3200));
-            }, k * 700),
-          );
-        });
-      } catch {
-        /* réseau indisponible : la carte reste calme */
+    const onItems = (items: FeedItem[]) => {
+      const trades = items.filter((i): i is Extract<FeedItem, { kind: "trade" }> => i.kind === "trade");
+      // Premier passage : on retient l'historique sans l'animer (seuls les échanges qui arrivent ensuite font une onde)
+      if (!seen.current) {
+        seen.current = new Set(trades.map((t) => t.id));
+        return;
       }
+      const fresh = trades.filter((t) => !seen.current!.has(t.id)).slice(0, 8);
+      fresh.forEach((t) => seen.current!.add(t.id));
+      fresh.forEach((t, k) => {
+        const p = pulsePoint(view, variant, t.author);
+        if (!p) return;
+        // Léger décalage pour que plusieurs achats d'une même région ne se superposent pas
+        const jitter = (n: number) => ((parseInt(t.id.slice(-n - 2, -n) || "0", 36) % 9) - 4) * 0.35;
+        timers.push(
+          setTimeout(() => {
+            if (stop) return;
+            const pulse: Pulse = { id: t.id, x: p[0] + jitter(1), y: p[1] + jitter(3), side: t.side };
+            setPulses((cur) => [...cur.slice(-11), pulse]);
+            timers.push(setTimeout(() => setPulses((cur) => cur.filter((q) => q.id !== pulse.id)), 3200));
+          }, k * 700),
+        );
+      });
     };
-    void load();
-    const id = setInterval(load, POLL_MS);
+    const unsubscribe = subscribeTrades(onItems);
     return () => {
       stop = true;
-      clearInterval(id);
+      unsubscribe();
       timers.forEach(clearTimeout);
     };
   }, [view, variant]);

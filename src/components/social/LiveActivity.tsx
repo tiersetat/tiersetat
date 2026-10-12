@@ -6,6 +6,7 @@ import { Avatar } from "./Avatar";
 import { displayName } from "@/lib/display";
 import { usd } from "@/lib/market-format";
 import type { FeedItem } from "@/lib/feed";
+import { subscribeTrades } from "./tradesFeed";
 
 type Scope = "mondial" | "amis";
 type Trade = Extract<FeedItem, { kind: "trade" }>;
@@ -28,22 +29,30 @@ export function LiveActivity({ limit = 12 }: { limit?: number }) {
   const [items, setItems] = useState<Trade[] | null>(null);
   const [notice, setNotice] = useState<null | "login" | "follows">(null);
 
-  const load = useCallback(async () => {
+  // Amis : requête propre (liste personnelle) ; Mondial : flux partagé avec le reste de la page
+  const loadFriends = useCallback(async () => {
     try {
-      const r = await fetch(`/api/fil?type=echanges${scope === "amis" ? "&abonnements=1" : ""}`);
+      const r = await fetch("/api/fil?type=echanges&abonnements=1");
       const j = (await r.json()) as { items: FeedItem[]; needLogin?: boolean; noFollows?: boolean };
       setNotice(j.needLogin ? "login" : j.noFollows ? "follows" : null);
       setItems(j.items.filter((i): i is Trade => i.kind === "trade").slice(0, limit));
     } catch {
       /* réseau indisponible : on garde la liste affichée */
     }
-  }, [scope, limit]);
+  }, [limit]);
 
   useEffect(() => {
-    Promise.resolve().then(() => setItems(null)).then(load);
-    const id = setInterval(load, 8_000);
+    Promise.resolve().then(() => setItems(null));
+    if (scope === "mondial") {
+      return subscribeTrades((all) => {
+        setNotice(null);
+        setItems(all.filter((i): i is Trade => i.kind === "trade").slice(0, limit));
+      });
+    }
+    void Promise.resolve().then(loadFriends);
+    const id = setInterval(() => !document.hidden && void loadFriends(), 8_000);
     return () => clearInterval(id);
-  }, [load]);
+  }, [scope, limit, loadFriends]);
 
   return (
     <section className="space-y-3">

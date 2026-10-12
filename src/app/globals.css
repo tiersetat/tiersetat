@@ -427,8 +427,13 @@ body {
   background: linear-gradient(180deg, rgb(16 22 58 / 0.78), rgb(9 12 36 / 0.78));
   border: 1px solid rgb(120 150 255 / 0.14);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 18px 40px -28px rgb(0 0 0 / 0.9);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+}
+/* Flou d'arrière-plan seulement sur ordinateur : sur téléphone il ralentit le défilement, un fond un peu plus opaque le remplace */
+@media (hover: hover) and (pointer: fine) {
+  .dash-panel { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+}
+@media (hover: none) {
+  .dash-panel { background: linear-gradient(180deg, rgb(16 22 58 / 0.9), rgb(9 12 36 / 0.9)); }
 }
 .dash-hover { transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; }
 @media (hover: hover) {
