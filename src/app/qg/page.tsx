@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { QgScene } from "@/components/qg/QgScene";
+import { QgChapitre2 } from "@/components/qg/QgChapitre2";
 import { QG_SCENE_READY, QG_TEAM } from "@/lib/qg-scene";
 
 export const metadata: Metadata = { title: "Le QG — Tiers-État" };
@@ -29,6 +30,8 @@ export default function QgPage() {
           ))}
         </div>
       )}
+
+      <QgChapitre2 />
     </div>
   );
 }
