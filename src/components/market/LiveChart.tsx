@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { PositionForm } from "./PositionForm";
+import { checkPlan, pnlPct, type Plan } from "@/lib/position-plan";
 import {
   AreaSeries,
   CandlestickSeries,
@@ -114,6 +116,14 @@ export function LiveChart({
   const [full, setFull] = useState(false);
   const [limited, setLimited] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
+  // Outil « position » (comme TradingView) : gardé par actif sur cet appareil
+  const planKey = `te_plan:${source.kind === "local" ? `local:${source.createdAt ?? ""}` : JSON.stringify(source)}`;
+  const [plan, setPlan] = useState<Plan | null>(null);
+  const [planOpen, setPlanOpen] = useState(false);
+  const planRef = useRef<Plan | null>(null);
+  const planLines = useRef<IPriceLine[]>([]);
+  const riskBox = useRef<HTMLDivElement>(null);
+  const rewardBox = useRef<HTMLDivElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -183,6 +193,27 @@ export function LiveChart({
     };
   }, []);
 
+  /** Lignes de la position (entrée, stop, objectifs) sur la série principale. */
+  const drawPlan = useCallback(() => {
+    const m = main.current;
+    if (!m) return;
+    for (const l of planLines.current) {
+      try {
+        m.removePriceLine(l);
+      } catch {
+        /* ligne d'une ancienne série */
+      }
+    }
+    planLines.current = [];
+    const p = planRef.current;
+    if (!p) return;
+    const add = (price: number, color: string, title: string, style = 0) => planLines.current.push(m.createPriceLine({ price, color, lineWidth: 2, lineStyle: style, axisLabelVisible: true, title }));
+    add(p.entry, "#f4f1fa", p.side === "long" ? "Long" : "Short");
+    add(p.stop, "#ff3d68", "Stop");
+    add(p.target, "#3dffb0", "Objectif");
+    if (p.partial) add(p.partial, "#8fa2ff", "Partiel", 2);
+  }, []);
+
   // Dessine la série principale et les indicateurs à partir des barres
   const render = useCallback(() => {
     const chart = chartRef.current;
@@ -205,8 +236,10 @@ export function LiveChart({
       s.setData(data.map((b) => ({ time: b.time, value: b.close })));
       main.current = s;
     }
-    // les dessins sont attachés à l'ancienne série : on les retire
+    // les dessins sont attachés à l'ancienne série : on les retire (la position, elle, est redessinée)
     drawings.current.lines = [];
+    planLines.current = [];
+    drawPlan();
     if (indics.has("volume")) {
       const v = chart.addSeries(HistogramSeries, { priceScaleId: "", priceFormat: { type: "volume" }, lastValueVisible: false, priceLineVisible: false });
       v.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
@@ -225,11 +258,69 @@ export function LiveChart({
       line(b.up, "#5ec8ff");
       line(b.lo, "#5ec8ff");
     }
-  }, [kind, indics]);
+  }, [kind, indics, drawPlan]);
 
   useEffect(() => {
     render();
   }, [render]);
+
+  // Position enregistrée pour cet actif (relue à l'ouverture)
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(planKey) ?? "null") as Plan | null;
+      if (saved && checkPlan(saved).ok) Promise.resolve().then(() => setPlan(saved));
+    } catch {
+      /* stockage indisponible */
+    }
+  }, [planKey]);
+  useEffect(() => {
+    planRef.current = plan;
+    drawPlan();
+  }, [plan, drawPlan]);
+
+  // Boîtes rouge (risque) et verte (gain), recalées à chaque image sur l'échelle de prix du graphique
+  useEffect(() => {
+    if (!plan) return;
+    let raf = 0;
+    const place = () => {
+      const m = main.current;
+      const chart = chartRef.current;
+      const r = riskBox.current;
+      const g = rewardBox.current;
+      if (m && chart && r && g && box.current) {
+        const yE = m.priceToCoordinate(plan.entry);
+        const yS = m.priceToCoordinate(plan.stop);
+        const yT = m.priceToCoordinate(plan.target);
+        const scale = chart.priceScale("right").width();
+        const w = box.current.clientWidth - scale;
+        const left = Math.round(w * 0.55);
+        const setBox = (el: HTMLDivElement, a: number | null, b: number | null) => {
+          if (a === null || b === null) return void (el.style.display = "none");
+          el.style.display = "block";
+          el.style.left = `${left}px`;
+          el.style.width = `${Math.max(0, w - left)}px`;
+          el.style.top = `${Math.min(a, b)}px`;
+          el.style.height = `${Math.abs(b - a)}px`;
+        };
+        setBox(r, yE, yS);
+        setBox(g, yE, yT);
+      }
+      raf = requestAnimationFrame(place);
+    };
+    raf = requestAnimationFrame(place);
+    return () => cancelAnimationFrame(raf);
+  }, [plan]);
+
+  const applyPlan = (p: Plan | null) => {
+    setPlan(p);
+    setPlanOpen(false);
+    try {
+      if (p) localStorage.setItem(planKey, JSON.stringify(p));
+      else localStorage.removeItem(planKey);
+    } catch {
+      /* stockage indisponible : la position vaut pour cette visite */
+    }
+  };
 
   // Historique, puis temps réel (flux en direct ou actualisation régulière)
   const sourceKey = source.kind === "local" ? `local:${source.trades.length}:${source.trades[source.trades.length - 1]?.signature ?? ""}` : JSON.stringify(source);
@@ -423,6 +514,9 @@ export function LiveChart({
         <button type="button" onClick={clearDrawings} className={`${btn(false)} shrink-0`}>
           Effacer
         </button>
+        <button type="button" onClick={() => setPlanOpen((v) => !v)} className={`${btn(planOpen || Boolean(plan))} shrink-0`} title="Placer ta position : entrée, stop et objectif">
+          ▤ Position
+        </button>
         <span className="mx-1 h-4 w-px shrink-0 bg-white/15" />
         <button type="button" onClick={capture} className={`${btn(false)} shrink-0`} title="Enregistrer une image du graphique">
           📷
@@ -447,7 +541,41 @@ export function LiveChart({
         {tool && <span className="font-sans font-bold text-soleil">{tool === "horizontale" ? "Touche le graphique pour placer la ligne" : step === 2 ? "Touche le 2e point" : "Touche le 1er point"}</span>}
       </div>
 
-      <div ref={box} style={full ? undefined : { height }} className={`w-full ${full ? "flex-1" : ""} ${tool ? "cursor-crosshair" : ""}`} />
+      {plan && (() => {
+        const c = checkPlan(plan);
+        const last = legend?.close;
+        const pnl = last ? pnlPct(plan, last) : null;
+        return c.ok ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-1 pb-2 text-[11px]">
+            <span className={`rounded-md px-1.5 py-0.5 font-bold ${plan.side === "long" ? "bg-achat/15 text-achat" : "bg-vente/15 text-vente"}`}>{plan.side === "long" ? "Long" : "Short"}</span>
+            <span className="text-muted-foreground">
+              risque <b className="text-vente">{c.riskPct.toFixed(2)} %</b> · gain visé <b className="text-achat">{c.rewardPct.toFixed(2)} %</b> · ratio <b className="text-foreground">{c.ratio.toFixed(2)} : 1</b>
+            </span>
+            {pnl !== null && <span className={`font-mono font-bold ${pnl >= 0 ? "text-achat" : "text-vente"}`}>en cours {pnl >= 0 ? "+" : "−"}{Math.abs(pnl).toFixed(2)} %</span>}
+          </div>
+        ) : null;
+      })()}
+
+      <div className={`relative w-full ${full ? "flex-1" : ""}`} style={full ? undefined : { height }}>
+        <div ref={box} className={`absolute inset-0 ${tool ? "cursor-crosshair" : ""}`} />
+        {plan && (
+          <>
+            <div ref={riskBox} className="pointer-events-none absolute border border-vente/50 bg-vente/15" style={{ display: "none" }} />
+            <div ref={rewardBox} className="pointer-events-none absolute border border-achat/50 bg-achat/12" style={{ display: "none" }} />
+          </>
+        )}
+        {planOpen && (
+          <div className="absolute left-2 top-2 z-10 w-[min(22rem,calc(100%-1rem))]">
+            <PositionForm
+              initial={plan}
+              price={legend?.close ?? null}
+              onApply={(p) => applyPlan(p)}
+              onClear={() => applyPlan(null)}
+              onClose={() => setPlanOpen(false)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
