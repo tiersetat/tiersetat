@@ -98,7 +98,7 @@ export function Workspace({ children }: { children: ReactNode }) {
     });
 
   // Pages sans panneaux : téléphone, accueil (déjà Social + Tokens), connexion et pages légales
-  const bare = !wide || path === "/" || path.startsWith("/cgu") || path.startsWith("/mentions-legales");
+  const bare = !wide || path === "/" || path.startsWith("/cgu") || path.startsWith("/mentions-legales") || path.startsWith("/qg");
   if (bare) return <>{children}</>;
 
   const clamp = (v: number) => Math.max(MIN, Math.min(MAX, v));

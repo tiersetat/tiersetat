@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PortfolioView } from "@/components/social/PortfolioView";
 import { CashWallet } from "@/components/wallet/CashWallet";
 import { MeHeader } from "@/components/me/MeHeader";
@@ -18,6 +19,13 @@ export default function MoiPage() {
           <PortfolioView />
         </section>
       </ConnectedOnly>
+      <Link href="/qg" className="surface flex items-center justify-between gap-3 p-4 lg:hidden">
+        <span>
+          <span className="block font-extrabold">Le QG du Tiers-État</span>
+          <span className="block text-sm text-muted-foreground">Rencontrez Jacques Bonhomme et son équipe</span>
+        </span>
+        <span aria-hidden>→</span>
+      </Link>
     </div>
   );
 }

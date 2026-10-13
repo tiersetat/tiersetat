@@ -4,8 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase/browser";
-import { explorerUrl } from "@/lib/solana/config";
+import { explorerUrl, RPC_URL } from "@/lib/solana/config";
 import { MIGRATION_QUOTE_THRESHOLD_LAMPORTS } from "@/lib/solana/platform";
+import { computePoolStats, decodePoolAccount } from "@/lib/solana/pool-stats";
+import { RpcStream } from "@/lib/solana/market-ticks";
+import { intervalForAge } from "@/lib/chart-feeds";
 import type { TradeRow } from "@/lib/candles";
 import { Eur } from "@/components/Eur";
 import { MigrationPanel } from "./MigrationPanel";
@@ -41,6 +44,8 @@ export function TokenLive(props: {
   const { mint, pool, ticker, createdAt } = props;
   const [trades, setTrades] = useState(props.initialTrades);
   const [live, setLive] = useState(props.initial);
+  /** Capitalisation lue directement sur la blockchain à chaque échange (avant même son enregistrement) */
+  const [liveMcap, setLiveMcap] = useState<number | null>(null);
 
   const reload = useCallback(async () => {
     const supabase = supabaseBrowser();
@@ -57,6 +62,37 @@ export function TokenLive(props: {
   useEffect(() => {
     void fetch("/api/trades/sync", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mint }) }).catch(() => undefined);
   }, [mint]);
+
+  // Écoute directe du pool sur la blockchain : la capitalisation et la courbe bougent à chaque échange,
+  // y compris ceux faits hors du site, qui sont alors enregistrés (rattrapage regroupé, au plus toutes les 20 s)
+  useEffect(() => {
+    if (typeof WebSocket === "undefined") return;
+    let lastSync = Date.now();
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const sync = () => {
+      timer = null;
+      lastSync = Date.now();
+      void fetch("/api/trades/sync", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mint }) }).catch(() => undefined);
+    };
+    const rpc = new RpcStream(RPC_URL.replace(/^http/, "ws"), () => undefined);
+    rpc.subscribe("accountSubscribe", [pool, { encoding: "base64", commitment: "confirmed" }], (value) => {
+      const data = (value as { data?: [string, string] })?.data?.[0];
+      if (!data) return;
+      try {
+        const state = decodePoolAccount(Uint8Array.from(atob(data), (c) => c.charCodeAt(0)));
+        const stats = computePoolStats(state, MIGRATION_QUOTE_THRESHOLD_LAMPORTS);
+        setLiveMcap(stats.marketCapSol);
+        setLive((l) => ({ ...l, market_cap_sol: stats.marketCapSol, curve_progress: stats.progress, migrated: state.isMigrated }));
+      } catch {
+        return;
+      }
+      if (!timer) timer = setTimeout(sync, Math.max(2500, 20_000 - (Date.now() - lastSync)));
+    });
+    return () => {
+      rpc.close();
+      if (timer) clearTimeout(timer);
+    };
+  }, [mint, pool]);
 
   useEffect(() => {
     const supabase = supabaseBrowser();
@@ -97,7 +133,7 @@ export function TokenLive(props: {
           ))}
         </dl>
 
-        <LiveChart source={{ kind: "local", trades, createdAt }} unit="SOL" height={320} />
+        <LiveChart source={{ kind: "local", trades, createdAt }} unit="SOL" height={320} liveValue={liveMcap} defaultInterval={intervalForAge(createdAt)} />
 
         <section className="surface space-y-3 p-5">
           <div className="flex items-baseline justify-between">

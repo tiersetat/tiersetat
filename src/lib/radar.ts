@@ -11,6 +11,10 @@ export type RadarToken = RadarStats & {
   imageUrl: string | null;
   dexUrl: string;
   links: { label: string; url: string }[];
+  /** Pool le plus liquide, son DEX (dexId DexScreener) et la monnaie de paiement : pour le graphique en direct */
+  pair?: string;
+  dexId?: string;
+  quoteAddress?: string;
 };
 
 const num = (v: unknown) => (v === null || v === undefined || v === "" ? null : Number.isFinite(Number(v)) ? Number(v) : null);
@@ -19,7 +23,10 @@ const STABLES = new Set(["SOL", "WSOL", "USDC", "USDT"]);
 type DexPair = {
   chainId: string;
   url: string;
+  dexId?: string;
+  pairAddress?: string;
   baseToken: { address: string; name: string; symbol: string };
+  quoteToken?: { address: string };
   priceUsd?: string;
   marketCap?: number;
   fdv?: number;
@@ -43,6 +50,9 @@ function fromPair(p: DexPair): RadarToken {
     imageUrl: p.info?.imageUrl && /^https:\/\//.test(p.info.imageUrl) ? p.info.imageUrl : null,
     dexUrl: p.url,
     links,
+    pair: p.pairAddress,
+    dexId: p.dexId,
+    quoteAddress: p.quoteToken?.address,
     priceUsd: num(p.priceUsd),
     mcapUsd: num(p.marketCap ?? p.fdv),
     liquidityUsd: num(p.liquidity?.usd),
@@ -120,6 +130,7 @@ export function trendingRadar(): Promise<RadarToken[]> {
           imageUrl: null,
           dexUrl: `https://www.geckoterminal.com/solana/pools/${a.address}`,
           links: [],
+          pair: a.address,
           priceUsd: num(a.base_token_price_usd),
           mcapUsd: num(a.market_cap_usd) ?? num(a.fdv_usd),
           liquidityUsd: num(a.reserve_in_usd),

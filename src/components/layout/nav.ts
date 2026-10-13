@@ -14,6 +14,7 @@ export const ICONS = {
   news: "M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5",
   wallet: "M3 7a2 2 0 0 1 2-2h13v4M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2zM16 14h1",
   chart: "M3 3v18h18M7 15l4-5 3 3 5-7",
+  flag: "M5 21V4M5 4h12l-2 4 2 4H5",
 } as const;
 
 export type NavItem = { href: string; label: string; d: string; color: string; match: string[] };
@@ -35,6 +36,7 @@ export const SIDEBAR: NavItem[] = [
   { href: "/crypto/bitcoin", label: "Graphiques", d: ICONS.chart, color: "text-ciel", match: [] },
   { href: "/fil", label: "Social", d: ICONS.social, color: "text-ciel", match: ["/communaute", "/profil", "/semaine"] },
   { href: "/recherche", label: "Recherche", d: ICONS.search, color: "text-ciel", match: [] },
+  { href: "/qg", label: "Le QG", d: ICONS.flag, color: "text-ciel", match: [] },
 ];
 
 /** Pages utiles mais secondaires : en bas du Profil (téléphone) et du menu (ordinateur). */

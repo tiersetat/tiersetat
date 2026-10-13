@@ -50,7 +50,7 @@
 }
 
 :root {
-  --nuit: #0b0d2a;
+  --nuit: #0a1a40;
   /* Cartes transparentes : le ciel se voit à travers */
   --surface: rgb(14 16 46 / 0.5);
   --ligne: rgb(255 255 255 / 0.1);
@@ -396,29 +396,6 @@ body {
   overflow-x: clip;
 }
 
-/* « Le monde qui trade » : villes qui scintillent (or) et ondes des vrais échanges sur la carte */
-.city-glow {
-  background: #fff3d6;
-  box-shadow: 0 0 10px 3px rgb(255 214 138 / 0.75), 0 0 28px 8px rgb(255 190 100 / 0.35);
-  animation: city-glow 6s ease-in-out infinite;
-}
-@keyframes city-glow {
-  0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) scale(0.7); }
-  50% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.25); }
-}
-.map-pulse { animation: map-pulse 3s cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
-.map-pulse-buy { background: rgb(157 176 255 / 0.9); box-shadow: 0 0 0 2px rgb(157 176 255 / 0.9), 0 0 24px 6px rgb(127 155 255 / 0.8); }
-.map-pulse-sell { background: rgb(233 163 201 / 0.9); box-shadow: 0 0 0 2px rgb(233 163 201 / 0.9), 0 0 24px 6px rgb(233 163 201 / 0.7); }
-@keyframes map-pulse {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
-  12% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(7); }
-}
-@media (prefers-reduced-motion: reduce) { .city-glow, .map-pulse { animation: none; } }
-/* Changement de carte : fondu doux */
-.map-fade { animation: map-fade 0.9s ease-out; }
-@keyframes map-fade { from { opacity: 0; } to { opacity: 1; } }
-
 /* ---------- Tableau de bord (accueil) ----------
    Panneaux bleu marine translucides, liseré fin, lueur bleue discrète.
    La grille suit la largeur : empilée (téléphone), 2 colonnes (ordinateur), 3 colonnes (grand écran, ultrawide). */
@@ -492,3 +469,112 @@ body {
 .flash-up { animation: flash-up 0.9s ease-out; }
 .flash-down { animation: flash-down 0.9s ease-out; }
 @media (prefers-reduced-motion: reduce) { .flash-up, .flash-down { animation: none; } }
+
+/* Le QG : noms des pièces écrits sur les panneaux suspendus de l'image */
+.qg-panneau {
+  font-size: clamp(10px, 1.25cqw, 24px);
+  color: #f6e3b4;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 0.6em rgb(255 200 90 / 0.55), 0 1px 0 rgb(0 0 0 / 0.6);
+  transition: transform 0.2s, color 0.2s;
+}
+.qg-panneau:hover { transform: scale(1.08); color: #fff; }
+/* Pièce sans panneau dans l'image (le café) : petite enseigne flottante */
+.qg-enseigne {
+  font-size: clamp(10px, 1.1cqw, 22px);
+  color: #f6e3b4;
+  padding: 0.3em 0.8em;
+  border-radius: 0.4em;
+  background: rgb(11 13 42 / 0.85);
+  box-shadow: inset 0 0 0 0.12em #c9a24a, 0 0.3em 0.8em rgb(0 0 0 / 0.4);
+  transition: transform 0.2s;
+}
+.qg-enseigne:hover { transform: scale(1.06); }
+@keyframes qg-info-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
+.qg-info { animation: qg-info-in 0.35s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .qg-info { animation: none; } }
+
+/* Le QG au travail : ce que fabrique chaque personnage */
+.qg-feuille { width: 0.7cqw; height: 0.9cqw; background: #f5eedc; border-radius: 1px; box-shadow: 0 0 3px rgb(0 0 0 / 0.4); opacity: 0; animation: qg-feuille 3.3s ease-out infinite; }
+@keyframes qg-feuille {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--r)); }
+}
+
+.qg-feu { width: 4cqw; height: 4cqw; translate: -50% -50%; background: radial-gradient(circle, rgb(255 170 60 / 0.75), rgb(255 90 20 / 0.25) 45%, transparent 70%); mix-blend-mode: screen; animation: qg-feu 0.9s ease-in-out infinite alternate; }
+@keyframes qg-feu { from { opacity: 0.55; transform: scale(0.92); } to { opacity: 1; transform: scale(1.12); } }
+.qg-etincelle { width: 0.32cqw; height: 0.32cqw; background: #ffe08a; box-shadow: 0 0 6px 2px rgb(255 170 50 / 0.9); opacity: 0; animation: qg-etincelle 1.4s cubic-bezier(0.5, 0, 0.3, 1) infinite; }
+@keyframes qg-etincelle {
+  0%, 43% { opacity: 0; transform: translate(0, 0) scale(1); }
+  46% { opacity: 1; transform: translate(calc(var(--dx) * 0.2), calc(var(--dy) * 0.2)) scale(1.2); }
+  72%, 100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) * -0.2 + var(--dy))) scale(0.3); }
+}
+
+.qg-eclat { width: 1.1cqw; height: 1.1cqw; translate: -50% -50%; background: radial-gradient(circle, #fff 0 12%, transparent 13%), linear-gradient(transparent 46%, #fff6c8 46% 54%, transparent 54%), linear-gradient(90deg, transparent 46%, #fff6c8 46% 54%, transparent 54%); opacity: 0; animation: qg-eclat 4.2s ease-in-out infinite; }
+@keyframes qg-eclat { 0%, 70%, 100% { opacity: 0; transform: scale(0.2) rotate(0); } 80% { opacity: 1; transform: scale(1) rotate(45deg); } 90% { opacity: 0; transform: scale(0.4) rotate(90deg); } }
+
+.qg-holo { background: radial-gradient(ellipse, rgb(94 200 255 / 0.65), rgb(61 90 254 / 0.25) 50%, transparent 72%); mix-blend-mode: screen; animation: qg-holo 1.6s ease-in-out infinite; }
+@keyframes qg-holo { 0%, 100% { opacity: 0.45; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
+
+.qg-vapeur { width: 1.1cqw; height: 1.1cqw; background: rgb(255 255 255 / 0.8); filter: blur(4px); opacity: 0; animation: qg-vapeur 3.4s ease-out infinite; }
+@keyframes qg-vapeur {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(0.4cqw, -3.5cqw) scale(2); }
+}
+
+/* Bulles de travail : chacun parle à son tour, une bulle à la fois (cycle de 18 secondes) */
+.qg-bulle { white-space: nowrap; font-size: clamp(9px, 0.9cqw, 15px); font-weight: 700; color: #1b1440; background: #fffaf0; padding: 0.3em 0.7em; border-radius: 1em; box-shadow: 0 0.2em 0.6em rgb(0 0 0 / 0.35); opacity: 0; pointer-events: none; animation: qg-bulle 18s ease-out infinite; }
+@keyframes qg-bulle {
+  0% { opacity: 0; transform: translateY(6px) scale(0.85); }
+  2%, 12% { opacity: 1; transform: none; }
+  15%, 100% { opacity: 0; transform: translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qg-feuille, .qg-feu, .qg-etincelle, .qg-eclat, .qg-holo, .qg-vapeur, .qg-bulle { animation: none; }
+  .qg-feuille, .qg-etincelle, .qg-eclat, .qg-vapeur, .qg-bulle { display: none; }
+}
+
+
+/* Le grand écran du QG : les tokens lancés sur Tiers-État */
+.qg-screen { font-size: clamp(7px, 0.62cqw, 13px); line-height: 1.25; color: #eaf6ff; padding: 0.6em 0.8em; border-radius: 0.3em; background: linear-gradient(160deg, rgb(8 18 40 / 0.94), rgb(4 10 26 / 0.96)); box-shadow: 0 0 1.5em rgb(94 200 255 / 0.35), inset 0 0 0 0.12em rgb(94 200 255 / 0.35); }
+.qg-live { animation: qg-live 1.4s ease-in-out infinite; }
+@keyframes qg-live { 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) { .qg-live { animation: none; } }
+
+/* Vidéos des gestes : les bords se fondent dans l'image pour ne laisser voir aucune couture */
+.qg-anim {
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 94%, transparent);
+  mask-composite: intersect;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 94%, transparent);
+  -webkit-mask-composite: source-in;
+}
+/* Grand écran : chaque nouveau token glisse en haut de la liste */
+.qg-ligne-in { animation: qg-ligne-in 0.45s ease-out both; }
+@keyframes qg-ligne-in { from { opacity: 0; transform: translateY(-0.6em); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .qg-ligne-in { animation: none; } }
+
+/* La quête du QG : repère « ! » au-dessus du personnage qui attend le joueur, ✓ quand c'est réussi */
+.qg-repere, .qg-repere-ok {
+  display: grid;
+  place-items: center;
+  width: 2.2cqw;
+  height: 2.2cqw;
+  min-width: 22px;
+  min-height: 22px;
+  margin-top: -0.4cqw;
+  border-radius: 9999px;
+  font-weight: 900;
+  font-size: clamp(12px, 1.3cqw, 24px);
+  pointer-events: none;
+}
+.qg-repere { background: #ffd23f; color: #0b0d2a; box-shadow: 0 0 0 0.25cqw rgb(255 210 63 / 0.35), 0 0.3cqw 1cqw rgb(0 0 0 / 0.4); animation: qg-repere 1.2s ease-in-out infinite; }
+.qg-repere-ok { background: #3dffb0; color: #0b0d2a; opacity: 0.9; box-shadow: 0 0.3cqw 1cqw rgb(0 0 0 / 0.4); }
+@keyframes qg-repere { 0%, 100% { transform: none; } 50% { transform: translateY(-25%); } }
+/* Bulle de dialogue des missions */
+.qg-dialogue { border-left: 3px solid rgb(255 210 63 / 0.7); padding: 0.6rem 0.9rem; border-radius: 0 1rem 1rem 0; background: rgb(255 255 255 / 0.05); font-size: 1.05rem; line-height: 1.55; animation: qg-info-in 0.3s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .qg-repere, .qg-dialogue { animation: none; } }

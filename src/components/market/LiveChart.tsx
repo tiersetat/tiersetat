@@ -8,6 +8,7 @@ import {
   createChart,
   HistogramSeries,
   LineSeries,
+  TickMarkType,
   type IChartApi,
   type IPriceLine,
   type ISeriesApi,
@@ -17,7 +18,7 @@ import {
   type UTCTimestamp,
 } from "lightweight-charts";
 
-import { intervalsOf, LABELS, loadBars, pollMs, remembered, subscribeBars, type Bar, type ChartSource, type Interval } from "@/lib/chart-feeds";
+import { intervalsOf, LABELS, loadBars, pollMs, remembered, subscribeBars, type Bar, type ChartSource, type Interval, type LiveMode } from "@/lib/chart-feeds";
 
 type Kind = "bougies" | "ligne" | "aire";
 type Tool = null | "horizontale" | "tendance";
@@ -57,20 +58,58 @@ const INDICS: { key: Indic; label: string; color: string }[] = [
   { key: "bollinger", label: "Bollinger", color: "#5ec8ff" },
 ];
 
-const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: n < 1 ? 6 : 2 });
+/** Prix lisible quelle que soit sa taille : 2 décimales au-dessus de 1, sinon 4 chiffres significatifs (0.00003312). */
+const fmt = (n: number) => (Math.abs(n) >= 1 || n === 0 ? n.toLocaleString("en-US", { maximumFractionDigits: 2 }) : n.toLocaleString("en-US", { maximumSignificantDigits: 4 }));
+
+/** Graduations de l'axe du temps à l'heure locale : heure pour les petites durées, jour, mois ou année au-delà. */
+function localTick(t: Time, type: TickMarkType): string {
+  const d = new Date((t as number) * 1000);
+  if (type === TickMarkType.Year) return String(d.getFullYear());
+  if (type === TickMarkType.Month) return d.toLocaleDateString("fr-FR", { month: "short" });
+  if (type === TickMarkType.DayOfMonth) return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+  return d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+}
+
+/** Décimales de l'axe des prix selon l'ordre de grandeur (un memecoin à 0.00003 $ ne doit pas s'afficher « 0.00 »). */
+function priceFormat(data: Bar[]) {
+  const ref = data.length ? Math.abs(data[data.length - 1].close) : 1;
+  const precision = ref >= 1000 ? 2 : ref >= 1 ? 4 : Math.min(14, Math.ceil(-Math.log10(ref || 1e-9)) + 3);
+  return { type: "price" as const, precision, minMove: 10 ** -precision };
+}
+const SECONDS: Record<Interval, number> = { "1m": 60, "5m": 300, "15m": 900, "1h": 3600, "4h": 14400, "1d": 86400 };
+
+/** Légende du direct : ce qui fait bouger le graphique. */
+const LIVE_LABEL: Record<LiveMode, string> = { transactions: "En direct · chaque transaction", direct: "En direct", prix: "À jour" };
+
 
 /**
  * Graphique en temps réel avec ses outils : type (bougies, ligne, aire), indicateurs (volume, moyennes mobiles,
  * Bollinger), dessin (ligne horizontale, ligne de tendance), plein écran et capture.
  * `source` : Hyperliquid (actions, cryptos), GeckoTerminal (memecoins), CoinGecko (autres cryptos) ou nos échanges (mèmes Tiers-État).
  */
-export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartSource; unit?: string; height?: number }) {
+export function LiveChart({
+  source,
+  unit = "$",
+  height = 360,
+  defaultInterval,
+  liveValue,
+}: {
+  source: ChartSource;
+  unit?: string;
+  height?: number;
+  defaultInterval?: Interval;
+  /** Dernière valeur connue en direct (mèmes Tiers-État : capitalisation lue sur la blockchain), appliquée à la bougie en cours */
+  liveValue?: number | null;
+}) {
   const intervals = intervalsOf(source);
-  const [interval, setIntervalKey] = useState<Interval>(intervals.includes("15m") ? "15m" : intervals[0]);
+  const [interval, setIntervalKey] = useState<Interval>(
+    defaultInterval && intervals.includes(defaultInterval) ? defaultInterval : intervals.includes("15m") ? "15m" : intervals[0],
+  );
   const [kind, setKind] = useState<Kind>("bougies");
   const [indics, setIndics] = useState<Set<Indic>>(new Set(["volume"]));
   const [tool, setTool] = useState<Tool>(null);
   const [live, setLive] = useState(false);
+  const [liveMode, setLiveMode] = useState<LiveMode>("prix");
   const [legend, setLegend] = useState<Bar | null>(null);
   const [full, setFull] = useState(false);
   const [limited, setLimited] = useState(false);
@@ -95,10 +134,11 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
       autoSize: true,
       layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: "#c3c7ea", fontFamily: "var(--font-geist-mono), monospace" },
       grid: { vertLines: { color: "rgba(255,255,255,0.05)" }, horzLines: { color: "rgba(255,255,255,0.05)" } },
-      timeScale: { timeVisible: true, secondsVisible: false, borderColor: "rgba(255,255,255,0.1)", rightOffset: 4 },
+      timeScale: { timeVisible: true, secondsVisible: false, borderColor: "rgba(255,255,255,0.1)", rightOffset: 4, tickMarkFormatter: localTick },
       rightPriceScale: { borderColor: "rgba(255,255,255,0.1)" },
       crosshair: { horzLine: { color: "rgba(255,255,255,0.35)" }, vertLine: { color: "rgba(255,255,255,0.35)" } },
-      localization: { locale: "fr-FR" },
+      // Heures affichées dans le fuseau du visiteur (par défaut, la bibliothèque affiche l'heure universelle)
+      localization: { locale: "fr-FR", timeFormatter: (t: Time) => new Date((t as number) * 1000).toLocaleString("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) },
     });
     chartRef.current = chart;
     const onMove = (p: MouseEventParams) => {
@@ -151,16 +191,17 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
     extras.current = [];
     if (main.current) chart.removeSeries(main.current);
     const data = bars.current;
+    const pf = priceFormat(data);
     if (kind === "bougies") {
-      const s = chart.addSeries(CandlestickSeries, { upColor: UP, borderUpColor: UP, wickUpColor: UP, downColor: DOWN, borderDownColor: DOWN, wickDownColor: DOWN });
+      const s = chart.addSeries(CandlestickSeries, { upColor: UP, borderUpColor: UP, wickUpColor: UP, downColor: DOWN, borderDownColor: DOWN, wickDownColor: DOWN, priceFormat: pf });
       s.setData(data);
       main.current = s;
     } else if (kind === "ligne") {
-      const s = chart.addSeries(LineSeries, { color: "#ffffff", lineWidth: 2 });
+      const s = chart.addSeries(LineSeries, { color: "#ffffff", lineWidth: 2, priceFormat: pf });
       s.setData(data.map((b) => ({ time: b.time, value: b.close })));
       main.current = s;
     } else {
-      const s = chart.addSeries(AreaSeries, { lineColor: "#8fa2ff", topColor: "rgba(143,162,255,0.4)", bottomColor: "rgba(143,162,255,0)", lineWidth: 2 });
+      const s = chart.addSeries(AreaSeries, { lineColor: "#8fa2ff", topColor: "rgba(143,162,255,0.4)", bottomColor: "rgba(143,162,255,0)", lineWidth: 2, priceFormat: pf });
       s.setData(data.map((b) => ({ time: b.time, value: b.close })));
       main.current = s;
     }
@@ -173,7 +214,7 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
       extras.current.push(v);
     }
     const line = (pts: { time: UTCTimestamp; value: number }[], color: string) => {
-      const s = chart.addSeries(LineSeries, { color, lineWidth: 1, lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false });
+      const s = chart.addSeries(LineSeries, { color, lineWidth: 1, lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false, priceFormat: pf });
       s.setData(pts);
       extras.current.push(s);
     };
@@ -192,6 +233,9 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
 
   // Historique, puis temps réel (flux en direct ou actualisation régulière)
   const sourceKey = source.kind === "local" ? `local:${source.trades.length}:${source.trades[source.trades.length - 1]?.signature ?? ""}` : JSON.stringify(source);
+  // Le cadrage automatique n'a lieu qu'à l'ouverture et au changement de durée : un nouvel échange ne remet pas le zoom à zéro
+  const viewKey = `${source.kind === "local" ? `local:${source.createdAt ?? ""}` : JSON.stringify(source)}:${interval}`;
+  const fitted = useRef("");
   const kindRef = useRef(kind);
   const indicsRef = useRef(indics);
   useEffect(() => {
@@ -200,13 +244,15 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
   }, [kind, indics]);
   useEffect(() => {
     let stop = false;
-    let first = true;
     const apply = (b: Bar) => {
       const list = bars.current;
       if (list.length && list[list.length - 1].time === b.time) list[list.length - 1] = b;
       else if (!list.length || b.time > list[list.length - 1].time) list.push(b);
       else return;
       if (!main.current) return;
+      // Le prix a changé d'ordre de grandeur (token qui s'envole ou s'effondre) : l'axe garde le bon nombre de décimales
+      const pf = priceFormat(list);
+      if (pf.precision !== (main.current.options().priceFormat as { precision?: number }).precision) main.current.applyOptions({ priceFormat: pf });
       if (kindRef.current === "bougies") (main.current as ISeriesApi<"Candlestick">).update(b);
       else (main.current as ISeriesApi<"Line">).update({ time: b.time, value: b.close });
       const vol = indicsRef.current.has("volume") ? (extras.current[0] as ISeriesApi<"Histogram"> | undefined) : undefined;
@@ -218,8 +264,10 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
     const show = (list: Bar[]) => {
       bars.current = list;
       render();
-      if (first) chartRef.current?.timeScale().fitContent();
-      first = false;
+      if (fitted.current !== viewKey && list.length) {
+        chartRef.current?.timeScale().fitContent();
+        fitted.current = viewKey;
+      }
       setLegend(list[list.length - 1] ?? null);
     };
     const load = () =>
@@ -234,7 +282,7 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
           const merged = newer.length && list.length ? [...list, ...newer] : list;
           // Une réponse vide ne remplace jamais un graphique déjà affiché
           if (merged.length || !bars.current.length) show(merged);
-          if (source.kind !== "hyperliquid") setLive(list.length > 0);
+          if (source.kind !== "hyperliquid" && source.kind !== "binance") setLive(list.length > 0);
         })
         .catch(() => {
           if (stop) return;
@@ -247,11 +295,22 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
         });
     // Affichage immédiat de ce qui est en mémoire
     const cached = remembered(source, interval);
-    bars.current = [];
+    // Un mème Tiers-État qui reçoit un échange garde ses bougies affichées pendant le recalcul (pas de clignotement)
+    if (source.kind !== "local") bars.current = [];
     if (cached) show(cached);
-    Promise.resolve().then(() => !stop && setLive(Boolean(cached) && source.kind !== "hyperliquid"));
+    Promise.resolve().then(() => !stop && setLive(Boolean(cached) && source.kind !== "hyperliquid" && source.kind !== "binance"));
     void load();
-    const unsub = subscribeBars(source, interval, apply, (on) => !stop && setLive(on), () => bars.current[bars.current.length - 1]);
+    const unsub = subscribeBars(
+      source,
+      interval,
+      apply,
+      (on, mode) => {
+        if (stop) return;
+        setLive(on);
+        if (mode) setLiveMode(mode);
+      },
+      () => bars.current[bars.current.length - 1],
+    );
     const every = pollMs(source);
     const timer = every ? setInterval(load, every) : null;
     return () => {
@@ -263,6 +322,30 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
     // la source est suivie par sa clé (sourceKey) ; le rendu suit kind/indics via render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceKey, interval]);
+
+  // Valeur en direct (mèmes Tiers-État) : la bougie en cours bouge dès que la blockchain change, avant même l'enregistrement de l'échange
+  const applyRef = useRef<(b: Bar) => void>(() => undefined);
+  useEffect(() => {
+    applyRef.current = (b: Bar) => {
+      const list = bars.current;
+      if (list.length && list[list.length - 1].time === b.time) list[list.length - 1] = b;
+      else if (!list.length || b.time > list[list.length - 1].time) list.push(b);
+      else return;
+      if (!main.current) return;
+      if (kind === "bougies") (main.current as ISeriesApi<"Candlestick">).update(b);
+      else (main.current as ISeriesApi<"Line">).update({ time: b.time, value: b.close });
+      setLegend(b);
+    };
+  }, [kind]);
+  useEffect(() => {
+    if (!liveValue || !Number.isFinite(liveValue) || liveValue <= 0) return;
+    const sec = SECONDS[interval];
+    const bucket = (Math.floor(Date.now() / 1000 / sec) * sec) as UTCTimestamp;
+    const prev = bars.current[bars.current.length - 1];
+    if (!prev) return;
+    if (prev.time === bucket) applyRef.current({ ...prev, high: Math.max(prev.high, liveValue), low: Math.min(prev.low, liveValue), close: liveValue });
+    else if (bucket > prev.time) applyRef.current({ time: bucket, open: prev.close, high: Math.max(prev.close, liveValue), low: Math.min(prev.close, liveValue), close: liveValue, volume: 0 });
+  }, [liveValue, interval]);
 
   const clearDrawings = () => {
     const chart = chartRef.current;
@@ -353,7 +436,7 @@ export function LiveChart({ source, unit = "$", height = 360 }: { source: ChartS
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-1 pb-2 font-mono text-[11px]">
         <span className="flex items-center gap-1.5 font-bold text-muted-foreground">
           <span className={`size-2 rounded-full ${live ? "animate-pulse bg-achat" : "bg-muted-foreground"}`} />
-          {live ? (source.kind === "hyperliquid" ? "En direct" : "À jour") : "Connexion…"}
+          {live ? (source.kind === "hyperliquid" || source.kind === "binance" ? LIVE_LABEL.direct : source.kind === "local" ? LIVE_LABEL.transactions : LIVE_LABEL[liveMode]) : "Connexion…"}
         </span>
         {legend && (
           <span className={up ? "text-achat" : "text-vente"}>

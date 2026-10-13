@@ -17,6 +17,23 @@ function hyperliquidCoins(): Promise<Set<string>> {
   });
 }
 
+/** Paires en dollars (USDT) cotées sur Binance et leur dernier prix : bougies en direct pour les cryptos absentes d'Hyperliquid. */
+function binancePairs(): Promise<Map<string, number>> {
+  return memo("binance:usdt", 600_000, async () => {
+    const res = await fetch("https://data-api.binance.vision/api/v3/ticker/price", { signal: AbortSignal.timeout(7000) });
+    const list = (await res.json()) as { symbol: string; price: string }[];
+    return new Map(list.filter((x) => x.symbol.endsWith("USDT")).map((x) => [x.symbol, Number(x.price)]));
+  });
+}
+
+/** La paire Binance de cette crypto, seulement si son prix colle (±10 %) : un symbole partagé par deux cryptos ne trompe pas le graphique. */
+function binanceSymbol(pairs: Map<string, number>, symbol: string, priceUsd: number | null): string | null {
+  const s = `${symbol.toUpperCase()}USDT`;
+  const p = pairs.get(s);
+  if (!p || !priceUsd) return null;
+  return Math.abs(p - priceUsd) / priceUsd < 0.1 ? s : null;
+}
+
 type Coin = {
   id: string;
   symbol: string;
@@ -74,6 +91,7 @@ export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) 
   const m = coin.market_data;
   const hl = await hyperliquidCoins().catch(() => new Set<string>());
   const hlCoin = hl.has(coin.symbol.toUpperCase()) ? coin.symbol.toUpperCase() : null;
+  const bnSymbol = hlCoin ? null : binanceSymbol(await binancePairs().catch(() => new Map<string, number>()), coin.symbol, m.current_price.usd);
   const up = (m.price_change_percentage_24h ?? 0) >= 0;
   const stats: [string, string][] = [
     ["Capitalisation", usd(m.market_cap.usd)],
@@ -101,7 +119,10 @@ export default async function CryptoPage({ params }: PageProps<"/crypto/[id]">) 
           <p className="font-[family-name:var(--font-display)] text-5xl font-extrabold">{usd(m.current_price.usd)}</p>
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(m.price_change_percentage_24h)} 24 h</p>
         </div>
-        <ChartPanel source={hlCoin ? { kind: "hyperliquid", coin: hlCoin } : { kind: "coingecko", id: coin.id }} tvSymbol={tvForCrypto(coin.symbol)} />
+        <ChartPanel
+          source={hlCoin ? { kind: "hyperliquid", coin: hlCoin } : bnSymbol ? { kind: "binance", symbol: bnSymbol } : { kind: "coingecko", id: coin.id }}
+          tvSymbol={tvForCrypto(coin.symbol)}
+        />
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {stats.map(([k, v]) => (
             <div key={k} className="rounded-2xl bg-surface px-4 py-3 ring-1 ring-white/[0.08]">

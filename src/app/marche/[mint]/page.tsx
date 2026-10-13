@@ -5,7 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { searchRadar, tokenOnChain } from "@/lib/radar";
 import { CHAINS, isChain } from "@/lib/market-feeds";
 import { ChartPanel } from "@/components/market/ChartPanel";
-import { geckoNetwork } from "@/lib/chart-feeds";
+import { geckoNetwork, intervalForAge } from "@/lib/chart-feeds";
 import { age, alertes, isSolanaAddress } from "@/lib/radar-utils";
 import { pct, usd } from "@/lib/market-format";
 import { supabasePublic } from "@/lib/supabase/public";
@@ -52,7 +52,8 @@ export default async function MarchePage({ params, searchParams }: PageProps<"/m
       </div>
     );
   }
-  const pair = t.dexUrl.match(/dexscreener\.com\/[a-z]+\/([a-z0-9]{32,44})/i)?.[1];
+  const pair = t.pair ?? t.dexUrl.match(/dexscreener\.com\/[a-z]+\/([a-z0-9]{32,44})/i)?.[1];
+  const network = geckoNetwork(chain);
   const c = feteColor(t.symbol + t.name);
   const warnings = alertes(t);
   const up = (t.change.h24 ?? 0) >= 0;
@@ -94,7 +95,13 @@ export default async function MarchePage({ params, searchParams }: PageProps<"/m
           <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(t.change.h24)} 24 h</p>
         </div>
 
-        {pair && <ChartPanel source={{ kind: "gecko", network: geckoNetwork(chain), pool: pair, chain, token: t.address }} />}
+        {pair && (
+          <ChartPanel
+            source={{ kind: "gecko", network, pool: pair, chain, token: t.address, dex: t.dexId, quote: t.quoteAddress }}
+            pro={{ chain, network, pair }}
+            defaultInterval={intervalForAge(t.createdAt)}
+          />
+        )}
 
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {stats.map(([k, v]) => (

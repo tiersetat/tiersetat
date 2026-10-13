@@ -97,7 +97,6 @@ export default function DemarrerPage() {
         <h2 className="text-xl font-semibold">Questions fréquentes</h2>
         {[
           ["C'est quoi une bonding curve ?", "Le prix d'un token suit une courbe publique : il monte quand on achète, descend quand on vend. Tout le monde achète au même prix, sans prévente. Quand la courbe est remplie, le token migre sur un DEX avec une liquidité verrouillée."],
-          ["Est-ce que je peux perdre de l'argent ?", "Oui. Un memecoin est très spéculatif : son prix peut tomber à zéro. N'engage que ce que tu es prêt à perdre."],
           ["Qui peut retirer la liquidité ?", "Personne. Pendant la courbe, les SOL sont dans le pool, puis la liquidité est verrouillée à vie sur le DEX. Le panneau « Transparence » de chaque token le vérifie sur la blockchain."],
           ["Combien gagne un créateur ?", "Le créateur touche 70 % des frais de trading de son token (après la part du protocole Meteora), qu'il encaisse depuis son profil."],
         ].map(([q, a]) => (
