@@ -2,12 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PositionForm } from "./PositionForm";
+import { BacktestPanel } from "./BacktestPanel";
+import type { BacktestResult, Candle } from "@/lib/backtest";
 import { checkPlan, pnlPct, type Plan } from "@/lib/position-plan";
 import {
   AreaSeries,
   CandlestickSeries,
   ColorType,
   createChart,
+  createSeriesMarkers,
+  type ISeriesMarkersPluginApi,
   HistogramSeries,
   LineSeries,
   TickMarkType,
@@ -120,6 +124,11 @@ export function LiveChart({
   const planKey = `te_plan:${source.kind === "local" ? `local:${source.createdAt ?? ""}` : JSON.stringify(source)}`;
   const [plan, setPlan] = useState<Plan | null>(null);
   const [planOpen, setPlanOpen] = useState(false);
+  // Backtest : panneau, bougies figées au lancement, marqueurs d'entrée et de sortie
+  const [btOpen, setBtOpen] = useState(false);
+  const [btCandles, setBtCandles] = useState<Candle[]>([]);
+  const [bt, setBt] = useState<BacktestResult | null>(null);
+  const markers = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const planRef = useRef<Plan | null>(null);
   const planLines = useRef<IPriceLine[]>([]);
   const riskBox = useRef<HTMLDivElement>(null);
@@ -310,6 +319,22 @@ export function LiveChart({
     raf = requestAnimationFrame(place);
     return () => cancelAnimationFrame(raf);
   }, [plan]);
+
+  // Marqueurs du backtest (flèches d'entrée et de sortie) sur la série principale
+  const drawMarkers = useCallback(() => {
+    markers.current?.detach();
+    markers.current = null;
+    if (!bt || !main.current) return;
+    const list = bt.trades.flatMap((t) => [
+      { time: t.entryTime as UTCTimestamp, position: t.side === "long" ? ("belowBar" as const) : ("aboveBar" as const), color: t.side === "long" ? "#3dffb0" : "#ff3d68", shape: t.side === "long" ? ("arrowUp" as const) : ("arrowDown" as const), text: t.side === "long" ? "Achat" : "Vente" },
+      { time: t.exitTime as UTCTimestamp, position: t.side === "long" ? ("aboveBar" as const) : ("belowBar" as const), color: "#d9ccff", shape: "circle" as const, text: `${t.pnlPct >= 0 ? "+" : ""}${t.pnlPct.toFixed(1)} %` },
+    ]);
+    list.sort((a, b) => (a.time as number) - (b.time as number));
+    markers.current = createSeriesMarkers(main.current, list);
+  }, [bt]);
+  useEffect(() => {
+    drawMarkers();
+  }, [drawMarkers, kind, indics]);
 
   const applyPlan = (p: Plan | null) => {
     setPlan(p);
@@ -517,6 +542,17 @@ export function LiveChart({
         <button type="button" onClick={() => setPlanOpen((v) => !v)} className={`${btn(planOpen || Boolean(plan))} shrink-0`} title="Placer ta position : entrée, stop et objectif">
           ▤ Position
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (!btOpen) setBtCandles(bars.current.map((b) => ({ time: b.time as number, open: b.open, high: b.high, low: b.low, close: b.close })));
+            setBtOpen((v) => !v);
+          }}
+          className={`${btn(btOpen || Boolean(bt))} shrink-0`}
+          title="Tester une stratégie sur l'historique affiché"
+        >
+          ⟲ Backtest
+        </button>
         <span className="mx-1 h-4 w-px shrink-0 bg-white/15" />
         <button type="button" onClick={capture} className={`${btn(false)} shrink-0`} title="Enregistrer une image du graphique">
           📷
@@ -563,6 +599,19 @@ export function LiveChart({
             <div ref={riskBox} className="pointer-events-none absolute border border-vente/50 bg-vente/15" style={{ display: "none" }} />
             <div ref={rewardBox} className="pointer-events-none absolute border border-achat/50 bg-achat/12" style={{ display: "none" }} />
           </>
+        )}
+        {btOpen && (
+          <div className="absolute right-2 top-2 z-10 max-h-[calc(100%-1rem)] w-[min(22rem,calc(100%-1rem))] overflow-y-auto">
+            <BacktestPanel
+              candles={btCandles}
+              interval={LABELS[interval]}
+              onResult={setBt}
+              onClose={() => {
+                setBtOpen(false);
+                setBt(null);
+              }}
+            />
+          </div>
         )}
         {planOpen && (
           <div className="absolute left-2 top-2 z-10 w-[min(22rem,calc(100%-1rem))]">
