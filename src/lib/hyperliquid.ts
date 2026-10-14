@@ -54,6 +54,17 @@ const INFO: Record<string, [string, Category?]> = {
   SOFI: ["SoFi"], TTWO: ["Take-Two"], CIFR: ["Cipher Mining"], IONQ: ["IonQ"], GPRO: ["GoPro"], TCNT: ["Tencent"], PURRDAT: ["Purr Data"],
 };
 
+/**
+ * Levier maximal proposé aux particuliers européens (règles ESMA, reprises par l'AMF) :
+ * ×5 sur les actions et la plupart des marchés, ×2 sur ce qui suit les cryptomonnaies.
+ * Le levier technique d'Hyperliquid peut être plus élevé : on ne propose jamais plus que ces plafonds.
+ */
+export const RETAIL_LEVERAGE_CAP = 5;
+const CRYPTO_INDEX = new Set(["TOTAL2", "OTHERS", "BTCD", "BVIV"]);
+export function retailLeverage(symbol: string, raw: number): number {
+  return Math.max(1, Math.min(raw, CRYPTO_INDEX.has(symbol) ? 2 : RETAIL_LEVERAGE_CAP));
+}
+
 /** Vraie image du marché (logo officiel ou photo), hébergée par Tiers-État. */
 function logoOf(symbol: string): { imageUrl: string | null; emoji: null } {
   return { imageUrl: MARKET_LOGOS.has(symbol) ? `/images/marches/${encodeURIComponent(symbol)}.webp` : null, emoji: null };
@@ -89,7 +100,7 @@ async function marketsOf(dex: string): Promise<PerpMarket[]> {
         change24: px > 0 && prev > 0 ? ((px - prev) / prev) * 100 : null,
         volume24Usd: Number(c.dayNtlVlm ?? 0),
         openInterestUsd: Number(c.openInterest ?? 0) * (px || 0),
-        maxLeverage: a.maxLeverage,
+        maxLeverage: retailLeverage(symbol, a.maxLeverage),
         fundingPct: c.funding ? Number(c.funding) * 100 : null,
         ...logoOf(symbol),
       },

@@ -13,6 +13,7 @@ import { DepositOptions, SellOptions } from "./FundingOptions";
 import { DEMO_CASH_EUR, useDemo } from "@/lib/demo";
 import { PortfolioChart } from "./PortfolioChart";
 import { addSnapshot, demoHistory, type Point } from "@/lib/portfolio-history";
+import { knownRecipients, rememberRecipient, sendRisk } from "@/lib/send-safety";
 
 type Display = "EUR" | "USD";
 type Sheet = null | "deposer" | "recevoir" | "envoyer" | "vendre" | "securite";
@@ -129,7 +130,9 @@ export function CashWallet() {
         <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[radial-gradient(closest-side,rgb(217_204_255/0.35),transparent)]" />
         <div className="relative flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-white/80">Cash</p>
+            <p className="text-sm font-semibold text-white/80">
+              Cash{demo && <span className="ml-2 rounded-full bg-black/25 px-2 py-0.5 text-[11px] font-bold text-white/75">Démo · solde fictif</span>}
+            </p>
             <p className="mt-1 font-[family-name:var(--font-display)] text-5xl font-extrabold tracking-tight sm:text-6xl">
               {shown === null ? "…" : total === null ? "—" : money(total, display)}
             </p>
@@ -272,6 +275,8 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
   const [email, setEmail] = useState("");
   const [lookup, setLookup] = useState<{ state: "idle" | "busy" | "ok" | "error"; text?: string; created?: boolean }>({ state: "idle" });
   const [amount, setAmount] = useState("");
+  const [ackNew, setAckNew] = useState(false);
+  const [ackBig, setAckBig] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; text: string; sig?: string } | null>(null);
 
@@ -293,6 +298,15 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
     }
   };
 
+  const risk = sendRisk({
+    recipient: to,
+    amount: value,
+    balance: max,
+    // USDC et EURC valent environ un dollar ou un euro : assez précis pour le seuil d'alerte
+    amountUsd: asset === "SOL" ? null : value,
+    known: typeof window === "undefined" ? [] : knownRecipients(),
+  });
+  const needAck = (risk.newRecipient && !ackNew) || (risk.big && !ackBig);
   const problem = !to
     ? mode === "email"
       ? "Indique l'e-mail du destinataire, puis touche « Trouver »."
@@ -317,6 +331,9 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
       const tx = buildSendTransaction(publicKey, recipient, asset, value);
       const sig = await sendTransaction(tx, connection);
       await connection.confirmTransaction(sig, "confirmed");
+      rememberRecipient(to);
+      setAckNew(false);
+      setAckBig(false);
       setResult({
         ok: true,
         text:
@@ -417,7 +434,28 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
         <input id="send-amount" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="0,00" className="field font-mono" />
       </label>
       {to || amount ? <p className={`text-sm ${problem ? "text-muted-foreground" : "text-achat"}`}>{problem ?? (mode === "email" ? "Vérifie bien l'e-mail : un envoi sur la blockchain ne peut pas être annulé." : "Vérifie bien l'adresse : un envoi sur la blockchain ne peut pas être annulé.")}</p> : null}
-      <SlideToConfirm label={`Glisser pour envoyer ${asset}`} tone="buy" disabled={Boolean(problem)} busy={busy} onConfirm={send} />
+      {!problem && (risk.newRecipient || risk.big) && (
+        <div className="space-y-2 rounded-2xl border border-soleil/30 bg-soleil/[0.07] p-3 text-sm">
+          {risk.newRecipient && (
+            <label className="flex items-start gap-2">
+              <input type="checkbox" checked={ackNew} onChange={(e) => setAckNew(e.target.checked)} className="mt-1" />
+              <span>Première fois vers ce destinataire : je le connais personnellement et j&apos;ai vérifié l&apos;adresse.</span>
+            </label>
+          )}
+          {risk.big && (
+            <label className="flex items-start gap-2">
+              <input type="checkbox" checked={ackBig} onChange={(e) => setAckBig(e.target.checked)} className="mt-1" />
+              <span>
+                Gros montant ({qty(value, 6)} {asset}) : je confirme, et je sais qu&apos;un envoi ne peut pas être annulé.
+              </span>
+            </label>
+          )}
+        </div>
+      )}
+      <SlideToConfirm label={`Glisser pour envoyer ${asset}`} tone="buy" disabled={Boolean(problem) || needAck} busy={busy} onConfirm={send} />
+      <p className="text-xs text-muted-foreground">
+        Tiers-État ne te demandera jamais de payer pour « débloquer » ou « récupérer » de l&apos;argent. Si quelqu&apos;un te le demande, c&apos;est une arnaque.
+      </p>
       {result && (
         <p className={`text-sm ${result.ok ? "text-achat" : "text-vente"}`}>
           {result.text}{" "}

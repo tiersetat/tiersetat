@@ -8,8 +8,9 @@ const PRESETS = [10, 100, 500, 1000];
 export function PerpPanel({ symbol, maxLeverage }: { symbol: string; maxLeverage: number }) {
   const [side, setSide] = useState<"long" | "short">("long");
   const [amount, setAmount] = useState("");
-  const levels = [1, 2, 5, 10, 20, 25, 50].filter((l) => l <= maxLeverage);
-  const [lev, setLev] = useState(Math.min(10, maxLeverage));
+  // Plafond particuliers (ESMA) : jamais plus de ×5, quel que soit le marché
+  const levels = [1, 2, 3, 5].filter((l) => l <= Math.min(5, maxLeverage));
+  const [lev, setLev] = useState(Math.min(2, maxLeverage));
   const size = Number(amount.replace(",", ".")) * lev;
   return (
     <div className="space-y-4 rounded-3xl bg-surface p-5 ring-1 ring-white/[0.08]">
@@ -61,7 +62,7 @@ export function PerpPanel({ symbol, maxLeverage }: { symbol: string; maxLeverage
       <button type="button" disabled className={`${side === "long" ? "btn-buy" : "btn-sell"} w-full`}>
         {side === "long" ? `Long ${symbol} ×${lev}` : `Short ${symbol} ×${lev}`}
       </button>
-      <p className="text-center text-xs text-muted-foreground">Alimenté par Hyperliquid. L&apos;ouverture de positions arrive au lancement.</p>
+      <p className="text-center text-xs text-muted-foreground">Levier plafonné à ×5 pour les particuliers (règles européennes). L&apos;ouverture de positions arrive au lancement, avec un partenaire agréé.</p>
     </div>
   );
 }

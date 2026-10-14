@@ -56,7 +56,7 @@ export default async function BoursePage({ params }: PageProps<"/bourse/[id]">) 
           ))}
         </dl>
         <p className="text-xs text-muted-foreground">
-          Contrat perpétuel sur Hyperliquid : tu ne possèdes pas l&apos;action, tu prends une position sur son prix. Avec l&apos;effet de levier, les gains et les pertes sont multipliés, et ta position peut être liquidée.{" "}
+          Contrat perpétuel sur Hyperliquid : tu ne possèdes pas l&apos;action, tu prends une position sur son prix. Avec l&apos;effet de levier (plafonné à ×5 pour les particuliers), les gains et les pertes sont multipliés, et ta position peut être liquidée.{" "}
           <Link href="/?tri=bourse" className="font-bold text-electrique">
             Tous les marchés →
           </Link>

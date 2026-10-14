@@ -11,7 +11,7 @@ export const TABS = [
   { key: "bonding", label: "Bonding" },
   { key: "nouveaux", label: "Nouveaux" },
   { key: "tiers-etat", label: "Tiers-État" },
-  { key: "bourse", label: "Actions ×10" },
+  { key: "bourse", label: "Actions" },
 ] as const;
 export type Key = (typeof TABS)[number]["key"];
 /** Catégories des marchés Hyperliquid */
