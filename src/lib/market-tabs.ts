@@ -6,6 +6,7 @@ export const TABS = [
   { key: "cryptos", label: "Cryptos" },
   { key: "tendances", label: "Tendances" },
   { key: "dexpaye", label: "DEX payé" },
+  { key: "francais", label: "Mèmes français" },
   { key: "detenus", label: "Plus détenus" },
   { key: "migre", label: "Migré" },
   { key: "bonding", label: "Bonding" },

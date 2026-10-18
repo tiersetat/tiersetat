@@ -194,6 +194,14 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             </div>
           )}
 
+          {key === "francais" && (
+            <p className="rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-xs text-muted-foreground">
+              <b className="text-foreground">Repérés automatiquement, non vérifiés, non recommandés.</b> Des mèmes à thème français du marché Solana, hors Tiers-État.
+              Sont écartés : la politique, les insultes et les drames, les créateurs qui ont lancé plus de 50 tokens, et ceux qui ont moins de 100 détenteurs.
+              Les memecoins sont très risqués : tu peux tout perdre.
+            </p>
+          )}
+
           {key === "liste" ? (
             <WatchlistView />
           ) : key === "nouveaux" ? (

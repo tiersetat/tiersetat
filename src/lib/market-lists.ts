@@ -1,6 +1,6 @@
 import "server-only";
 import type { MarketItem } from "@/components/market/MarketRow";
-import { dexPaidLatest, dexPaidTrending, topCryptos, type ChainId } from "@/lib/market-feeds";
+import { dexPaidLatest, dexPaidTrending, frenchMemes, topCryptos, type ChainId } from "@/lib/market-feeds";
 import { memesBy } from "@/lib/market-data";
 import { hyperliquidMarkets, type Category } from "@/lib/hyperliquid";
 import { solUsd } from "@/lib/feed";
@@ -43,6 +43,7 @@ export async function loadList(key: Key, chain: ChainId | null, cat: Category | 
     const all = await dexPaidLatest();
     return chain ? all.filter((t) => t.chain === chain) : all;
   }
+  if (key === "francais") return frenchMemes();
   if (key === "tendances") {
     const all = await dexPaidTrending();
     return chain ? all.filter((t) => t.chain === chain) : all;

@@ -1,6 +1,7 @@
 import "server-only";
 import { memo } from "@/lib/memo";
 import type { MarketItem } from "@/components/market/MarketRow";
+import { exclusionReason, looksFrench, passesChecks } from "@/lib/french-memes";
 
 /** Blockchains suivies par le marché (identifiants DexScreener). */
 export const CHAINS = {
@@ -202,5 +203,86 @@ export function topCryptos(): Promise<MarketItem[]> {
         sparkline: thin(c.sparkline_in_7d?.price),
         href: `/crypto/${c.id}`,
       }));
+  });
+}
+
+export type FrenchItem = MarketItem & { chain: "solana"; holders: number; liquidityUsd: number | null };
+
+/** Recherches DexScreener qui font remonter les mèmes à thème français. */
+const FR_QUERIES = ["france", "french", "francais", "paris", "baguette", "croissant", "fromage", "gaulois", "cocorico", "marseille"];
+/** Mémoire des mèmes français déjà repérés (la liste s'enrichit au fil des heures). */
+const frSeen = new Map<string, { description: string | null }>();
+/** Dernière fiche Jupiter de chaque candidat (détenteurs, créateur). */
+const frInfo = new Map<string, { at: number; j: { id: string; name: string; symbol: string; icon?: string; holderCount?: number; audit?: { devMints?: number } } }>();
+let frTurn = 0;
+
+/**
+ * Mèmes français repérés automatiquement sur Solana (profils DexScreener récents et recherches par thème),
+ * gardés seulement s'ils passent les garde-fous : pas de politique, d'insulte ni de drame,
+ * créateur qui n'est pas un lanceur en série, au moins 100 détenteurs. Triés par capitalisation. Cache 2 min.
+ */
+export function frenchMemes(): Promise<FrenchItem[]> {
+  return memo("feeds:french", 120_000, async () => {
+    type Listed = { chainId: string; tokenAddress: string; description?: string; links?: { url: string }[] };
+    const [lists, searches] = await Promise.all([
+      Promise.all(["token-profiles/latest/v1", "token-boosts/latest/v1", "token-boosts/top/v1"].map((p) => getJson<Listed[]>(`https://api.dexscreener.com/${p}`).catch(() => [] as Listed[]))),
+      Promise.all(FR_QUERIES.map((q) => getJson<{ pairs?: DexPair[] }>(`https://api.dexscreener.com/latest/dex/search?q=${q}`).catch(() => ({ pairs: [] as DexPair[] })))),
+    ]);
+    // Candidats : profils écrits en français ou à thème français, et résultats de recherche à thème français
+    for (const t of lists.flat()) {
+      if (t.chainId !== "solana") continue;
+      const links = (t.links ?? []).map((l) => l.url);
+      if (looksFrench({ name: "", symbol: "", description: t.description, links }) && !exclusionReason({ name: "", symbol: "", description: t.description })) frSeen.set(t.tokenAddress, { description: t.description ?? null });
+    }
+    for (const p of searches.flatMap((s) => s.pairs ?? [])) {
+      if (p.chainId !== "solana") continue;
+      if (looksFrench(p.baseToken) && !exclusionReason(p.baseToken)) frSeen.set(p.baseToken.address, frSeen.get(p.baseToken.address) ?? { description: null });
+    }
+    // Recherche par mot-clé chez Jupiter : quota serré (~5 requêtes par fenêtre), donc 2 mots par passage, à tour de rôle
+    type Jup = { id: string; name: string; symbol: string; icon?: string; holderCount?: number; audit?: { devMints?: number } };
+    const now = Date.now();
+    for (let k = 0; k < 2; k++) {
+      const q = FR_QUERIES[frTurn++ % FR_QUERIES.length];
+      const hits = await getJson<Jup[]>(`https://lite-api.jup.ag/tokens/v2/search?query=${q}`).catch(() => [] as Jup[]);
+      for (const h of hits) {
+        if (!looksFrench(h) || exclusionReason(h)) continue;
+        frSeen.set(h.id, frSeen.get(h.id) ?? { description: null });
+        frInfo.set(h.id, { at: now, j: h });
+      }
+    }
+    while (frSeen.size > 400) frSeen.delete(frSeen.keys().next().value!);
+
+    // Créateur et détenteurs : relus toutes les 30 min au plus, un seul lot de 100 par passage
+    const stale = [...frSeen.keys()].filter((m) => now - (frInfo.get(m)?.at ?? 0) > 30 * 60_000).slice(0, 100);
+    if (stale.length) {
+      const got = await getJson<Jup[]>(`https://lite-api.jup.ag/tokens/v2/search?query=${stale.join(",")}`).catch(() => null);
+      for (const j of got ?? []) frInfo.set(j.id, { at: now, j });
+    }
+    const ok = [...frSeen.keys()]
+      .map((m) => frInfo.get(m)?.j)
+      .filter((j): j is Jup => !!j)
+      .filter((j) => passesChecks({ holders: j.holderCount ?? null, devMints: j.audit?.devMints ?? null }) && !exclusionReason({ name: j.name, symbol: j.symbol, description: frSeen.get(j.id)?.description }));
+    const pairs = await bestPairs(new Map([["solana" as ChainId, ok.map((j) => j.id)]])).catch(() => [] as DexPair[]);
+    const pairOf = new Map(pairs.map((p) => [p.baseToken.address, p]));
+    return ok
+      .map((j): FrenchItem => {
+        const p = pairOf.get(j.id);
+        return {
+          address: j.id,
+          name: j.name,
+          symbol: j.symbol,
+          imageUrl: p?.info?.imageUrl ?? j.icon ?? null,
+          priceUsd: num(p?.priceUsd),
+          mcapUsd: num(p?.marketCap ?? p?.fdv),
+          change24: num(p?.priceChange?.h24),
+          chain: "solana",
+          holders: j.holderCount ?? 0,
+          liquidityUsd: num(p?.liquidity?.usd),
+          href: `/marche/${j.id}?c=solana`,
+        };
+      })
+      .filter((t) => (t.liquidityUsd ?? 0) >= 2_000)
+      .sort((a, b) => (b.mcapUsd ?? 0) - (a.mcapUsd ?? 0))
+      .slice(0, 60);
   });
 }
