@@ -20,6 +20,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
 
   const activeSource = typeof source === "string" && sources.includes(source) ? source : null;
   const cryptoOnly = categorie === "crypto";
+  const funOnly = categorie === "divertissement";
   const activeTrend = typeof sujet === "string" ? (trends.find((t) => t.key === sujet) ?? null) : null;
   const byHeat = tri !== "recent";
 
@@ -27,6 +28,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
   const shown = enriched
     .filter(({ item }) => !activeSource || item.source === activeSource)
     .filter(({ item }) => !cryptoOnly || item.kind === "crypto")
+    .filter(({ item }) => !funOnly || item.kind === "fun")
     .filter(({ item }) => !activeTrend || keywords(item.title).some((k) => k.key === activeTrend.key))
     .sort((a, b) =>
       byHeat
@@ -36,7 +38,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
 
   const query = (patch: Record<string, string | null>) => {
     const params = new URLSearchParams();
-    const next = { source: activeSource, sujet: activeTrend?.key ?? null, tri: byHeat ? null : "recent", categorie: cryptoOnly ? "crypto" : null, ...patch };
+    const next = { source: activeSource, sujet: activeTrend?.key ?? null, tri: byHeat ? null : "recent", categorie: cryptoOnly ? "crypto" : funOnly ? "divertissement" : null, ...patch };
     for (const [k, v] of Object.entries(next)) if (v) params.set(k, v);
     const qs = params.toString();
     return qs ? `/ca-buzz?${qs}` : "/ca-buzz";
@@ -73,11 +75,14 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav className="flex flex-wrap gap-2" aria-label="Filtrer par source">
-          <Link href={query({ source: null, categorie: null })} className={`chip ${!activeSource && !cryptoOnly ? "chip-active" : ""}`}>
+          <Link href={query({ source: null, categorie: null })} className={`chip ${!activeSource && !cryptoOnly && !funOnly ? "chip-active" : ""}`}>
             Toutes les sources
           </Link>
           <Link href={query({ source: null, categorie: "crypto" })} className={`chip ${cryptoOnly && !activeSource ? "chip-active" : ""}`}>
             ₿ Crypto
+          </Link>
+          <Link href={query({ source: null, categorie: "divertissement" })} className={`chip ${funOnly && !activeSource ? "chip-active" : ""}`}>
+            Divertissement
           </Link>
           {sources.map((s) => (
             <Link key={s} href={query({ source: s })} className={`chip ${activeSource === s ? "chip-active" : ""}`}>
@@ -108,7 +113,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
               >
                 <a href={item.url} target="_blank" rel="noreferrer" tabIndex={-1} aria-hidden className="relative block">
                   <BuzzImage src={item.image} source={item.source} priority={index < 3} />
-                  <span className={`absolute left-3 top-3 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium ${item.kind === "reddit" ? "text-vente" : item.kind === "crypto" ? "text-soleil" : "text-lueur"}`}>
+                  <span className={`absolute left-3 top-3 rounded-full bg-black/75 px-2.5 py-0.5 text-xs font-medium ${item.kind === "reddit" ? "text-vente" : item.kind === "crypto" ? "text-soleil" : item.kind === "fun" ? "text-achat" : "text-lueur"}`}>
                     {item.source}
                   </span>
                   {trend && heat && (

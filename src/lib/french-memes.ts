@@ -21,7 +21,7 @@ const THEME = /\b(france|french|francais\w*|paris\w*|baguettes?|croissants?|from
 /** Mots-outils très français : une description qui en contient plusieurs est écrite en français. */
 const STOP = /\b(le|la|les|des|du|une|est|pour|avec|pas|qui|que|sur|dans|nous|vous|mais|aussi|tout|notre|votre|cette|sont|ete|plus)\b/g;
 /** Médias français : un lien vers eux signale une actu française. */
-const MEDIA = /(\.fr\b|lemonde|lefigaro|liberation|bfmtv|francetvinfo|leparisien|ouest-france|20minutes|tf1info|lexpress|nouvelobs|huffingtonpost\.fr|konbini|brut\.media)/;
+const MEDIA = /(\.fr\b|lemonde|lefigaro|liberation|bfmtv|francetvinfo|leparisien|ouest-france|20minutes|tf1info|lexpress|nouvelobs|huffingtonpost\.fr|konbini|brut\.media|topito|legorafi|journaldugeek|jeuxvideo\.com|allocine|serieously|dexerto\.fr)/;
 
 export function looksFrench(t: { name: string; symbol: string; description?: string | null; links?: string[] }): boolean {
   if (THEME.test(norm(`${t.name} ${t.symbol}`))) return true;

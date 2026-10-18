@@ -5,7 +5,7 @@ import { isSensitive } from "@/lib/buzz-suggest";
 export type BuzzItem = {
   id: string;
   source: string;
-  kind: "media" | "reddit" | "crypto";
+  kind: "media" | "reddit" | "crypto" | "fun";
   title: string;
   excerpt: string;
   url: string;
@@ -26,6 +26,15 @@ const SOURCES: { name: string; url: string; kind: BuzzItem["kind"] }[] = [
   { name: "Journal du Coin", url: "https://journalducoin.com/feed/", kind: "crypto" },
   { name: "Cryptoast", url: "https://cryptoast.fr/feed/", kind: "crypto" },
   { name: "Coin Academy", url: "https://coinacademy.fr/feed/", kind: "crypto" },
+  // Médias divertissants français : pop culture, buzz, jeux vidéo, séries, satire (la source d'idées de mèmes)
+  { name: "Konbini", url: "https://www.konbini.com/fr/feed/", kind: "fun" },
+  { name: "Topito", url: "https://www.topito.com/feed", kind: "fun" },
+  { name: "Le Gorafi (satire)", url: "https://www.legorafi.fr/feed/", kind: "fun" },
+  { name: "Journal du Geek", url: "https://www.journaldugeek.com/feed/", kind: "fun" },
+  { name: "Jeuxvideo.com", url: "https://www.jeuxvideo.com/rss/rss.xml", kind: "fun" },
+  { name: "Allociné", url: "https://www.allocine.fr/rss/news.xml", kind: "fun" },
+  { name: "Serieously", url: "https://www.serieously.com/feed/", kind: "fun" },
+  { name: "Dexerto", url: "https://www.dexerto.fr/feed/", kind: "fun" },
   // L'API JSON de Reddit refuse les serveurs ; le flux Atom public reste accessible.
   { name: "r/france", url: "https://www.reddit.com/r/france/hot/.rss", kind: "reddit" },
 ];
