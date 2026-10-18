@@ -13,6 +13,7 @@ import { WatchStar } from "@/components/market/WatchStar";
 import { BuyPanel } from "@/components/market/BuyPanel";
 import { CopyAddress } from "@/components/radar/CopyAddress";
 import { feteColor } from "@/components/brand/TokenCard";
+import { jupInfo } from "@/lib/jup-info";
 
 const isEvmAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
@@ -26,7 +27,9 @@ const chainOf = (c: unknown) => (isChain(c) ? c : "solana");
 
 export async function generateMetadata({ params, searchParams }: PageProps<"/marche/[mint]">): Promise<Metadata> {
   const t = await load((await params).mint, chainOf((await searchParams).c));
-  return { title: t ? `${t.symbol} — ${usd(t.priceUsd)} — Tiers-État` : "Token — Tiers-État" };
+  if (!t) return { title: "Token — Tiers-État" };
+  const description = `${t.name} ($${t.symbol}) · Capitalisation ${usd(t.mcapUsd)} · ${pct(t.change.h24)} sur 24 h · Liquidité ${usd(t.liquidityUsd)} · Créé il y a ${age(t.createdAt)}. Données publiques, pour information.`;
+  return { title: `${t.symbol} — ${usd(t.priceUsd)} — Tiers-État`, description, openGraph: { description }, twitter: { card: "summary_large_image", description } };
 }
 
 /** Fiche d'un token Solana (hors Tiers-État) : cours, graphique, chiffres clés, alertes, achat en dollars. */
@@ -40,7 +43,7 @@ export default async function MarchePage({ params, searchParams }: PageProps<"/m
     if (ours) redirect(`/token/${mint}`);
   }
 
-  const t = await load(mint, chain);
+  const [t, info] = await Promise.all([load(mint, chain), chain === "solana" ? jupInfo(mint) : Promise.resolve(null)]);
   if (!t) {
     return (
       <div className="surface mx-auto max-w-lg space-y-3 p-8 text-center">
@@ -71,29 +74,58 @@ export default async function MarchePage({ params, searchParams }: PageProps<"/m
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_22rem] xl:grid-cols-1 min-[1800px]:grid-cols-[1fr_22rem]">
       <div className="min-w-0 space-y-5">
-        <header className="flex items-start gap-4">
+        {/* L'image du token et, juste à côté, tout ce qu'il faut savoir avant de trader */}
+        <header className="flex items-start gap-4 sm:gap-6">
           {t.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- image du token (domaine variable)
-            <img src={t.imageUrl} alt="" className="size-16 shrink-0 rounded-3xl bg-muted object-cover" />
+            <img src={t.imageUrl} alt="" className="size-20 shrink-0 rounded-3xl bg-muted object-cover sm:size-32" />
           ) : (
-            <span className="grid size-16 shrink-0 place-items-center rounded-3xl text-2xl font-extrabold" style={{ background: c.bg, color: c.fg }}>
+            <span className="grid size-20 shrink-0 place-items-center rounded-3xl text-3xl font-extrabold sm:size-32 sm:text-5xl" style={{ background: c.bg, color: c.fg }}>
               {t.symbol.slice(0, 1)}
             </span>
           )}
-          <div className="min-w-0 flex-1">
-            <h1 className="truncate text-3xl font-extrabold">{t.symbol}</h1>
-            <p className="truncate text-sm text-muted-foreground">
-              {t.name} · <span style={{ color: CHAINS[chain].color }}>{CHAINS[chain].label}</span>
-            </p>
-            <CopyAddress address={t.address} />
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="flex items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <h1 className="truncate text-3xl font-extrabold">{t.symbol}</h1>
+                <p className="truncate text-sm text-muted-foreground">
+                  {t.name} · <span style={{ color: CHAINS[chain].color }}>{CHAINS[chain].label}</span>
+                </p>
+              </div>
+              <WatchStar address={t.address} />
+            </div>
+            <div className="flex flex-wrap items-baseline gap-x-3">
+              <p className="font-[family-name:var(--font-display)] text-3xl font-extrabold sm:text-4xl">{usd(t.mcapUsd)}</p>
+              <p className={`font-mono text-base font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(t.change.h24)} 24 h</p>
+            </div>
+            <dl className="flex flex-wrap gap-1.5 text-xs">
+              {(
+                [
+                  ["Prix", usd(t.priceUsd)],
+                  ["Liquidité", usd(t.liquidityUsd)],
+                  ["Vol. 24 h", usd(t.volume24Usd)],
+                  ["Âge", age(t.createdAt)],
+                  ...(info?.holders != null ? [["Détenteurs", info.holders.toLocaleString("fr-FR")]] : []),
+                  ...(info?.top10Pct != null ? [["Top 10", `${Math.round(info.top10Pct)} %`]] : []),
+                  ...(info?.devMints != null ? [["Créateur", `${info.devMints.toLocaleString("fr-FR")} token${info.devMints > 1 ? "s" : ""} lancé${info.devMints > 1 ? "s" : ""}`]] : []),
+                ] as [string, string][]
+              ).map(([k, v]) => (
+                <div key={k} className={`flex gap-1.5 rounded-full px-2.5 py-1 ${k === "Créateur" && (info?.devMints ?? 0) > 50 ? "bg-vente/15 text-vente" : "bg-white/[0.06]"}`}>
+                  <dt className="text-muted-foreground">{k}</dt>
+                  <dd className="font-mono font-bold">{v}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="flex flex-wrap items-center gap-2">
+              <CopyAddress address={t.address} />
+              {t.links.slice(0, 4).map((l) => (
+                <a key={l.url} href={l.url} target="_blank" rel="noreferrer nofollow" className="chip px-2.5 py-0.5 text-xs">
+                  {l.label} ↗
+                </a>
+              ))}
+            </div>
           </div>
-          <WatchStar address={t.address} />
         </header>
-
-        <div className="flex flex-wrap items-end gap-x-4 gap-y-1">
-          <p className="font-[family-name:var(--font-display)] text-5xl font-extrabold">{usd(t.mcapUsd)}</p>
-          <p className={`pb-1.5 font-mono text-lg font-bold ${up ? "text-achat" : "text-vente"}`}>{pct(t.change.h24)} 24 h</p>
-        </div>
 
         {pair && (
           <ChartPanel

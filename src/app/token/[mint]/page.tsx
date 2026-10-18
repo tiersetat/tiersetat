@@ -23,6 +23,7 @@ import type { TradeRow } from "@/lib/candles";
 import { explorerUrl } from "@/lib/solana/config";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { solanaAddress } from "@/lib/validators";
+import { usd } from "@/lib/market-format";
 
 type TokenRow = {
   mint: string;
@@ -117,6 +118,23 @@ export default async function TokenPage({ params }: PageProps<"/token/[mint]">) 
             <span className="font-mono text-lg text-pervenche">${token.ticker}</span>
           </div>
           {token.description && <p className="max-w-2xl text-muted-foreground">{token.description}</p>}
+          {/* Les chiffres clés, à côté de l'image */}
+          <dl className="flex flex-wrap gap-1.5 text-xs">
+            {(
+              [
+                ["Capitalisation", sol ? usd(Number(token.market_cap_sol) * sol) : `${Number(token.market_cap_sol).toLocaleString("fr-FR", { maximumFractionDigits: 2 })} SOL`],
+                ["Prix", sol ? usd((Number(token.market_cap_sol) / TOTAL_SUPPLY) * sol) : "—"],
+                [token.migrated ? "Statut" : "Courbe", token.migrated ? "Migré" : `${Math.round(Number(token.curve_progress))} %`],
+                ["Traders", traders.length.toLocaleString("fr-FR")],
+                ["Échanges", (trades ?? []).length.toLocaleString("fr-FR")],
+              ] as [string, string][]
+            ).map(([k, v]) => (
+              <div key={k} className="flex gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1">
+                <dt className="text-muted-foreground">{k}</dt>
+                <dd className="font-mono font-bold">{v}</dd>
+              </div>
+            ))}
+          </dl>
           <div className="flex flex-wrap gap-2 pt-1 text-xs">
             <a href={explorerUrl("address", token.mint)} target="_blank" rel="noreferrer" className="chip font-mono">
               {token.mint.slice(0, 4)}…{token.mint.slice(-4)} ↗
