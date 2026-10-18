@@ -59,6 +59,11 @@ export default async function ProfilePage({ params }: PageProps<"/profil/[wallet
   const profile: Profile = profileRes.data ?? { wallet, pseudo: null, avatar_url: null, bio: null };
   const [trust, founders, wins] = await Promise.all([getCreatorTrust(wallet).catch(() => null), getFounders().catch(() => null), winsByCreator().catch(() => new Map<string, number>())]);
   const weeklyWins = wins.get(wallet) ?? 0;
+  // Défis gagnés : participations de ce wallet choisies comme gagnantes (0 tant que la table n'existe pas)
+  const myEntries = ((await db.from("defi_entries").select("id").eq("author_wallet", wallet).limit(500)).data ?? []).map((e) => e.id as number);
+  const defiWins = myEntries.length
+    ? ((await db.from("defis").select("id", { count: "exact", head: true }).eq("status", "closed").in("winner_entry_id", myEntries)).count ?? 0)
+    : 0;
   const founderN = founders?.byWallet.get(wallet) ?? null;
   const tokens = (tokensRes.data ?? []) as CreatedToken[];
   const trades = (tradesRes.data ?? []) as unknown as TradeWithToken[];
@@ -100,6 +105,14 @@ export default async function ProfilePage({ params }: PageProps<"/profil/[wallet
               </svg>
               Mème de la semaine{weeklyWins > 1 ? ` ×${weeklyWins}` : ""}
             </Link>
+          )}
+          {defiWins > 0 && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-1 text-sm font-bold">
+              <svg viewBox="0 0 24 24" className="size-4 text-achat" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8-4.3-4.1 5.9-.9z" />
+              </svg>
+              Gagnant de défi{defiWins > 1 ? ` ×${defiWins}` : ""}
+            </span>
           )}
           {profile.bio && <p className="max-w-2xl text-muted-foreground">{profile.bio}</p>}
           {trust && trust.niveau !== "nouveau" && (

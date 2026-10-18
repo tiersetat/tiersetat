@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CommunityChat } from "@/components/community/CommunityChat";
+import { DefisPanel } from "@/components/community/DefisPanel";
 import { supabasePublic } from "@/lib/supabase/public";
 import { solanaAddress } from "@/lib/validators";
 
@@ -38,6 +39,7 @@ export default async function CommunautePage({ params }: PageProps<"/communaute/
           Le mème
         </Link>
       </header>
+      <DefisPanel mint={token.mint} ticker={token.ticker} creator={token.creator_wallet} />
       <CommunityChat mint={token.mint} ticker={token.ticker} creator={token.creator_wallet} />
     </div>
   );

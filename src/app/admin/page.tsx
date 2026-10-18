@@ -12,6 +12,7 @@ import { getWaitlistCount } from "@/lib/waitlist";
 import { WeeklyPost } from "@/components/admin/WeeklyPost";
 import { SnapshotPanel } from "@/components/admin/SnapshotPanel";
 import { getWeek } from "@/lib/weekly-data";
+import { DefisAdminPanel, type PendingDefi } from "@/components/admin/DefisAdminPanel";
 
 export const metadata: Metadata = { title: "Administration — Tiers-État" };
 
@@ -45,6 +46,8 @@ export default async function AdminPage() {
   const weeklyPost = lastWeek?.winner
     ? `Le Mème de la semaine sur Tiers-État : ${lastWeek.winner.name} ($${lastWeek.winner.ticker}).\n\n${lastWeek.winner.holders} détenteurs, ${lastWeek.winner.marketCapSol.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} SOL de capitalisation.\n\nUne nouvelle semaine commence.\ntiersetat.vercel.app/semaine`
     : null;
+  // Table « defis » absente tant que la migration n'a pas été lancée : liste vide
+  const { data: pendingDefis } = await db.from("defis").select("id, mint, title, rules, ends_at, created_at, tokens(ticker)").eq("status", "pending").order("created_at").limit(50);
   const [{ data: reports }, { data: hidden }, { data: words }, { data: allTokens }] = await Promise.all([
     db
       .from("reports")
@@ -79,6 +82,7 @@ export default async function AdminPage() {
           words={(words ?? []).map((w) => w.word as string)}
         />
         <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <DefisAdminPanel defis={(pendingDefis ?? []) as unknown as PendingDefi[]} />
           <WeeklyPost text={weeklyPost} />
           <SnapshotPanel />
           <section className="surface space-y-3 p-5">
