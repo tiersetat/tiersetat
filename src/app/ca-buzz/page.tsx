@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BuzzImage } from "@/components/buzz/BuzzImage";
 import { HEAT_STYLE, TrendList } from "@/components/buzz/TrendList";
-import { getBuzz } from "@/lib/buzz";
+import { COUNTRIES, getBuzz, isCountry, ofCountry, type Country } from "@/lib/buzz";
 import { timeAgo, trendLaunchHref } from "@/lib/buzz-links";
 import { computeTrends, itemHeat, keywords, type Trend } from "@/lib/buzz-trends";
 
@@ -13,8 +13,10 @@ const HEAT_RANK = { brulant: 0, chaud: 1, tiede: 2 } as const;
 const heatRank = (t: Trend | null) => (t ? HEAT_RANK[t.heat] : 3);
 
 export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">) {
-  const { source, sujet, tri, categorie } = await searchParams;
-  const { items, failed } = await getBuzz();
+  const { source, sujet, tri, categorie, pays } = await searchParams;
+  const country: Country = isCountry(pays) ? pays : "fr";
+  const { items: all, failed } = await getBuzz();
+  const items = ofCountry(all, country);
   const trends = computeTrends(items, 16);
   const sources = [...new Set(items.map((i) => i.source))];
 
@@ -38,7 +40,7 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
 
   const query = (patch: Record<string, string | null>) => {
     const params = new URLSearchParams();
-    const next = { source: activeSource, sujet: activeTrend?.key ?? null, tri: byHeat ? null : "recent", categorie: cryptoOnly ? "crypto" : funOnly ? "divertissement" : null, ...patch };
+    const next = { source: activeSource, sujet: activeTrend?.key ?? null, tri: byHeat ? null : "recent", categorie: cryptoOnly ? "crypto" : funOnly ? "divertissement" : null, pays: country === "fr" ? null : country, ...patch };
     for (const [k, v] of Object.entries(next)) if (v) params.set(k, v);
     const qs = params.toString();
     return qs ? `/ca-buzz?${qs}` : "/ca-buzz";
@@ -72,6 +74,16 @@ export default async function CaBuzzPage({ searchParams }: PageProps<"/ca-buzz">
           </Link>
         </section>
       )}
+
+      {/* Pays : la France, puis la francophonie européenne (en test) */}
+      <nav className="flex flex-wrap items-center gap-2" aria-label="Choisir le pays">
+        {(Object.keys(COUNTRIES) as Country[]).map((c) => (
+          <Link key={c} href={query({ pays: c === "fr" ? null : c, source: null, sujet: null })} className={`chip ${country === c ? "chip-active" : ""}`}>
+            {COUNTRIES[c]}
+          </Link>
+        ))}
+        {country !== "fr" && <span className="text-xs text-muted-foreground">Nouveau, en test</span>}
+      </nav>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav className="flex flex-wrap gap-2" aria-label="Filtrer par source">

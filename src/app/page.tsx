@@ -69,7 +69,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           <section className="dash-panel dash-hero relative overflow-hidden p-5 sm:p-6">
             <div aria-hidden className="pointer-events-none absolute -right-12 -top-12 size-48 rounded-full bg-[radial-gradient(closest-side,rgb(127_155_255/0.35),transparent)]" />
             <h1 className="relative font-[family-name:var(--font-display)] text-3xl leading-tight font-extrabold">
-              Crée. Trade. <span className="text-lueur-gradient">Gagne ensemble.</span>
+              Crée. Trade. <span className="text-lueur-gradient">Partage.</span>
             </h1>
             <p className="relative mt-2 max-w-md text-[15px] text-white/80">
               Le launchpad et l&apos;appli de trading du peuple : lance ton mème en une minute, trade toutes les cryptos et suis ce que tes amis achètent.
@@ -245,9 +245,9 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           )}
           {key === "bourse" && (
             <p className="px-1 text-xs text-muted-foreground">
-              Contrats perpétuels avec effet de levier, alimentés par
-              Hyperliquid : actions, indices, matières premières, devises et
-              pré-IPO. Très risqué : les pertes sont multipliées par le levier.
+              Cours en direct des actions, indices, matières premières, devises
+              et pré-IPO (contrats perpétuels Hyperliquid), pour information.
+              Tiers-État ne propose pas de trading à effet de levier.
             </p>
           )}
           {key === "cryptos" && (

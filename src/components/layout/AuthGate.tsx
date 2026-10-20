@@ -11,7 +11,7 @@ import { Starfield } from "./Starfield";
 import { PRIVY_APP_ID } from "@/components/providers/PrivyBridge";
 
 /** Pages lisibles sans compte (obligations légales). */
-const PUBLIC = ["/cgu", "/mentions-legales", "/indisponible"];
+const PUBLIC = ["/cgu", "/mentions-legales", "/indisponible", "/partenaires"];
 
 /**
  * L'appli n'est accessible qu'avec un compte : Google / e-mail (wallet créé automatiquement) ou un wallet Solana.

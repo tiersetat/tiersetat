@@ -67,4 +67,4 @@ export function isPlatformConfig(config: PublicKey): boolean {
 }
 
 /** Adresse publique du site (liens de partage, images Open Graph). */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://tiersetat.vercel.app").replace(/\/$/, "");
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://tiersetatfamily.xyz").replace(/\/$/, "");

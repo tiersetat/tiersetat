@@ -45,14 +45,14 @@ function Row({ icon, title, sub, onClick, href, badge }: { icon: string; title: 
 
 /** Carte bancaire / Apple Pay : passe par Privy (prestataire de paiement agréé). Actif sur le réseau principal. */
 function CardRow({ address }: { address: string }) {
-  if (!PRIVY_APP_ID) return <Row icon="💳" title="Carte de débit ou Apple Pay" sub="Achète des USDC ou des SOL en quelques secondes" badge="Bientôt" />;
+  if (!PRIVY_APP_ID) return <Row icon="💳" title="Carte de débit ou Apple Pay" sub="Bientôt, avec un partenaire agréé MiCA" badge="Bientôt" />;
   return <CardRowPrivy address={address} />;
 }
 function CardRowPrivy({ address }: { address: string }) {
   const { fundWallet } = useFundWallet();
   const [msg, setMsg] = useState<string | null>(null);
   const go = async () => {
-    if (DEVNET) return setMsg("Le paiement par carte s'active au lancement, sur le réseau principal.");
+    if (DEVNET) return setMsg("Le paiement par carte arrivera avec un partenaire agréé MiCA, au lancement de l'argent réel.");
     try {
       await fundWallet({ address });
     } catch {
@@ -61,7 +61,7 @@ function CardRowPrivy({ address }: { address: string }) {
   };
   return (
     <>
-      <Row icon="💳" title="Carte de débit ou Apple Pay" sub="Achète des USDC ou des SOL en quelques secondes" badge={DEVNET ? "Bientôt" : undefined} onClick={go} />
+      <Row icon="💳" title="Carte de débit ou Apple Pay" sub={DEVNET ? "Bientôt, avec un partenaire agréé MiCA" : "Achète des USDC ou des SOL en quelques secondes"} badge={DEVNET ? "Bientôt" : undefined} onClick={go} />
       {msg && <p className="px-3 text-sm text-muted-foreground">{msg}</p>}
     </>
   );

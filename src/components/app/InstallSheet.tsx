@@ -84,7 +84,7 @@ export function InstallSheet() {
     }
     setOpen(false);
   };
-  const url = typeof window !== "undefined" ? window.location.href : "https://tiersetat.vercel.app";
+  const url = typeof window !== "undefined" ? window.location.href : "https://tiersetatfamily.xyz";
 
   return (
     <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]" onClick={close}>

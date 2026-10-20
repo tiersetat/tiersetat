@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AutoScroller } from "@/components/buzz/AutoScroller";
 import { BuzzImage } from "@/components/buzz/BuzzImage";
 import { HEAT_STYLE } from "@/components/buzz/TrendList";
-import { getBuzz } from "@/lib/buzz";
+import { getBuzz, ofCountry } from "@/lib/buzz";
 import { timeAgo } from "@/lib/buzz-links";
 import { computeTrends, itemHeat, keywords } from "@/lib/buzz-trends";
 
@@ -10,7 +10,7 @@ const HEAT_RANK = { brulant: 0, chaud: 1, tiede: 2 } as const;
 
 /** Accueil, « À la une » : le sujet le plus chaud du moment et les actus chaudes, en cartes qui défilent. */
 export async function HomeBuzz() {
-  const items = await getBuzz().then((b) => b.items, () => []);
+  const items = await getBuzz().then((b) => ofCountry(b.items, "fr"), () => []);
   const trends = computeTrends(items, 16);
   const top = trends[0];
   if (!top) return null;

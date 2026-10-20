@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { hyperliquidMarket } from "@/lib/hyperliquid";
 import { pct, usd } from "@/lib/market-format";
 import { PerpPanel } from "@/components/market/PerpPanel";
+import { LEVERAGE_ENABLED } from "@/lib/features";
 import { WatchStar } from "@/components/market/WatchStar";
 import { TokenLogo } from "@/components/market/TokenLogo";
 import { ChartPanel } from "@/components/market/ChartPanel";
@@ -56,14 +57,23 @@ export default async function BoursePage({ params }: PageProps<"/bourse/[id]">) 
           ))}
         </dl>
         <p className="text-xs text-muted-foreground">
-          Contrat perpétuel sur Hyperliquid : tu ne possèdes pas l&apos;action, tu prends une position sur son prix. Avec l&apos;effet de levier (plafonné à ×5 pour les particuliers), les gains et les pertes sont multipliés, et ta position peut être liquidée.{" "}
+          {LEVERAGE_ENABLED
+            ? "Contrat perpétuel sur Hyperliquid : tu ne possèdes pas l'action, tu prends une position sur son prix. Avec l'effet de levier (plafonné à ×5 pour les particuliers), les gains et les pertes sont multipliés, et ta position peut être liquidée. "
+            : "Cours d'un contrat perpétuel Hyperliquid, affiché pour information. Tiers-État ne propose pas de trading à effet de levier. "}
           <Link href="/?tri=bourse" className="font-bold text-electrique">
             Tous les marchés →
           </Link>
         </p>
       </div>
       <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-        <PerpPanel symbol={m.symbol} maxLeverage={m.maxLeverage} />
+        {LEVERAGE_ENABLED ? (
+          <PerpPanel symbol={m.symbol} maxLeverage={m.maxLeverage} />
+        ) : (
+          <div className="surface space-y-2 p-5 text-sm">
+            <p className="font-extrabold">Pour information</p>
+            <p className="text-muted-foreground">Ces cours sont affichés pour suivre les marchés. Tiers-État ne propose pas d&apos;acheter ces produits ni de trader avec effet de levier.</p>
+          </div>
+        )}
         <div className="space-y-2 xl:hidden">
           <h2 className="px-1 text-lg font-extrabold">Ce que le monde achète</h2>
           <LiveActivity limit={6} />

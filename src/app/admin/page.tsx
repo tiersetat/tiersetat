@@ -44,7 +44,7 @@ export default async function AdminPage() {
   const lastWeek = await getWeek(1).catch(() => null);
   // Annonce sans emoji, factuelle, < 280 caractères (le lien compte pour 23)
   const weeklyPost = lastWeek?.winner
-    ? `Le Mème de la semaine sur Tiers-État : ${lastWeek.winner.name} ($${lastWeek.winner.ticker}).\n\n${lastWeek.winner.holders} détenteurs, ${lastWeek.winner.marketCapSol.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} SOL de capitalisation.\n\nUne nouvelle semaine commence.\ntiersetat.vercel.app/semaine`
+    ? `Le Mème de la semaine sur Tiers-État : ${lastWeek.winner.name} ($${lastWeek.winner.ticker}).\n\n${lastWeek.winner.holders} détenteurs, ${lastWeek.winner.marketCapSol.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} SOL de capitalisation.\n\nUne nouvelle semaine commence.\ntiersetatfamily.xyz/semaine`
     : null;
   // Table « defis » absente tant que la migration n'a pas été lancée : liste vide
   const { data: pendingDefis } = await db.from("defis").select("id, mint, title, rules, ends_at, created_at, tokens(ticker)").eq("status", "pending").order("created_at").limit(50);

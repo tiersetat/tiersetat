@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FeedView } from "@/components/social/FeedView";
 import { LiveActivity } from "@/components/social/LiveActivity";
-import { PnlLeaderboard } from "@/components/rank/PnlLeaderboard";
-import { topTradersByPnl } from "@/lib/pnl-leaderboard";
+import { ActivityLeaderboard } from "@/components/rank/ActivityLeaderboard";
+import { topTraders } from "@/lib/leaderboards";
 import { CommunityList } from "@/components/community/CommunityList";
 import { listCommunities } from "@/lib/community-data";
 
@@ -16,11 +16,11 @@ const VUES = [
   { key: "theses", label: "Thèses" },
 ] as const;
 
-/** Social : qui achète (Mondial / Amis), les communautés des mèmes, le classement des traders par gains, et les thèses. */
+/** Social : qui achète (Mondial / Amis), les communautés des mèmes, le classement des membres par activité, et les thèses. */
 export default async function SocialPage({ searchParams }: PageProps<"/fil">) {
   const raw = (await searchParams).vue;
   const vue = VUES.find((v) => v.key === raw)?.key ?? "fil";
-  const rows = vue === "classement" ? await topTradersByPnl(50).catch(() => []) : [];
+  const rows = vue === "classement" ? await topTraders().catch(() => []) : [];
   const communities = vue === "communautes" ? await listCommunities().catch(() => []) : [];
   return (
     <div className="mx-auto max-w-2xl space-y-5">
@@ -39,8 +39,15 @@ export default async function SocialPage({ searchParams }: PageProps<"/fil">) {
       </nav>
       {vue === "fil" && <LiveActivity limit={40} />}
       {vue === "communautes" && <CommunityList items={communities} />}
-      {vue === "classement" && <PnlLeaderboard rows={rows} />}
-      {vue === "theses" && <FeedView initial={[]} defaultType="theses" />}
+      {vue === "classement" && <ActivityLeaderboard rows={rows} />}
+      {vue === "theses" && (
+        <>
+          <p className="rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-xs text-muted-foreground">
+            Les thèses sont les opinions personnelles des membres, pas des conseils en investissement ni des recommandations de Tiers-État. Les memecoins sont très risqués.
+          </p>
+          <FeedView initial={[]} defaultType="theses" />
+        </>
+      )}
     </div>
   );
 }

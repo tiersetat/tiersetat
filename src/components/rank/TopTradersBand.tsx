@@ -1,17 +1,16 @@
 import Link from "next/link";
 import { Avatar } from "@/components/social/Avatar";
 import { displayName } from "@/lib/display";
-import { usd } from "@/lib/market-format";
-import { topTradersByPnl } from "@/lib/pnl-leaderboard";
+import { topTraders } from "@/lib/leaderboards";
 
-/** Petite bande en haut de l'accueil : les traders qui gagnent le plus, et le mème qui les a fait gagner. */
+/** Petite bande de l'accueil : les membres les plus actifs de la semaine (par activité, jamais par gains). */
 export async function TopTradersBand() {
-  const rows = (await topTradersByPnl(12).catch(() => [])).filter((r) => r.pnlSol > 0);
+  const rows = (await topTraders().catch(() => [])).filter((r) => r.trades_count > 0).slice(0, 12);
   if (rows.length === 0) return null;
   return (
-    <section aria-label="Meilleurs traders" className="space-y-2">
+    <section aria-label="Membres les plus actifs" className="space-y-2">
       <div className="flex items-baseline justify-between">
-        <h2 className="text-sm font-bold text-muted-foreground">🏆 Les plus gros gains</h2>
+        <h2 className="text-sm font-bold text-muted-foreground">Les plus actifs de la semaine</h2>
         <Link href="/fil?vue=classement" className="text-sm font-bold text-electrique">
           Classement →
         </Link>
@@ -24,13 +23,9 @@ export async function TopTradersBand() {
                 <Avatar wallet={r.wallet} pseudo={r.pseudo} url={r.avatar_url} size={22} />
                 <span className="truncate text-sm font-bold">{displayName(r)}</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2.5">
-                {r.best && (
-                  // eslint-disable-next-line @next/next/no-img-element -- images IPFS
-                  <img src={r.best.image_url} alt="" className="size-7 shrink-0 rounded-full bg-muted object-cover" />
-                )}
-                <span className="truncate font-mono text-[15px] font-bold text-achat">+{usd(r.pnlUsd)}</span>
-              </div>
+              <p className="px-3 py-2.5 font-mono text-[15px] font-bold text-muted-foreground">
+                {r.trades_count.toLocaleString("fr-FR")} échange{r.trades_count > 1 ? "s" : ""}
+              </p>
             </Link>
           </li>
         ))}

@@ -6,6 +6,8 @@ export type BuzzItem = {
   id: string;
   source: string;
   kind: "media" | "reddit" | "crypto" | "fun";
+  /** Pays de la source (l'onglet Actualités filtre par pays ; l'accueil n'affiche que la France). */
+  country: Country;
   title: string;
   excerpt: string;
   url: string;
@@ -14,7 +16,12 @@ export type BuzzItem = {
   publishedAt: string;
 };
 
-const SOURCES: { name: string; url: string; kind: BuzzItem["kind"] }[] = [
+/** Pays couverts par les actus : la France, puis la francophonie européenne (même langue, rien à traduire). */
+export const COUNTRIES = { fr: "France", be: "Belgique", lu: "Luxembourg" } as const;
+export type Country = keyof typeof COUNTRIES;
+export const isCountry = (v: unknown): v is Country => typeof v === "string" && v in COUNTRIES;
+
+const SOURCES: { name: string; url: string; kind: BuzzItem["kind"]; country?: Country }[] = [
   { name: "franceinfo", url: "https://www.francetvinfo.fr/titres.rss", kind: "media" },
   { name: "Le Monde", url: "https://www.lemonde.fr/rss/une.xml", kind: "media" },
   { name: "20 Minutes", url: "https://www.20minutes.fr/feeds/rss-une.xml", kind: "media" },
@@ -35,13 +42,21 @@ const SOURCES: { name: string; url: string; kind: BuzzItem["kind"] }[] = [
   { name: "Allociné", url: "https://www.allocine.fr/rss/news.xml", kind: "fun" },
   { name: "Serieously", url: "https://www.serieously.com/feed/", kind: "fun" },
   { name: "Dexerto", url: "https://www.dexerto.fr/feed/", kind: "fun" },
+  // Belgique (en test : visible dans l'onglet Actualités, pas encore à l'accueil)
+  { name: "RTBF", url: "https://rss.rtbf.be/article/rss/highlight_rtbf_info.xml", kind: "media", country: "be" },
+  { name: "Le Soir", url: "https://www.lesoir.be/rss2/2/cible_principale", kind: "media", country: "be" },
+  { name: "La Libre", url: "https://www.lalibre.be/arc/outboundfeeds/rss/?outputType=xml", kind: "media", country: "be" },
+  { name: "7sur7", url: "https://www.7sur7.be/rss.xml", kind: "media", country: "be" },
+  { name: "DH", url: "https://www.dhnet.be/arc/outboundfeeds/rss/?outputType=xml", kind: "media", country: "be" },
+  // Luxembourg
+  { name: "Le Quotidien", url: "https://lequotidien.lu/feed/", kind: "media", country: "lu" },
   // L'API JSON de Reddit refuse les serveurs ; le flux Atom public reste accessible.
   { name: "r/france", url: "https://www.reddit.com/r/france/hot/.rss", kind: "reddit" },
 ];
 
 const PER_SOURCE = 8;
 const TTL_MS = 10 * 60 * 1000;
-const UA = "Mozilla/5.0 (compatible; TiersEtatBot/1.0; +https://tiersetat.vercel.app)";
+const UA = "Mozilla/5.0 (compatible; TiersEtatBot/1.0; +https://tiersetatfamily.xyz)";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@", textNodeName: "#text" });
 
@@ -112,7 +127,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
 }
 
 /** Extrait les éléments d'un flux RSS 2.0 ou Atom (pur, testable). */
-export function parseFeed(xml: string, source: string, kind: BuzzItem["kind"]): BuzzItem[] {
+export function parseFeed(xml: string, source: string, kind: BuzzItem["kind"], country: Country = "fr"): BuzzItem[] {
   const doc = parser.parse(xml);
   const rssItems = asArray(doc?.rss?.channel?.item);
   const atomEntries = asArray(doc?.feed?.entry);
@@ -123,7 +138,7 @@ export function parseFeed(xml: string, source: string, kind: BuzzItem["kind"]): 
     const title = cleanText(it.title);
     if (!url || !title) continue;
     items.push({
-      id: url, source, kind, title, url,
+      id: url, source, kind, country, title, url,
       excerpt: cleanText(it.description).slice(0, 220),
       image: extractImage(it),
       publishedAt: safeDate(cleanText(it.pubDate)),
@@ -135,7 +150,7 @@ export function parseFeed(xml: string, source: string, kind: BuzzItem["kind"]): 
     const title = cleanText(e.title);
     if (!url || !title) continue;
     items.push({
-      id: url, source, kind, title, url,
+      id: url, source, kind, country, title, url,
       excerpt: "",
       image: extractImage(e),
       publishedAt: safeDate(cleanText(e.updated ?? e.published)),
@@ -151,7 +166,12 @@ function isNoise(item: BuzzItem) {
 
 let cache: { items: BuzzItem[]; at: number; failed: string[] } | null = null;
 
-/** Actus agrégées (cache 10 min). Une source en panne n'empêche pas l'affichage des autres. */
+/** Les actus d'un seul pays. */
+export function ofCountry(items: BuzzItem[], country: Country): BuzzItem[] {
+  return items.filter((i) => i.country === country);
+}
+
+/** Actus agrégées, tous pays confondus (cache 10 min). Une source en panne n'empêche pas l'affichage des autres. */
 export async function getBuzz(): Promise<{ items: BuzzItem[]; failed: string[]; updatedAt: string }> {
   if (cache && Date.now() - cache.at < TTL_MS) {
     return { items: cache.items, failed: cache.failed, updatedAt: new Date(cache.at).toISOString() };
@@ -162,7 +182,7 @@ export async function getBuzz(): Promise<{ items: BuzzItem[]; failed: string[]; 
       try {
         const res = await fetch(s.url, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(8000) });
         if (!res.ok) throw new Error(String(res.status));
-        const parsed = parseFeed(await res.text(), s.name, s.kind);
+        const parsed = parseFeed(await res.text(), s.name, s.kind, s.country ?? "fr");
         // Une page de blocage (anti-robots) répond parfois 200 sans aucun article
         if (parsed.length === 0) throw new Error("flux vide");
         return parsed

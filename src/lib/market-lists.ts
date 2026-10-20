@@ -7,6 +7,7 @@ import { solUsd } from "@/lib/feed";
 import { listTokens, type Tab, type TokenCard } from "@/lib/tokens";
 import { TOTAL_SUPPLY } from "@/lib/traders";
 import { CATS, type Key } from "@/lib/market-tabs";
+import { LEVERAGE_ENABLED } from "@/lib/features";
 
 function fromMeme(t: TokenCard, sol: number | null): MarketItem {
   const mcapUsd = sol === null ? null : Number(t.market_cap_sol) * sol;
@@ -36,7 +37,7 @@ export async function loadList(key: Key, chain: ChainId | null, cat: Category | 
     const all = await hyperliquidMarkets();
     return all
       .filter((m) => !cat || m.category === cat)
-      .map((m) => ({ address: m.id, name: m.name, symbol: m.symbol, imageUrl: m.imageUrl, emoji: m.emoji, priceUsd: m.priceUsd, mcapUsd: null, change24: m.change24, leverage: m.maxLeverage, href: `/bourse/${encodeURIComponent(m.id)}` }));
+      .map((m) => ({ address: m.id, name: m.name, symbol: m.symbol, imageUrl: m.imageUrl, emoji: m.emoji, priceUsd: m.priceUsd, mcapUsd: null, change24: m.change24, leverage: LEVERAGE_ENABLED ? m.maxLeverage : undefined, href: `/bourse/${encodeURIComponent(m.id)}` }));
   }
   if (key === "cryptos") return topCryptos();
   if (key === "dexpaye") {

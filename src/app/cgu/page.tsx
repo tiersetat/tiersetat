@@ -119,6 +119,17 @@ const SECTIONS: { titre: string; contenu: React.ReactNode }[] = [
     ),
   },
   {
+    titre: "Réclamations",
+    contenu: (
+      <p>
+        Une question ou un problème ? Écris-nous à <Todo>adresse e-mail de réclamation</Todo> en décrivant ta demande (et, si besoin, l&apos;adresse
+        du token ou la transaction concernée). Nous accusons réception sous <Todo>délai</Todo> et répondons sous <Todo>délai</Todo>. Les
+        réclamations sont traitées gratuitement, de façon équitable, et enregistrées. Si la réponse ne te satisfait pas, tu peux saisir
+        <Todo> médiateur compétent</Todo>.
+      </p>
+    ),
+  },
+  {
     titre: "Points, rangs, Fondateurs et invitations",
     contenu: (
       <p>

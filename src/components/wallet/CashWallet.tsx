@@ -338,7 +338,7 @@ function Send({ balances, onSent }: { balances: Balances; onSent: () => void }) 
         ok: true,
         text:
           mode === "email"
-            ? `${qty(value, 6)} ${asset} envoyés à ${email}. Préviens cette personne : elle les retrouve en se connectant sur tiersetat.vercel.app avec cet e-mail.`
+            ? `${qty(value, 6)} ${asset} envoyés à ${email}. Préviens cette personne : elle les retrouve en se connectant sur tiersetatfamily.xyz avec cet e-mail.`
             : `${qty(value, 6)} ${asset} envoyés.`,
         sig,
       });
