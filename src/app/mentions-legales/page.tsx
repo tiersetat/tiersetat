@@ -38,7 +38,7 @@ export default function MentionsLegalesPage() {
 
       <section className="space-y-2">
         <h2 className="text-lg font-semibold">Données personnelles</h2>
-        <p>[PLACEHOLDER] Responsable de traitement, finalités, droits RGPD, contact DPO.</p>
+        <p>Voir la <a href="/confidentialite" className="underline underline-offset-2">politique de confidentialité</a>.</p>
       </section>
     </article>
   );

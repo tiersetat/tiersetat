@@ -33,6 +33,9 @@ export function Footer() {
           <Link href="/mentions-legales" className="hover:text-foreground">
             Mentions légales
           </Link>
+          <Link href="/confidentialite" className="hover:text-foreground">
+            Confidentialité
+          </Link>
         </div>
       </div>
     </footer>

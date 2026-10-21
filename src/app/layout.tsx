@@ -5,6 +5,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WalletProviders } from "@/components/providers/WalletProviders";
 import { SITE_URL } from "@/lib/solana/config";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { InviteCapture } from "@/components/invite/InviteCapture";
 import { BottomTabBar } from "@/components/layout/BottomTabBar";
@@ -85,6 +87,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <LiveTrades />
           </AuthGate>
         </WalletProviders>
+        {/* Vitesse réelle des pages et fréquentation, sans cookies (Vercel) */}
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

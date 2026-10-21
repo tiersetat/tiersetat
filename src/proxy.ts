@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isGeoBlocked, parseExtra } from "@/lib/geo";
 
 /** Pages toujours accessibles, même depuis un pays bloqué (informations légales). */
-const ALWAYS_OPEN = ["/indisponible", "/cgu", "/mentions-legales"];
+const ALWAYS_OPEN = ["/indisponible", "/cgu", "/mentions-legales", "/confidentialite", "/api/sante"];
 
 /** Filtrage par pays (en-têtes de géolocalisation fournis par Vercel). */
 export function proxy(request: NextRequest) {
