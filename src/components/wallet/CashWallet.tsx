@@ -131,7 +131,7 @@ export function CashWallet() {
         <div className="relative flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-white/80">
-              Cash{demo && <span className="ml-2 rounded-full bg-black/25 px-2 py-0.5 text-[11px] font-bold text-white/75">Démo · solde fictif</span>}
+              Cash
             </p>
             <p className="mt-1 font-[family-name:var(--font-display)] text-5xl font-extrabold tracking-tight sm:text-6xl">
               {shown === null ? "…" : total === null ? "—" : money(total, display)}

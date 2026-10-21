@@ -45,7 +45,7 @@ export function CashBar() {
               ? "…"
               : cash.toLocaleString("en-US", { style: "currency", currency: "USD" })}
         </p>
-        <p className="mt-1.5 text-sm text-muted-foreground">liquidités{demo && <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-bold text-white/70">Démo · fictif</span>}</p>
+        <p className="mt-1.5 text-sm text-muted-foreground">liquidités</p>
       </div>
       <Link href="/portefeuille" className="btn-primary min-h-11 px-6">
         Déposer
