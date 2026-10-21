@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabasePublic } from "@/lib/supabase/public";
-import { RPC_URL } from "@/lib/solana/config";
+import { SERVER_RPC_URL } from "@/lib/solana/server-rpc";
 
 export const dynamic = "force-dynamic";
 
@@ -26,8 +26,10 @@ export async function GET() {
       if (error) throw error;
     }),
     timed(async () => {
-      const res = await fetch(RPC_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getHealth" }) });
+      const res = await fetch(SERVER_RPC_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getSlot" }) });
       if (!res.ok) throw new Error(String(res.status));
+      const j = (await res.json()) as { result?: number };
+      if (typeof j.result !== "number") throw new Error("réponse invalide");
     }),
   ]);
   const ok = base !== null && blockchain !== null;
